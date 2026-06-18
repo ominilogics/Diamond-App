@@ -1,0 +1,23 @@
+class AppAssets {
+  AppAssets._(); // Private constructor to prevent instantiation
+
+  // ---------------------------------------------------------------------------
+  // Pictures
+  // ---------------------------------------------------------------------------
+  static const String _picturesPath = 'assets/pictures';
+  
+  static const String gatta = '$_picturesPath/gatta.svg';
+
+  // ---------------------------------------------------------------------------
+  // Icons
+  // ---------------------------------------------------------------------------
+  static const String _iconsPath = 'assets/icons';
+
+  static const String backArrow = '$_iconsPath/back_arrow.svg';
+  static const String cards = '$_iconsPath/cards.svg';
+  static const String favourite = '$_iconsPath/favourite.svg';
+  static const String home = '$_iconsPath/home.svg';
+  static const String notification = '$_iconsPath/notification.svg';
+  static const String search = '$_iconsPath/search.svg';
+  static const String settings = '$_iconsPath/settings.svg';
+}

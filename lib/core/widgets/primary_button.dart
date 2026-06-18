@@ -1,0 +1,53 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../theme/app_colors.dart';
+import '../theme/app_text_styles.dart';
+
+class PrimaryButton extends StatelessWidget {
+  final String text;
+  final VoidCallback onPressed;
+  final bool isLoading;
+
+  const PrimaryButton({
+    super.key,
+    required this.text,
+    required this.onPressed,
+    this.isLoading = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: 44.h,
+      decoration: BoxDecoration(
+        gradient: AppColors.primaryButtonGradient,
+        borderRadius: BorderRadius.circular(20.r),
+      ),
+      child: Material(
+        color: Colors.transparent, // Ensures the gradient shows through
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20.r),
+          onTap: isLoading ? null : onPressed,
+          child: Center(
+            child: isLoading
+                ? SizedBox(
+                    width: 24.w,
+                    height: 24.w,
+                    child: const CircularProgressIndicator(
+                      color: Colors.black, // Matching the default text color
+                      strokeWidth: 2.0,
+                    ),
+                  )
+                : Text(
+                    text,
+                    style: AppTextStyles.colitez400Italic22(),
+                    textAlign: TextAlign.center,
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+}
