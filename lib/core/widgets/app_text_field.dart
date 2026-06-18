@@ -8,6 +8,7 @@ class AppTextField extends StatelessWidget {
   final bool obscureText;
   final TextInputType? keyboardType;
   final Widget? suffixIcon;
+  final Widget? prefixIcon;
   final String? Function(String?)? validator;
 
   const AppTextField({
@@ -17,6 +18,7 @@ class AppTextField extends StatelessWidget {
     this.obscureText = false,
     this.keyboardType,
     this.suffixIcon,
+    this.prefixIcon,
     this.validator,
   });
 
@@ -55,10 +57,16 @@ class AppTextField extends StatelessWidget {
                 textAlignVertical: TextAlignVertical.center,
                 decoration: InputDecoration(
                   hintText: hintText,
-                  hintStyle: AppTextStyles.roboto300Light12(),
+                  hintStyle: AppTextStyles.roboto300Light12(color: Colors.black87),
                   border: InputBorder.none,
                   isDense: true,
                   contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
+                  prefixIcon: prefixIcon,
+                  prefixIconConstraints: BoxConstraints(
+                    minWidth: 40.w,
+                    minHeight: 20.h,
+                    maxHeight: 44.h,
+                  ),
                   suffixIcon: suffixIcon,
                   suffixIconConstraints: BoxConstraints(
                     minWidth: 40.w,

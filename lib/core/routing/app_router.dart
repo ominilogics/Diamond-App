@@ -2,13 +2,14 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/sign_up_screen.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
+import '../../features/main/presentation/screens/main_screen.dart';
 import 'app_routes.dart';
 
 class AppRouter {
   AppRouter._();
 
   static final router = GoRouter(
-    initialLocation: AppRoute.login.path,
+    initialLocation: AppRoute.main.path,
     routes: [
       GoRoute(
         name: AppRoute.login.name,
@@ -24,6 +25,11 @@ class AppRouter {
         name: AppRoute.forgotPassword.name,
         path: AppRoute.forgotPassword.path,
         builder: (context, state) => const ForgotPasswordScreen(),
+      ),
+      GoRoute(
+        name: AppRoute.main.name,
+        path: AppRoute.main.path,
+        builder: (context, state) => const MainScreen(),
       ),
     ],
   );

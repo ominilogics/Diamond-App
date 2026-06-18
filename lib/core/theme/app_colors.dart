@@ -37,6 +37,6 @@ class AppColors {
   static const Color card1 = Color(0xFFFFA7A7);
   static const Color card2 = Color(0xFFADA7FF);
   static const Color card3 = Color(0xFFA7CDFF);
-  static const Color card4 = Color(0xFFA7CDFF); // Same as card3 based on the prompt
+  static const Color card4 = Color(0xFFA7FFB5); // Light Green
   static const Color card5 = Color(0xFFFFDCA7);
 }
