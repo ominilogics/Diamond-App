@@ -16,7 +16,6 @@ class CategoriesSection extends StatelessWidget {
       'Birthday',
       'Thank You',
       'Anniversary',
-      'Best Wishes'
     ];
     
     final colors = [
@@ -24,7 +23,6 @@ class CategoriesSection extends StatelessWidget {
       AppColors.card2,
       AppColors.card3,
       AppColors.card4,
-      AppColors.card5,
     ];
 
     return Column(
@@ -51,12 +49,12 @@ class CategoriesSection extends StatelessWidget {
         ),
         SizedBox(height: 16.h),
         SizedBox(
-          height: 110.h, // Space for 72 circle + 10 gap + text
+          height: 102.h, // Precisely sized for 72 circle + 10 gap + text to remove extra vertical space
           child: ListView.separated(
             padding: EdgeInsets.symmetric(horizontal: 24.w),
             scrollDirection: Axis.horizontal,
             itemCount: titles.length,
-            separatorBuilder: (context, index) => SizedBox(width: 12.w),
+            separatorBuilder: (context, index) => SizedBox(width: 20.w),
             itemBuilder: (context, index) {
               return Column(
                 mainAxisSize: MainAxisSize.min,

@@ -31,7 +31,7 @@ class CustomBottomNavBar extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: 12.h),
+          padding: EdgeInsets.only(top: 4.h, bottom: 4.h),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -82,28 +82,40 @@ class _NavBarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SvgPicture.asset(
-            iconPath,
-            width: 24.w,
-            height: 24.h,
-            colorFilter: isSelected 
-                ? const ColorFilter.mode(Colors.black, BlendMode.srcIn)
-                : const ColorFilter.mode(Colors.black54, BlendMode.srcIn),
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          color: Colors.transparent, // Ensures the entire expanded space is tappable
+          padding: EdgeInsets.symmetric(vertical: 12.h),
+          child: AnimatedScale(
+            scale: isSelected ? 1.15 : 1.0,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOutBack,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SvgPicture.asset(
+                  iconPath,
+                  width: 24.w,
+                  height: 24.h,
+                  colorFilter: isSelected 
+                      ? const ColorFilter.mode(Colors.black, BlendMode.srcIn)
+                      : const ColorFilter.mode(Colors.black54, BlendMode.srcIn),
+                ),
+                SizedBox(height: 4.h),
+                AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 200),
+                  style: isSelected
+                      ? AppTextStyles.roboto400Regular12(color: Colors.black).copyWith(fontWeight: FontWeight.w600)
+                      : AppTextStyles.roboto400Regular12(color: Colors.black54),
+                  child: Text(label),
+                ),
+              ],
+            ),
           ),
-          SizedBox(height: 4.h),
-          Text(
-            label,
-            style: isSelected
-                ? AppTextStyles.roboto400Regular12(color: Colors.black)
-                : AppTextStyles.roboto400Regular12(color: Colors.black54),
-          ),
-        ],
+        ),
       ),
     );
   }

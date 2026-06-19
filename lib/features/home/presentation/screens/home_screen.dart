@@ -69,7 +69,7 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(height: 34.h),
+          SizedBox(height: 24.h),
 
           // 3. Search Bar
           const SearchBarWidget(),
@@ -77,7 +77,7 @@ class HomeScreen extends StatelessWidget {
 
           // 4. Categories Section
           const CategoriesSection(),
-          SizedBox(height: 10.h),
+          SizedBox(height: 24.h),
 
           // 5. Islamic Cards Section
           const IslamicCardsSection(),
@@ -91,41 +91,28 @@ class HomeScreen extends StatelessWidget {
               style: AppTextStyles.colitez400Italic24(),
             ),
           ),
-          SizedBox(height: 24.h),
+          SizedBox(height: 16.h),
 
           // Featured Cards Grid
-          Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const FeaturedCard(
-                    title: 'Eid Card 1',
-                    cardColor: AppColors.card1,
-                  ),
-                  SizedBox(width: 14.w),
-                  const FeaturedCard(
-                    title: 'Eid Card 1',
-                    cardColor: AppColors.card5,
-                  ),
-                ],
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24.w),
+            child: GridView(
+              padding: EdgeInsets.zero,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 14.w,
+                mainAxisSpacing: 14.h,
+                childAspectRatio: 171.w / 204.h,
               ),
-              SizedBox(height: 14.h),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const FeaturedCard(
-                    title: 'Eid Card 1',
-                    cardColor: AppColors.card3,
-                  ),
-                  SizedBox(width: 14.w),
-                  const FeaturedCard(
-                    title: 'Eid Card 1',
-                    cardColor: AppColors.card4,
-                  ),
-                ],
-              ),
-            ],
+              children: const [
+                FeaturedCard(title: 'Eid Card 1', cardColor: AppColors.card1),
+                FeaturedCard(title: 'Eid Card 1', cardColor: AppColors.card5),
+                FeaturedCard(title: 'Eid Card 1', cardColor: AppColors.card3),
+                FeaturedCard(title: 'Eid Card 1', cardColor: AppColors.card4),
+              ],
+            ),
           ),
           SizedBox(height: 40.h), // Bottom padding
         ],
