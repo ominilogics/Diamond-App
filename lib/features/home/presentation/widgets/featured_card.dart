@@ -31,10 +31,7 @@ class FeaturedCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFFFFFFFF),
           borderRadius: BorderRadius.circular(20.r),
-          border: Border.all(
-            color: const Color(0xFF000000),
-            width: 0.5.w,
-          ),
+          border: Border.all(color: const Color(0xFF000000), width: 0.5.w),
         ),
         child: Stack(
           children: [
@@ -47,16 +44,10 @@ class FeaturedCard extends StatelessWidget {
                     AppAssets.gatta,
                     width: 84.5.w,
                     height: 118.3.h,
-                    colorFilter: ColorFilter.mode(
-                      cardColor,
-                      BlendMode.srcIn,
-                    ),
+                    colorFilter: ColorFilter.mode(cardColor, BlendMode.srcIn),
                   ),
                   SizedBox(height: 18.h),
-                  Text(
-                    title,
-                    style: AppTextStyles.roboto400Regular14(),
-                  ),
+                  Text(title, style: AppTextStyles.roboto400Regular14()),
                   SizedBox(height: 16.h),
                 ],
               ),
@@ -71,7 +62,7 @@ class FeaturedCard extends StatelessWidget {
                   AppAssets.favourite,
                   width: 23.w,
                   height: 20.h,
-                  colorFilter: isFavorite 
+                  colorFilter: isFavorite
                       ? const ColorFilter.mode(Colors.red, BlendMode.srcIn)
                       : null,
                 ),

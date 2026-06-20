@@ -192,6 +192,10 @@ class AppTextStyles {
     );
   }
 
+
+
+
+
   static TextStyle colitez400Italic13({
     Color? color,
     double? fontSize,
@@ -338,6 +342,7 @@ class AppTextStyles {
       leadingDistribution: leadingDistribution ?? TextLeadingDistribution.even,
     );
   }
+
   static TextStyle roboto300Light14({
     Color? color,
     double? fontSize,
@@ -350,6 +355,27 @@ class AppTextStyles {
     return TextStyle(
       fontFamily: 'Roboto',
       fontWeight: fontWeight ?? FontWeight.w300,
+      fontStyle: fontStyle ?? FontStyle.normal,
+      fontSize: fontSize ?? 14.0,
+      height: height ?? 1.0,
+      letterSpacing: letterSpacing ?? (14.0 * -0.03),
+      color: color ?? Colors.black,
+      leadingDistribution: leadingDistribution ?? TextLeadingDistribution.even,
+    );
+  }
+
+  static TextStyle roboto500Medium14({
+    Color? color,
+    double? fontSize,
+    FontWeight? fontWeight,
+    FontStyle? fontStyle,
+    double? height,
+    double? letterSpacing,
+    TextLeadingDistribution? leadingDistribution,
+  }) {
+    return TextStyle(
+      fontFamily: 'Roboto',
+      fontWeight: fontWeight ?? FontWeight.w500,
       fontStyle: fontStyle ?? FontStyle.normal,
       fontSize: fontSize ?? 14.0,
       height: height ?? 1.0,

@@ -3,6 +3,8 @@ import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/sign_up_screen.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/main/presentation/screens/main_screen.dart';
+import '../../features/notifications/presentation/screens/notifications_screen.dart';
+import '../../features/cards/presentation/screens/cards_screen.dart';
 import 'app_routes.dart';
 
 class AppRouter {
@@ -30,6 +32,19 @@ class AppRouter {
         name: AppRoute.main.name,
         path: AppRoute.main.path,
         builder: (context, state) => const MainScreen(),
+      ),
+      GoRoute(
+        name: AppRoute.notifications.name,
+        path: AppRoute.notifications.path,
+        builder: (context, state) => const NotificationsScreen(),
+      ),
+      GoRoute(
+        name: AppRoute.cards.name,
+        path: AppRoute.cards.path,
+        builder: (context, state) {
+          final title = state.extra as String?;
+          return CardsScreen(title: title, showBackButton: true);
+        },
       ),
     ],
   );

@@ -57,7 +57,9 @@ class AppTextField extends StatelessWidget {
                 textAlignVertical: TextAlignVertical.center,
                 decoration: InputDecoration(
                   hintText: hintText,
-                  hintStyle: AppTextStyles.roboto300Light12(color: Colors.black87),
+                  hintStyle: AppTextStyles.roboto300Light12(
+                    color: Colors.black87,
+                  ),
                   border: InputBorder.none,
                   isDense: true,
                   contentPadding: EdgeInsets.symmetric(horizontal: 16.w),

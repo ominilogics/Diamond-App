@@ -2,6 +2,9 @@ import 'package:daimond/core/routing/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:daimond/l10n/app_localizations.dart';
 
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/app_validators.dart';
@@ -9,68 +12,59 @@ import '../../../../core/widgets/app_labelled_text_field.dart';
 import '../../../../core/widgets/gradient_scaffold.dart';
 import '../../../../core/widgets/primary_button.dart';
 
-class ForgotPasswordScreen extends StatefulWidget {
+class ForgotPasswordScreen extends HookConsumerWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final formKey = useMemoized(() => GlobalKey<FormState>());
+    final emailController = useTextEditingController();
+    final texts = AppLocalizations.of(context)!;
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    super.dispose();
-  }
-
-  void _onSendPressed() {
-    if (_formKey.currentState!.validate()) {
-      // Proceed with password reset
+    void onSendPressed() {
+      if (formKey.currentState!.validate()) {
+        // Proceed with password reset
+      }
     }
-  }
 
-  @override
-  Widget build(BuildContext context) {
     return GradientScaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24.w),
-          child: Form(
-            key: _formKey,
-            child: Column(
+      body: CustomScrollView(
+        slivers: [
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              child: Form(
+                key: formKey,
+                child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 72.h),
+                SizedBox(height: 36.h),
                 Text(
-                  'Forgot Password?',
+                  texts.forgotPasswordTitle,
                   style: AppTextStyles.colitez400Italic32(),
                 ),
                 SizedBox(height: 9.h),
                 Text(
-                  'No worries. Enter your email and we\'ll send you a link to\nreset your password.',
+                  texts.forgotPasswordSubtitle,
                   style: AppTextStyles.roboto300Light13(),
                 ),
                 SizedBox(height: 29.h),
-                
+
                 AppLabelledTextField(
-                  label: 'Email', 
-                  hintText: 'Enter your email here.',
+                  label: texts.emailLabel,
+                  hintText: texts.emailHint,
                   keyboardType: TextInputType.emailAddress,
-                  controller: _emailController,
+                  controller: emailController,
                   validator: AppValidators.validateEmail,
                 ),
-                
+
                 SizedBox(height: 35.h),
+
+                PrimaryButton(text: texts.sendButton, onPressed: onSendPressed),
                 
-                PrimaryButton(
-                  text: 'Send',
-                  onPressed: _onSendPressed,
-                ),
-                SizedBox(height: 16.h),
-                
+                SizedBox(height: 24.h),
+
                 Center(
                   child: GestureDetector(
                     onTap: () {
@@ -78,11 +72,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     },
                     child: RichText(
                       text: TextSpan(
-                        text: 'Remember your password? ',
+                        text: texts.rememberPassword,
                         style: AppTextStyles.roboto300Light13(),
                         children: [
                           TextSpan(
-                            text: 'Log In',
+                            text: texts.logIn,
                             style: AppTextStyles.roboto400Regular13(),
                           ),
                         ],
@@ -95,6 +89,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ),
           ),
         ),
+          ),
+        ],
       ),
     );
   }

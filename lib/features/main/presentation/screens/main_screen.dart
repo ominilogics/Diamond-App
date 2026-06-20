@@ -1,43 +1,37 @@
 import 'package:daimond/features/home/presentation/screens/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../core/widgets/gradient_scaffold.dart';
+import '../../../../features/cards/presentation/screens/cards_screen.dart';
+import '../../../../features/favorites/presentation/screens/favorites_screen.dart';
+import '../../../../features/settings/presentation/screens/settings_screen.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
-class MainScreen extends StatefulWidget {
+
+final bottomNavIndexProvider = StateProvider<int>((ref) => 0);
+
+class MainScreen extends HookConsumerWidget {
   const MainScreen({super.key});
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentIndex = ref.watch(bottomNavIndexProvider);
 
-class _MainScreenState extends State<MainScreen> {
-  int _currentIndex = 0;
+    final pages = [
+      const HomeScreen(),
+      const CardsScreen(),
+      const FavoritesScreen(),
+      const SettingsScreen(),
+    ];
 
-  // Render the Home Screen at index 0, and dummy screens for the rest
-  final List<Widget> _pages = const [
-    HomeScreen(),
-    Center(child: Text('Cards Screen')),
-    Center(child: Text('Favorite Screen')),
-    Center(child: Text('Settings Screen')),
-  ];
-
-  void _onTabTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return GradientScaffold(
       bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: _onTabTapped,
+        currentIndex: currentIndex,
+        onTap: (index) {
+          ref.read(bottomNavIndexProvider.notifier).state = index;
+        },
       ),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _pages,
-      ),
+      body: IndexedStack(index: currentIndex, children: pages),
     );
   }
 }

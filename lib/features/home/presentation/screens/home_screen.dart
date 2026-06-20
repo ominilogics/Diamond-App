@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:daimond/l10n/app_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../../../core/utils/app_assets.dart';
+import '../../../../core/widgets/app_bar1.dart';
 import '../widgets/search_bar_widget.dart';
 import '../widgets/categories_section.dart';
 import '../widgets/islamic_cards_section.dart';
@@ -15,6 +15,8 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final texts = AppLocalizations.of(context)!;
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -22,33 +24,7 @@ class HomeScreen extends StatelessWidget {
           SizedBox(height: 12.h),
 
           // 1. Top Bar
-          Padding(
-            padding: EdgeInsets.only(left: 24.w, right: 16.w),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Home', style: AppTextStyles.colitez400Italic20()),
-                GestureDetector(
-                  onTap: () {
-                    // TODO: Handle notification tap
-                  },
-                  behavior: HitTestBehavior.opaque,
-                  child: Padding(
-                    padding: EdgeInsets.all(8.w),
-                    child: SvgPicture.asset(
-                      AppAssets.notification,
-                      width: 25.w,
-                      height: 25.h,
-                      colorFilter: const ColorFilter.mode(
-                        Colors.black,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          AppBar1(title: texts.home),
           SizedBox(height: 24.h),
 
           // 2. Welcome Section
@@ -58,12 +34,12 @@ class HomeScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Welcome back!',
+                  texts.welcomeBack,
                   style: AppTextStyles.colitez400Italic32(),
                 ),
                 // SizedBox(height: 4.h),
                 Text(
-                  '   Someone\'s smile could start with a card from you today.',
+                  texts.welcomeSubtitle,
                   style: AppTextStyles.roboto300Light13(),
                 ),
               ],
@@ -73,21 +49,21 @@ class HomeScreen extends StatelessWidget {
 
           // 3. Search Bar
           const SearchBarWidget(),
-          SizedBox(height: 24.h),
+          SizedBox(height: 32.h),
 
           // 4. Categories Section
           const CategoriesSection(),
-          SizedBox(height: 24.h),
+          SizedBox(height: 32.h),
 
           // 5. Islamic Cards Section
           const IslamicCardsSection(),
-          SizedBox(height: 24.h),
+          SizedBox(height: 32.h),
 
           // 6. Featured Cards Section
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 24.w),
             child: Text(
-              'Featured Cards',
+              texts.featuredCards,
               style: AppTextStyles.colitez400Italic24(),
             ),
           ),
@@ -106,11 +82,11 @@ class HomeScreen extends StatelessWidget {
                 mainAxisSpacing: 14.h,
                 childAspectRatio: 171.w / 204.h,
               ),
-              children: const [
-                FeaturedCard(title: 'Eid Card 1', cardColor: AppColors.card1),
-                FeaturedCard(title: 'Eid Card 1', cardColor: AppColors.card5),
-                FeaturedCard(title: 'Eid Card 1', cardColor: AppColors.card3),
-                FeaturedCard(title: 'Eid Card 1', cardColor: AppColors.card4),
+              children: [
+                FeaturedCard(title: texts.eidCard1, cardColor: AppColors.card1),
+                FeaturedCard(title: texts.eidCard1, cardColor: AppColors.card5),
+                FeaturedCard(title: texts.eidCard1, cardColor: AppColors.card3),
+                FeaturedCard(title: texts.eidCard1, cardColor: AppColors.card4),
               ],
             ),
           ),

@@ -12,11 +12,7 @@ class AppColors {
   static const LinearGradient globalBackgroundGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [
-      gradientStart,
-      gradientMiddle,
-      gradientEnd,
-    ],
+    colors: [gradientStart, gradientMiddle, gradientEnd],
     stops: [0.0, 0.5, 1.0], // 0%, 50%, 100%
   );
   // Primary Button Colors
@@ -27,10 +23,7 @@ class AppColors {
   static const LinearGradient primaryButtonGradient = LinearGradient(
     begin: Alignment.centerRight,
     end: Alignment.centerLeft,
-    colors: [
-      primaryButtonGradientStart,
-      primaryButtonGradientEnd,
-    ],
+    colors: [primaryButtonGradientStart, primaryButtonGradientEnd],
   );
 
   // Card Colors
@@ -39,4 +32,7 @@ class AppColors {
   static const Color card3 = Color(0xFFA7CDFF);
   static const Color card4 = Color(0xFFA7FFB5); // Light Green
   static const Color card5 = Color(0xFFFFDCA7);
+  
+  // Text Colors
+  static const Color textSecondary = Color(0xFF525252);
 }

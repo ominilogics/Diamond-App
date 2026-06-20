@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/theme/app_text_styles.dart';
-import '../../../../core/utils/app_assets.dart';
 
 class CategoryCard extends StatelessWidget {
   final String title;
@@ -27,10 +25,7 @@ class CategoryCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(
-          color: const Color(0xFF000000),
-          width: 0.5.w,
-        ),
+        border: Border.all(color: const Color(0xFF000000), width: 0.5.w),
       ),
       child: Stack(
         children: [

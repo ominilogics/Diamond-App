@@ -25,7 +25,8 @@ class GradientScaffold extends StatelessWidget {
     // The Container fills the screen with the gradient
     Widget content = GestureDetector(
       onTap: AppHelpers.dismissKeyboard,
-      behavior: HitTestBehavior.opaque, // Ensures taps on empty space are registered
+      behavior:
+          HitTestBehavior.opaque, // Ensures taps on empty space are registered
       child: Container(
         width: double.infinity,
         height: double.infinity,

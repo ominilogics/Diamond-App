@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 
 import '../theme/app_text_styles.dart';
 import 'app_text_field.dart';
 
-class AppLabelledTextField extends StatefulWidget {
+class AppLabelledTextField extends HookWidget {
   final String label;
   final String? hintText;
   final TextEditingController? controller;
@@ -25,33 +26,21 @@ class AppLabelledTextField extends StatefulWidget {
   });
 
   @override
-  State<AppLabelledTextField> createState() => _AppLabelledTextFieldState();
-}
-
-class _AppLabelledTextFieldState extends State<AppLabelledTextField> {
-  late bool _obscureText;
-
-  @override
-  void initState() {
-    super.initState();
-    _obscureText = widget.isPassword;
-  }
-
-  @override
   Widget build(BuildContext context) {
-    Widget? actualSuffixIcon = widget.suffixIcon;
+    final obscureText = useState(isPassword);
+    Widget? actualSuffixIcon = suffixIcon;
 
-    if (widget.isPassword) {
+    if (isPassword) {
       actualSuffixIcon = GestureDetector(
         onTap: () {
-          setState(() {
-            _obscureText = !_obscureText;
-          });
+          obscureText.value = !obscureText.value;
         },
         child: Padding(
           padding: EdgeInsets.only(right: 16.w),
           child: Icon(
-            _obscureText ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+            obscureText.value
+                ? Icons.visibility_off_outlined
+                : Icons.visibility_outlined,
             color: Colors.black54,
             size: 20.sp,
           ),
@@ -63,18 +52,15 @@ class _AppLabelledTextFieldState extends State<AppLabelledTextField> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          widget.label,
-          style: AppTextStyles.colitez400Italic16(),
-        ),
+        Text(label, style: AppTextStyles.colitez400Italic16()),
         SizedBox(height: 8.h),
         AppTextField(
-          hintText: widget.hintText,
-          controller: widget.controller,
-          obscureText: _obscureText,
-          keyboardType: widget.keyboardType,
+          hintText: hintText,
+          controller: controller,
+          obscureText: obscureText.value,
+          keyboardType: keyboardType,
           suffixIcon: actualSuffixIcon,
-          validator: widget.validator,
+          validator: validator,
         ),
       ],
     );
