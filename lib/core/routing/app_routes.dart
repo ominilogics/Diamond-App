@@ -4,7 +4,9 @@ enum AppRoute {
   forgotPassword('/forgot-password'),
   main('/main'),
   notifications('/notifications'),
-  cards('/cards');
+  cards('/cards'),
+  testing('/testing'),
+  editProfile('/edit-profile');
 
   const AppRoute(this.path);
   final String path;

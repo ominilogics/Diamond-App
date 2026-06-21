@@ -10,6 +10,7 @@ class AppTextField extends StatelessWidget {
   final Widget? suffixIcon;
   final Widget? prefixIcon;
   final String? Function(String?)? validator;
+  final bool readOnly;
 
   const AppTextField({
     super.key,
@@ -20,6 +21,7 @@ class AppTextField extends StatelessWidget {
     this.suffixIcon,
     this.prefixIcon,
     this.validator,
+    this.readOnly = false,
   });
 
   @override
@@ -49,6 +51,7 @@ class AppTextField extends StatelessWidget {
               child: TextField(
                 controller: controller,
                 obscureText: obscureText,
+                readOnly: readOnly,
                 keyboardType: keyboardType,
                 style: AppTextStyles.roboto300Light12(color: Colors.black),
                 onChanged: (val) {
@@ -58,7 +61,7 @@ class AppTextField extends StatelessWidget {
                 decoration: InputDecoration(
                   hintText: hintText,
                   hintStyle: AppTextStyles.roboto300Light12(
-                    color: Colors.black87,
+                    color: const Color(0xFFA8A8A8),
                   ),
                   border: InputBorder.none,
                   isDense: true,

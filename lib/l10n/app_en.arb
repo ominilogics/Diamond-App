@@ -74,5 +74,14 @@
   "logout": "Logout",
   "profileInitial": "S",
   "profileName": "Samama Hussain",
-  "profileEmail": "samamahussain23@gmail.com"
+  "profileEmail": "samamahussain23@gmail.com",
+  "yes": "Yes",
+  "no": "No",
+  "logoutConfirmation": "Logout confirmation",
+  "loginFailedTitle": "Login Failed",
+  "loginFailedMessage": "We couldn't sign you in. Please check your details and try again.",
+  "editProfile": "Edit Profile",
+  "saveChanges": "Save Changes",
+  "loginPrompt": "Please login to access features!",
+  "loginAction": "Login"
 }

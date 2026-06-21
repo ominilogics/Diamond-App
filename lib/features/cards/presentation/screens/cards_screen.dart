@@ -20,7 +20,7 @@ class CardsScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final texts = AppLocalizations.of(context)!;
-    final screenTitle = title ?? texts.navCards;
+    final screenTitle = title?.replaceAll('\n', ' ') ?? texts.navCards;
 
     final selectedIndex = useState(0);
 

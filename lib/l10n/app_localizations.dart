@@ -543,6 +543,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'samamahussain23@gmail.com'**
   String get profileEmail;
+
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
+
+  /// No description provided for @no.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no;
+
+  /// No description provided for @logoutConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout confirmation'**
+  String get logoutConfirmation;
+
+  /// No description provided for @loginFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Login Failed'**
+  String get loginFailedTitle;
+
+  /// No description provided for @loginFailedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t sign you in. Please check your details and try again.'**
+  String get loginFailedMessage;
+
+  /// No description provided for @editProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get editProfile;
+
+  /// No description provided for @saveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Changes'**
+  String get saveChanges;
+
+  /// No description provided for @loginPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Please login to access features!'**
+  String get loginPrompt;
+
+  /// No description provided for @loginAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get loginAction;
 }
 
 class _AppLocalizationsDelegate

@@ -38,6 +38,8 @@ class AppBar2 extends StatelessWidget {
               title,
               style: AppTextStyles.colitez400Italic20(),
               textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
           SizedBox(

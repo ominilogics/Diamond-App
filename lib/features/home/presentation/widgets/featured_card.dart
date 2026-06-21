@@ -4,8 +4,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
+import '../../../../core/widgets/animated_like_button.dart';
 
-class FeaturedCard extends StatelessWidget {
+class FeaturedCard extends StatefulWidget {
   final String title;
   final Color cardColor;
   final bool isFavorite;
@@ -22,9 +23,39 @@ class FeaturedCard extends StatelessWidget {
   });
 
   @override
+  State<FeaturedCard> createState() => _FeaturedCardState();
+}
+
+class _FeaturedCardState extends State<FeaturedCard> {
+  late bool _isFavorite;
+
+  @override
+  void initState() {
+    super.initState();
+    _isFavorite = widget.isFavorite;
+  }
+
+  @override
+  void didUpdateWidget(FeaturedCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isFavorite != oldWidget.isFavorite) {
+      _isFavorite = widget.isFavorite;
+    }
+  }
+
+  void _handleFavoriteToggle() {
+    setState(() {
+      _isFavorite = !_isFavorite;
+    });
+    if (widget.onFavoriteToggle != null) {
+      widget.onFavoriteToggle!();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: widget.onTap,
       child: Container(
         width: 171.w,
         height: 204.h,
@@ -44,10 +75,10 @@ class FeaturedCard extends StatelessWidget {
                     AppAssets.gatta,
                     width: 84.5.w,
                     height: 118.3.h,
-                    colorFilter: ColorFilter.mode(cardColor, BlendMode.srcIn),
+                    colorFilter: ColorFilter.mode(widget.cardColor, BlendMode.srcIn),
                   ),
                   SizedBox(height: 18.h),
-                  Text(title, style: AppTextStyles.roboto400Regular14()),
+                  Text(widget.title, style: AppTextStyles.roboto400Regular14()),
                   SizedBox(height: 16.h),
                 ],
               ),
@@ -56,16 +87,10 @@ class FeaturedCard extends StatelessWidget {
             Positioned(
               top: 14.h,
               right: 14.w,
-              child: GestureDetector(
-                onTap: onFavoriteToggle,
-                child: SvgPicture.asset(
-                  AppAssets.favourite,
-                  width: 23.w,
-                  height: 20.h,
-                  colorFilter: isFavorite
-                      ? const ColorFilter.mode(Colors.red, BlendMode.srcIn)
-                      : null,
-                ),
+              child: AnimatedLikeButton(
+                isLiked: _isFavorite,
+                onTap: _handleFavoriteToggle,
+                size: 23.w,
               ),
             ),
           ],

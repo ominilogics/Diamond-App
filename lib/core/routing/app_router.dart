@@ -5,6 +5,8 @@ import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/main/presentation/screens/main_screen.dart';
 import '../../features/notifications/presentation/screens/notifications_screen.dart';
 import '../../features/cards/presentation/screens/cards_screen.dart';
+import '../../features/testing/presentation/screens/testing_screen.dart';
+import '../../features/profile/presentation/screens/edit_profile_screen.dart';
 import 'app_routes.dart';
 
 class AppRouter {
@@ -13,6 +15,16 @@ class AppRouter {
   static final router = GoRouter(
     initialLocation: AppRoute.main.path,
     routes: [
+      GoRoute(
+        name: AppRoute.editProfile.name,
+        path: AppRoute.editProfile.path,
+        builder: (context, state) => const EditProfileScreen(),
+      ),
+      GoRoute(
+        name: AppRoute.testing.name,
+        path: AppRoute.testing.path,
+        builder: (context, state) => const TestingScreen(),
+      ),
       GoRoute(
         name: AppRoute.login.name,
         path: AppRoute.login.path,

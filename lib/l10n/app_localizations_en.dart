@@ -241,4 +241,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileEmail => 'samamahussain23@gmail.com';
+
+  @override
+  String get yes => 'Yes';
+
+  @override
+  String get no => 'No';
+
+  @override
+  String get logoutConfirmation => 'Logout confirmation';
+
+  @override
+  String get loginFailedTitle => 'Login Failed';
+
+  @override
+  String get loginFailedMessage =>
+      'We couldn\'t sign you in. Please check your details and try again.';
+
+  @override
+  String get editProfile => 'Edit Profile';
+
+  @override
+  String get saveChanges => 'Save Changes';
+
+  @override
+  String get loginPrompt => 'Please login to access features!';
+
+  @override
+  String get loginAction => 'Login';
 }
