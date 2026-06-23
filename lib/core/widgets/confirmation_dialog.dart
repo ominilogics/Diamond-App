@@ -53,7 +53,7 @@ class ConfirmationDialog extends StatelessWidget {
               ),
               SizedBox(height: 14.h),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 28.w),
+                padding: EdgeInsets.symmetric(horizontal: 40.w),
                 child: Text(
                   message,
                   style: AppTextStyles.roboto400Regular13(),
@@ -97,7 +97,9 @@ class ConfirmationDialog extends StatelessWidget {
                       alignment: Alignment.center,
                       child: Text(
                         confirmText,
-                        style: AppTextStyles.roboto500Medium14(),
+                        style: AppTextStyles.roboto500Medium14().copyWith(
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),

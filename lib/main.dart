@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:isar/isar.dart';
 import 'features/events/data/models/event_model.dart';
 import 'features/favorites/data/models/favorite_model.dart';
+import 'features/cart/data/models/cart_item_model.dart';
 import 'core/providers/database_provider.dart';
 
 void main() async {
@@ -15,7 +16,7 @@ void main() async {
 
   final dir = await getApplicationDocumentsDirectory();
   final isar = await Isar.open(
-    [EventModelSchema, FavoriteModelSchema],
+    [EventModelSchema, FavoriteModelSchema, CartItemModelSchema],
     directory: dir.path,
   );
 

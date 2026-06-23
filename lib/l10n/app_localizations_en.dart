@@ -318,9 +318,41 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyPolicyContent =>
-      'Your privacy is important to us. This Privacy Policy explains how we collect, use, and protect your personal information.\n\n1. Information Collection\nWe collect information you provide directly to us when using the app, such as your account details, uploaded images, and custom text.\n\n2. Use of Information\nYour data is used strictly to provide and improve the e-card service, ensure account security, and personalize your experience.\n\n3. Data Protection\nWe use industry-standard security measures, including Supabase Auth and Row Level Security, to ensure your data is isolated and protected from unauthorized access.\n\n4. Contact\nIf you have any questions about this Privacy Policy, please use the Contact Us section.';
+      'Your privacy is important to us. This Privacy Policy explains how Daimond App collects, uses, and protects your personal information when you use our mobile application and related services.\n\n1. Information We Collect\nWe collect information you provide directly, such as your name, email address, password, and profile details when you create an account. We also collect the content you create, including custom text and uploaded images for e-cards, as well as data regarding your device, app usage, and preferences.\n\n2. How We Use Your Information\nYour information is used to provide, maintain, and improve our services. This includes personalizing your experience, processing your e-card customizations, sending event reminders, managing your account, and communicating with you regarding updates, security alerts, and support.\n\n3. Data Storage and Security\nWe implement industry-standard security measures to protect your data. Your information is securely stored using Supabase, which utilizes advanced encryption and Row Level Security to ensure your data is isolated and protected from unauthorized access. However, no electronic transmission or storage is 100% secure.\n\n4. Sharing Your Information\nWe do not sell your personal information. We may share your data with trusted third-party service providers strictly to facilitate our services. We may also disclose information if required by law or to protect the rights and safety of our users.\n\n5. Your Privacy Rights\nYou have the right to access, update, or delete your personal information at any time through the app settings. You may also opt-out of promotional communications via your Notification Settings.\n\n6. Changes to This Policy\nWe may update this Privacy Policy from time to time. We will notify you of any changes by posting the new policy within the app. Your continued use of the app after such modifications constitutes your acknowledgment of the updated policy.\n\n7. Contact Us\nIf you have any questions or concerns about this Privacy Policy or our data practices, please contact us at support.ominilogics@gmail.com.';
 
   @override
   String get termsAndConditionsContent =>
-      'Welcome to Daimond App. By using our application, you agree to these terms and conditions. Please read them carefully.\n\n1. Acceptance of Terms\nBy accessing and using this app, you accept and agree to be bound by the terms and provision of this agreement.\n\n2. User Accounts\nYou are responsible for safeguarding the password that you use to access the service and for any activities or actions under your password.\n\n3. Content\nOur service allows you to post, link, store, share and otherwise make available certain information, text, graphics, videos, or other material. You are responsible for the content that you post.\n\n4. Changes\nWe reserve the right, at our sole discretion, to modify or replace these Terms at any time.';
+      'Welcome to Daimond App. By accessing or using our mobile application, you agree to be bound by these Terms and Conditions. Please read them carefully before using our services.\n\n1. Acceptance of Terms\nBy creating an account or using the app, you agree to these Terms. If you do not agree to all the terms and conditions, you may not access or use the service.\n\n2. User Accounts\nYou are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You must notify us immediately of any unauthorized use or security breaches.\n\n3. User-Generated Content\nOur service allows you to customize e-cards with your own text, images, and other content. You retain ownership of your content, but you grant us a license to use, store, and display it to provide the service. You agree not to upload or share content that is illegal, abusive, offensive, defamatory, or infringes on the intellectual property rights of others.\n\n4. Intellectual Property\nThe Daimond App, including its original content, features, designs, and card templates, are owned by us and are protected by international copyright, trademark, and other intellectual property laws. You may not reproduce, distribute, or create derivative works without explicit permission.\n\n5. Subscriptions and Payments\nCertain features or premium cards may require payment or a subscription. All fees are clearly stated within the app. By choosing a paid service, you agree to our billing terms. Subscriptions auto-renew unless canceled prior to the renewal date.\n\n6. Limitation of Liability\nTo the maximum extent permitted by law, Daimond App and its affiliates shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use the service.\n\n7. Termination\nWe reserve the right to suspend or terminate your account at our sole discretion, without prior notice, for conduct that we believe violates these Terms or is harmful to other users, us, or third parties.\n\n8. Changes to Terms\nWe reserve the right to modify or replace these Terms at any time. Material changes will be communicated through the app. Continued use of the app constitutes acceptance of the new Terms.\n\n9. Governing Law\nThese Terms shall be governed and construed in accordance with the laws of your jurisdiction, without regard to its conflict of law provisions.\n\n10. Contact Information\nFor any questions regarding these Terms, please contact our support team.';
+
+  @override
+  String get notificationSettings => 'Notification Settings';
+
+  @override
+  String get pushNotifications => 'Push Notifications';
+
+  @override
+  String get islamicEvents => 'Islamic Events';
+
+  @override
+  String get newCardAlerts => 'New Card Alerts';
+
+  @override
+  String get eventReminders => 'Event Reminders';
+
+  @override
+  String get specialOffers => 'Special Offers';
+
+  @override
+  String get deleteAccount => 'Delete Account';
+
+  @override
+  String get deleteAccountTitle => 'Delete Account';
+
+  @override
+  String get deleteAccountMessage =>
+      'Are you sure you want to delete your account? This action cannot be undone.';
+
+  @override
+  String get logoutMessage =>
+      'Are you sure you want to log out of your account?';
 }

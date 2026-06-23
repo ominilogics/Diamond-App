@@ -9,6 +9,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../core/widgets/app_bar1.dart';
+import '../../../../core/widgets/confirmation_dialog.dart';
 import '../../../../core/widgets/primary_button.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -164,9 +165,17 @@ class SettingsScreen extends StatelessWidget {
                     style: AppTextStyles.colitez400Italic24(),
                   ),
                   SizedBox(height: 24.h),
-                  _buildPreferenceItem(texts.myCart),
+                  _buildPreferenceItem(
+                    texts.myCart,
+                    onTap: () => context.pushNamed(AppRoute.cart.name),
+                  ),
                   _buildDivider(),
                   _buildPreferenceItem(texts.subscriptions),
+                  _buildDivider(),
+                  _buildPreferenceItem(
+                    texts.notificationsTitle,
+                    onTap: () => context.pushNamed(AppRoute.notificationSettings.name),
+                  ),
                   _buildDivider(),
                   _buildPreferenceItem(
                     texts.privacyPolicy,
@@ -178,7 +187,45 @@ class SettingsScreen extends StatelessWidget {
                     onTap: () => context.pushNamed(AppRoute.termsAndConditions.name),
                   ),
                   _buildDivider(),
-                  _buildPreferenceItem(texts.logout, isLast: true),
+                  _buildPreferenceItem(
+                    texts.logout,
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => ConfirmationDialog(
+                          title: texts.logoutConfirmation,
+                          message: texts.logoutMessage,
+                          confirmText: texts.yes,
+                          cancelText: texts.no,
+                          onConfirm: () {
+                            Navigator.of(context).pop();
+                            // Handle logout logic
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                  _buildDivider(),
+                  _buildPreferenceItem(
+                    texts.deleteAccount,
+                    isLast: true,
+                    isGradient: true,
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => ConfirmationDialog(
+                          title: texts.deleteAccountTitle,
+                          message: texts.deleteAccountMessage,
+                          confirmText: texts.yes,
+                          cancelText: texts.no,
+                          onConfirm: () {
+                            Navigator.of(context).pop();
+                            // Handle delete logic
+                          },
+                        ),
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
@@ -189,7 +236,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPreferenceItem(String title, {bool isLast = false, VoidCallback? onTap}) {
+  Widget _buildPreferenceItem(String title, {bool isLast = false, bool isGradient = false, VoidCallback? onTap}) {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -198,7 +245,18 @@ class SettingsScreen extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(title, style: AppTextStyles.roboto400Regular16()),
+            isGradient
+                ? ShaderMask(
+                    shaderCallback: (bounds) => AppColors.primaryButtonGradient.createShader(
+                      Rect.fromLTWH(0, 0, bounds.width, bounds.height),
+                    ),
+                    blendMode: BlendMode.srcIn,
+                    child: Text(
+                      title,
+                      style: AppTextStyles.roboto400Regular16(),
+                    ),
+                  )
+                : Text(title, style: AppTextStyles.roboto400Regular16()),
             SvgPicture.asset(
               AppAssets.forwardArrow,
               width: 8.w,

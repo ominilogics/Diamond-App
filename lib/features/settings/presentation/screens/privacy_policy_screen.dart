@@ -8,30 +8,91 @@ import '../../../../core/widgets/gradient_scaffold.dart';
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
 
+  Widget _buildBodyText(String text) {
+    final baseStyle = AppTextStyles.roboto400Regular14(
+      color: const Color(0xFF525252),
+    ).copyWith(height: 1.5);
+
+    const email = 'support.ominilogics@gmail.com';
+
+    if (text.contains(email)) {
+      final parts = text.split(email);
+      return Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(text: parts[0]),
+            TextSpan(
+              text: email,
+              style: baseStyle.copyWith(
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF000000),
+              ),
+            ),
+            if (parts.length > 1) TextSpan(text: parts[1]),
+          ],
+        ),
+        style: baseStyle,
+      );
+    }
+    return Text(text, style: baseStyle);
+  }
+
+  List<Widget> _buildFormattedContent(String content) {
+    final sections = content.split('\n\n');
+    return sections.map((section) {
+      if (section.startsWith(RegExp(r'^\d+\.'))) {
+        final parts = section.split('\n');
+        final header = parts.first;
+        final body = parts.skip(1).join('\n');
+        
+        return Padding(
+          padding: EdgeInsets.only(bottom: 24.h),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                header,
+                style: AppTextStyles.colitez400Italic20(),
+              ),
+              if (body.isNotEmpty) ...[
+                SizedBox(height: 8.h),
+                _buildBodyText(body),
+              ],
+            ],
+          ),
+        );
+      } else {
+        return Padding(
+          padding: EdgeInsets.only(bottom: 24.h),
+          child: _buildBodyText(section),
+        );
+      }
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final texts = AppLocalizations.of(context)!;
 
     return GradientScaffold(
-      body: SingleChildScrollView(
+      body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 12.h),
             AppBar2(title: texts.privacyPolicy),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 24.h),
-                  Text(
-                    texts.privacyPolicyContent,
-                    style: AppTextStyles.roboto400Regular16(
-                      color: const Color(0xFF525252),
-                    ).copyWith(height: 1.5),
+            SizedBox(height: 24.h),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ..._buildFormattedContent(texts.privacyPolicyContent),
+                      SizedBox(height: 16.h),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ],

@@ -9,7 +9,11 @@ enum AppRoute {
   privacyPolicy('/privacy-policy'),
   termsAndConditions('/terms-and-conditions'),
   testing('/testing'),
-  editProfile('/edit-profile');
+  editProfile('/edit-profile'),
+  cardDetail('/card-detail'),
+  previewCard('/preview-card'),
+  notificationSettings('/notification-settings'),
+  cart('/cart');
 
   const AppRoute(this.path);
   final String path;

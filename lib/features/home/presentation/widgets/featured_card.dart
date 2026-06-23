@@ -6,6 +6,8 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../core/widgets/animated_like_button.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../core/routing/app_routes.dart';
 import '../../../../features/favorites/domain/entities/favorite_entity.dart';
 import '../../../../features/favorites/presentation/providers/favorites_provider.dart';
 
@@ -29,7 +31,16 @@ class FeaturedCard extends ConsumerWidget {
     final isFavorite = isFavoriteAsync.valueOrNull ?? false;
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: onTap ??
+          () {
+            context.pushNamed(
+              AppRoute.cardDetail.name,
+              extra: {
+                'cardId': cardId,
+                'title': title,
+              },
+            );
+          },
       child: Container(
         width: 171.w,
         height: 204.h,

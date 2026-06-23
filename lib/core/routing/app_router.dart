@@ -10,6 +10,10 @@ import '../../features/testing/presentation/screens/testing_screen.dart';
 import '../../features/profile/presentation/screens/edit_profile_screen.dart';
 import '../../features/settings/presentation/screens/privacy_policy_screen.dart';
 import '../../features/settings/presentation/screens/terms_and_conditions_screen.dart';
+import '../../features/settings/presentation/screens/notification_settings_screen.dart';
+import '../../features/cards/presentation/screens/card_detail_screen.dart';
+import '../../features/cards/presentation/screens/preview_card_screen.dart';
+import '../../features/cart/presentation/screens/cart_screen.dart';
 import 'app_routes.dart';
 
 class AppRouter {
@@ -75,6 +79,39 @@ class AppRouter {
         name: AppRoute.termsAndConditions.name,
         path: AppRoute.termsAndConditions.path,
         builder: (context, state) => const TermsAndConditionsScreen(),
+      ),
+      GoRoute(
+        name: AppRoute.cardDetail.name,
+        path: AppRoute.cardDetail.path,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          return CardDetailScreen(
+            cardId: extra['cardId'] as String? ?? 'unknown',
+            title: extra['title'] as String? ?? 'Card Details',
+            cartItemId: extra['cartItemId'] as int?,
+            initialMessage: extra['initialMessage'] as String?,
+          );
+        },
+      ),
+      GoRoute(
+        name: AppRoute.previewCard.name,
+        path: AppRoute.previewCard.path,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          return PreviewCardScreen(
+            message: extra['message'] as String? ?? '',
+          );
+        },
+      ),
+      GoRoute(
+        name: AppRoute.notificationSettings.name,
+        path: AppRoute.notificationSettings.path,
+        builder: (context, state) => const NotificationSettingsScreen(),
+      ),
+      GoRoute(
+        name: AppRoute.cart.name,
+        path: AppRoute.cart.path,
+        builder: (context, state) => const CartScreen(),
       ),
     ],
   );
