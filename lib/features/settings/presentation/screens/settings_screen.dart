@@ -17,8 +17,7 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final texts = AppLocalizations.of(context)!;
-    // Toggle this flag to test states (true = logged in, false = logged out)
-    const bool isLoggedIn = false;
+    const bool isLoggedIn = true;
 
     return Column(
       children: [
@@ -52,7 +51,9 @@ class SettingsScreen extends StatelessWidget {
               context.pushNamed(AppRoute.login.name);
             },
           ),
-          SizedBox(height: 80.h), // Shift up slightly to visually balance above bottom nav
+          SizedBox(
+            height: 80.h,
+          ), // Shift up slightly to visually balance above bottom nav
         ],
       ),
     );
@@ -167,9 +168,15 @@ class SettingsScreen extends StatelessWidget {
                   _buildDivider(),
                   _buildPreferenceItem(texts.subscriptions),
                   _buildDivider(),
-                  _buildPreferenceItem(texts.privacyPolicy),
+                  _buildPreferenceItem(
+                    texts.privacyPolicy,
+                    onTap: () => context.pushNamed(AppRoute.privacyPolicy.name),
+                  ),
                   _buildDivider(),
-                  _buildPreferenceItem(texts.contactUs),
+                  _buildPreferenceItem(
+                    texts.termsAndConditions,
+                    onTap: () => context.pushNamed(AppRoute.termsAndConditions.name),
+                  ),
                   _buildDivider(),
                   _buildPreferenceItem(texts.logout, isLast: true),
                 ],
@@ -182,20 +189,24 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPreferenceItem(String title, {bool isLast = false}) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 16.h),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(title, style: AppTextStyles.roboto400Regular16()),
-          SvgPicture.asset(
-            AppAssets.forwardArrow,
-            width: 8.w,
-            height: 14.h,
-            colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
-          ),
-        ],
+  Widget _buildPreferenceItem(String title, {bool isLast = false, VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 16.h),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(title, style: AppTextStyles.roboto400Regular16()),
+            SvgPicture.asset(
+              AppAssets.forwardArrow,
+              width: 8.w,
+              height: 14.h,
+              colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -37,58 +37,61 @@ class ForgotPasswordScreen extends HookConsumerWidget {
               child: Form(
                 key: formKey,
                 child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 36.h),
-                Text(
-                  texts.forgotPasswordTitle,
-                  style: AppTextStyles.colitez400Italic32(),
-                ),
-                SizedBox(height: 9.h),
-                Text(
-                  texts.forgotPasswordSubtitle,
-                  style: AppTextStyles.roboto300Light13(),
-                ),
-                SizedBox(height: 29.h),
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 36.h),
+                    Text(
+                      texts.forgotPasswordTitle,
+                      style: AppTextStyles.colitez400Italic32(),
+                    ),
+                    SizedBox(height: 9.h),
+                    Text(
+                      texts.forgotPasswordSubtitle,
+                      style: AppTextStyles.roboto300Light13(),
+                    ),
+                    SizedBox(height: 29.h),
 
-                AppLabelledTextField(
-                  label: texts.emailLabel,
-                  hintText: texts.emailHint,
-                  keyboardType: TextInputType.emailAddress,
-                  controller: emailController,
-                  validator: AppValidators.validateEmail,
-                ),
+                    AppLabelledTextField(
+                      label: texts.emailLabel,
+                      hintText: texts.emailHint,
+                      keyboardType: TextInputType.emailAddress,
+                      controller: emailController,
+                      validator: AppValidators.validateEmail,
+                    ),
 
-                SizedBox(height: 35.h),
+                    SizedBox(height: 35.h),
 
-                PrimaryButton(text: texts.sendButton, onPressed: onSendPressed),
-                
-                SizedBox(height: 24.h),
+                    PrimaryButton(
+                      text: texts.sendButton,
+                      onPressed: onSendPressed,
+                    ),
 
-                Center(
-                  child: GestureDetector(
-                    onTap: () {
-                      context.goNamed(AppRoute.login.name);
-                    },
-                    child: RichText(
-                      text: TextSpan(
-                        text: texts.rememberPassword,
-                        style: AppTextStyles.roboto300Light13(),
-                        children: [
-                          TextSpan(
-                            text: texts.logIn,
-                            style: AppTextStyles.roboto400Regular13(),
+                    SizedBox(height: 24.h),
+
+                    Center(
+                      child: GestureDetector(
+                        onTap: () {
+                          context.goNamed(AppRoute.login.name);
+                        },
+                        child: RichText(
+                          text: TextSpan(
+                            text: texts.rememberPassword,
+                            style: AppTextStyles.roboto300Light13(),
+                            children: [
+                              TextSpan(
+                                text: texts.logIn,
+                                style: AppTextStyles.roboto400Regular13(),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
+                    SizedBox(height: 40.h),
+                  ],
                 ),
-                SizedBox(height: 40.h),
-              ],
+              ),
             ),
-          ),
-        ),
           ),
         ],
       ),

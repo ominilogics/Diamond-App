@@ -8,18 +8,20 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../core/widgets/app_bar1.dart';
 import '../../../home/presentation/widgets/featured_card.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/favorites_provider.dart';
 
-class FavoritesScreen extends StatelessWidget {
+class FavoritesScreen extends ConsumerWidget {
   const FavoritesScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final texts = AppLocalizations.of(context)!;
 
-    // Using dummy data array for 10 cards (Set to empty to show empty state)
-    final List<Color> cardColors = [];
+    final favoritesState = ref.watch(favoritesProvider);
+    final favorites = favoritesState.valueOrNull ?? [];
 
-    if (cardColors.isEmpty) {
+    if (favorites.isEmpty) {
       return Column(
         children: [
           SizedBox(height: 12.h),
@@ -35,7 +37,9 @@ class FavoritesScreen extends StatelessWidget {
                   style: AppTextStyles.colitez400Italic32(),
                   textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 80.h), // Offset from center to account for bottom nav
+                SizedBox(
+                  height: 80.h,
+                ), // Offset from center to account for bottom nav
               ],
             ),
           ),
@@ -56,7 +60,7 @@ class FavoritesScreen extends StatelessWidget {
               padding: EdgeInsets.zero,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: cardColors.length,
+              itemCount: favorites.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 crossAxisSpacing: 14.w,
@@ -64,9 +68,11 @@ class FavoritesScreen extends StatelessWidget {
                 childAspectRatio: 171.w / 204.h,
               ),
               itemBuilder: (context, index) {
+                final favorite = favorites[index];
                 return FeaturedCard(
-                  title: texts.eidCard1,
-                  cardColor: cardColors[index],
+                  cardId: favorite.cardId,
+                  title: favorite.title,
+                  cardColor: Color(favorite.colorValue),
                 );
               },
             ),

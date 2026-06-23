@@ -25,29 +25,19 @@ class AppSnackbars {
         decoration: BoxDecoration(
           color: const Color(0xFFFFFFFF),
           borderRadius: BorderRadius.circular(20.r),
-          border: Border.all(
-            color: const Color(0xFF000000),
-            width: 0.5,
-          ),
+          border: Border.all(color: const Color(0xFF000000), width: 0.5),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SvgPicture.asset(
-              AppAssets.warning,
-              width: 32.w,
-              height: 32.w,
-            ),
+            SvgPicture.asset(AppAssets.warning, width: 32.w, height: 32.w),
             SizedBox(width: 12.w),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: AppTextStyles.roboto500Medium14(),
-                  ),
+                  Text(title, style: AppTextStyles.roboto500Medium14()),
                   SizedBox(height: 3.h),
                   Text(
                     message,

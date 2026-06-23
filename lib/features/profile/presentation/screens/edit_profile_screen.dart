@@ -24,7 +24,7 @@ class EditProfileScreen extends StatelessWidget {
             SizedBox(height: 12.h),
             AppBar2(title: l10n.editProfile),
             SizedBox(height: 32.h),
-            
+
             // Avatar with Badge
             Center(
               child: SizedBox(
@@ -71,7 +71,7 @@ class EditProfileScreen extends StatelessWidget {
                         child: Icon(
                           Icons.edit,
                           size: 14.w,
-                          color: Colors.black,
+                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -79,9 +79,9 @@ class EditProfileScreen extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             SizedBox(height: 40.h),
-            
+
             // Form Fields
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 24.w),
@@ -102,15 +102,9 @@ class EditProfileScreen extends StatelessWidget {
                     style: AppTextStyles.colitez400Italic16(),
                   ),
                   SizedBox(height: 8.h),
-                  AppTextField(
-                    hintText: l10n.profileEmail,
-                    readOnly: true,
-                  ),
+                  AppTextField(hintText: l10n.profileEmail, readOnly: true),
                   SizedBox(height: 40.h),
-                  PrimaryButton(
-                    text: l10n.saveChanges,
-                    onPressed: () {},
-                  ),
+                  PrimaryButton(text: l10n.saveChanges, onPressed: () {}),
                 ],
               ),
             ),

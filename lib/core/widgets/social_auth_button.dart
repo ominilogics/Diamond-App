@@ -33,16 +33,9 @@ class SocialAuthButton extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SvgPicture.asset(
-                iconPath,
-                width: 24.w,
-                height: 24.h,
-              ),
+              SvgPicture.asset(iconPath, width: 24.w, height: 24.h),
               SizedBox(width: 8.w),
-              Text(
-                text,
-                style: AppTextStyles.roboto400Regular14(),
-              ),
+              Text(text, style: AppTextStyles.roboto400Regular14()),
             ],
           ),
         ),

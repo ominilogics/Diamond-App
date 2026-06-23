@@ -5,6 +5,9 @@ enum AppRoute {
   main('/main'),
   notifications('/notifications'),
   cards('/cards'),
+  events('/events'),
+  privacyPolicy('/privacy-policy'),
+  termsAndConditions('/terms-and-conditions'),
   testing('/testing'),
   editProfile('/edit-profile');
 

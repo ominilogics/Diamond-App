@@ -228,7 +228,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get privacyPolicy => 'Privacy Policy';
 
   @override
-  String get contactUs => 'Contact Us';
+  String get termsAndConditions => 'Terms and Conditions';
 
   @override
   String get logout => 'Logout';
@@ -269,4 +269,58 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get loginAction => 'Login';
+
+  @override
+  String get myEvents => 'My Events';
+
+  @override
+  String get addYourEventsHere => 'Add your\nevents here';
+
+  @override
+  String get upcomingOccasions => 'Upcoming Occasions';
+
+  @override
+  String get noEventsHere => 'No Events Here';
+
+  @override
+  String get addBtn => '+ ADD';
+
+  @override
+  String get addReminderTitle => 'Add Reminder';
+
+  @override
+  String get addReminderSubtitle =>
+      'Add reminders for your favorite events and occasions.';
+
+  @override
+  String get eventTitleLabel => 'Title';
+
+  @override
+  String get eventTitleHint => 'Enter title here.';
+
+  @override
+  String get eventReminderLabel => 'Reminder';
+
+  @override
+  String get eventReminderHint => 'When do you wanna get a reminder?';
+
+  @override
+  String get eventDateLabel => 'Date';
+
+  @override
+  String get eventDateHint => 'Select date';
+
+  @override
+  String get eventDateSubtext => 'Go with your best guess.';
+
+  @override
+  String get saveReminder => 'Save Reminder';
+
+  @override
+  String get privacyPolicyContent =>
+      'Your privacy is important to us. This Privacy Policy explains how we collect, use, and protect your personal information.\n\n1. Information Collection\nWe collect information you provide directly to us when using the app, such as your account details, uploaded images, and custom text.\n\n2. Use of Information\nYour data is used strictly to provide and improve the e-card service, ensure account security, and personalize your experience.\n\n3. Data Protection\nWe use industry-standard security measures, including Supabase Auth and Row Level Security, to ensure your data is isolated and protected from unauthorized access.\n\n4. Contact\nIf you have any questions about this Privacy Policy, please use the Contact Us section.';
+
+  @override
+  String get termsAndConditionsContent =>
+      'Welcome to Daimond App. By using our application, you agree to these terms and conditions. Please read them carefully.\n\n1. Acceptance of Terms\nBy accessing and using this app, you accept and agree to be bound by the terms and provision of this agreement.\n\n2. User Accounts\nYou are responsible for safeguarding the password that you use to access the service and for any activities or actions under your password.\n\n3. Content\nOur service allows you to post, link, store, share and otherwise make available certain information, text, graphics, videos, or other material. You are responsible for the content that you post.\n\n4. Changes\nWe reserve the right, at our sole discretion, to modify or replace these Terms at any time.';
 }

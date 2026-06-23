@@ -43,7 +43,7 @@
 
 ### 9. UI & Device Configuration
 * **Responsiveness**: Use the `flutter_screenutil` package to ensure UI components scale perfectly across all screen sizes.
-* **Platform Support**: The app targets Android and iOS.
+* **Platform Support**: Every implementation must be fully cross-platform. It must compile and function perfectly on both Android and iOS without platform-specific crashes or unsupported UI rendering.
 * **Orientation**: The application must be locked to **Portrait mode** only (disable landscape mode entirely).
 
 ### 10. Theme & Styling

@@ -5,8 +5,11 @@ import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/main/presentation/screens/main_screen.dart';
 import '../../features/notifications/presentation/screens/notifications_screen.dart';
 import '../../features/cards/presentation/screens/cards_screen.dart';
+import '../../features/events/presentation/screens/events_screen.dart';
 import '../../features/testing/presentation/screens/testing_screen.dart';
 import '../../features/profile/presentation/screens/edit_profile_screen.dart';
+import '../../features/settings/presentation/screens/privacy_policy_screen.dart';
+import '../../features/settings/presentation/screens/terms_and_conditions_screen.dart';
 import 'app_routes.dart';
 
 class AppRouter {
@@ -57,6 +60,21 @@ class AppRouter {
           final title = state.extra as String?;
           return CardsScreen(title: title, showBackButton: true);
         },
+      ),
+      GoRoute(
+        name: AppRoute.events.name,
+        path: AppRoute.events.path,
+        builder: (context, state) => const EventsScreen(showBackButton: true),
+      ),
+      GoRoute(
+        name: AppRoute.privacyPolicy.name,
+        path: AppRoute.privacyPolicy.path,
+        builder: (context, state) => const PrivacyPolicyScreen(),
+      ),
+      GoRoute(
+        name: AppRoute.termsAndConditions.name,
+        path: AppRoute.termsAndConditions.path,
+        builder: (context, state) => const TermsAndConditionsScreen(),
       ),
     ],
   );

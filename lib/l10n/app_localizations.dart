@@ -514,11 +514,11 @@ abstract class AppLocalizations {
   /// **'Privacy Policy'**
   String get privacyPolicy;
 
-  /// No description provided for @contactUs.
+  /// No description provided for @termsAndConditions.
   ///
   /// In en, this message translates to:
-  /// **'Contact Us'**
-  String get contactUs;
+  /// **'Terms and Conditions'**
+  String get termsAndConditions;
 
   /// No description provided for @logout.
   ///
@@ -597,6 +597,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Login'**
   String get loginAction;
+
+  /// No description provided for @myEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'My Events'**
+  String get myEvents;
+
+  /// No description provided for @addYourEventsHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your\nevents here'**
+  String get addYourEventsHere;
+
+  /// No description provided for @upcomingOccasions.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming Occasions'**
+  String get upcomingOccasions;
+
+  /// No description provided for @noEventsHere.
+  ///
+  /// In en, this message translates to:
+  /// **'No Events Here'**
+  String get noEventsHere;
+
+  /// No description provided for @addBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'+ ADD'**
+  String get addBtn;
+
+  /// No description provided for @addReminderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Reminder'**
+  String get addReminderTitle;
+
+  /// No description provided for @addReminderSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add reminders for your favorite events and occasions.'**
+  String get addReminderSubtitle;
+
+  /// No description provided for @eventTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get eventTitleLabel;
+
+  /// No description provided for @eventTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter title here.'**
+  String get eventTitleHint;
+
+  /// No description provided for @eventReminderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder'**
+  String get eventReminderLabel;
+
+  /// No description provided for @eventReminderHint.
+  ///
+  /// In en, this message translates to:
+  /// **'When do you wanna get a reminder?'**
+  String get eventReminderHint;
+
+  /// No description provided for @eventDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get eventDateLabel;
+
+  /// No description provided for @eventDateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select date'**
+  String get eventDateHint;
+
+  /// No description provided for @eventDateSubtext.
+  ///
+  /// In en, this message translates to:
+  /// **'Go with your best guess.'**
+  String get eventDateSubtext;
+
+  /// No description provided for @saveReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Reminder'**
+  String get saveReminder;
+
+  /// No description provided for @privacyPolicyContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Your privacy is important to us. This Privacy Policy explains how we collect, use, and protect your personal information.\n\n1. Information Collection\nWe collect information you provide directly to us when using the app, such as your account details, uploaded images, and custom text.\n\n2. Use of Information\nYour data is used strictly to provide and improve the e-card service, ensure account security, and personalize your experience.\n\n3. Data Protection\nWe use industry-standard security measures, including Supabase Auth and Row Level Security, to ensure your data is isolated and protected from unauthorized access.\n\n4. Contact\nIf you have any questions about this Privacy Policy, please use the Contact Us section.'**
+  String get privacyPolicyContent;
+
+  /// No description provided for @termsAndConditionsContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Daimond App. By using our application, you agree to these terms and conditions. Please read them carefully.\n\n1. Acceptance of Terms\nBy accessing and using this app, you accept and agree to be bound by the terms and provision of this agreement.\n\n2. User Accounts\nYou are responsible for safeguarding the password that you use to access the service and for any activities or actions under your password.\n\n3. Content\nOur service allows you to post, link, store, share and otherwise make available certain information, text, graphics, videos, or other material. You are responsible for the content that you post.\n\n4. Changes\nWe reserve the right, at our sole discretion, to modify or replace these Terms at any time.'**
+  String get termsAndConditionsContent;
 }
 
 class _AppLocalizationsDelegate

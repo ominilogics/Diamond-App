@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../../../core/widgets/gradient_scaffold.dart';
-import '../../../../features/cards/presentation/screens/cards_screen.dart';
+import '../../../../features/events/presentation/screens/events_screen.dart';
 import '../../../../features/favorites/presentation/screens/favorites_screen.dart';
 import '../../../../features/settings/presentation/screens/settings_screen.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
@@ -19,7 +19,7 @@ class MainScreen extends HookConsumerWidget {
 
     final pages = [
       const HomeScreen(),
-      const CardsScreen(),
+      const EventsScreen(),
       const FavoritesScreen(),
       const SettingsScreen(),
     ];

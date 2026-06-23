@@ -192,10 +192,6 @@ class AppTextStyles {
     );
   }
 
-
-
-
-
   static TextStyle colitez400Italic13({
     Color? color,
     double? fontSize,

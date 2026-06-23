@@ -21,6 +21,7 @@ class AppAssets {
   static const String favourite = '$_iconsPath/favourite.svg';
   static const String favouriteFilled = '$_iconsPath/favourite_filled.svg';
   static const String favouritesEmpty = '$_iconsPath/favourites_empty.svg';
+  static const String eventsEmpty = '$_iconsPath/events_empty.svg';
   static const String home = '$_iconsPath/home.svg';
   static const String homeFilled = '$_iconsPath/home_filled.svg';
   static const String notification = '$_iconsPath/notification.svg';

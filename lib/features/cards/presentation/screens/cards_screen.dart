@@ -75,9 +75,7 @@ class CardsScreen extends HookConsumerWidget {
                     height: 30.h,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: isSelected
-                          ? null
-                          : Colors.transparent,
+                      color: isSelected ? null : Colors.transparent,
                       gradient: isSelected
                           ? AppColors.primaryButtonGradient
                           : null,
@@ -118,6 +116,7 @@ class CardsScreen extends HookConsumerWidget {
               ),
               itemBuilder: (context, index) {
                 return FeaturedCard(
+                  cardId: 'cards_screen_card_$index',
                   title: texts.eidCard1,
                   cardColor: cardColors[index],
                 );

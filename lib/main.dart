@@ -4,10 +4,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:daimond/l10n/app_localizations.dart';
 import 'core/routing/app_router.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:isar/isar.dart';
+import 'features/events/data/models/event_model.dart';
+import 'features/favorites/data/models/favorite_model.dart';
+import 'core/providers/database_provider.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
+  final dir = await getApplicationDocumentsDirectory();
+  final isar = await Isar.open(
+    [EventModelSchema, FavoriteModelSchema],
+    directory: dir.path,
+  );
+
   // Configure system UI overlays for Android edge-to-edge support
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -24,7 +35,12 @@ void main() {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]).then((_) {
-    runApp(const ProviderScope(child: MyApp()));
+    runApp(ProviderScope(
+      overrides: [
+        isarProvider.overrideWithValue(isar),
+      ],
+      child: const MyApp(),
+    ));
   });
 }
 

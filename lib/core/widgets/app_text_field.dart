@@ -4,6 +4,8 @@ import '../theme/app_text_styles.dart';
 
 class AppTextField extends StatelessWidget {
   final String? hintText;
+  final String? labelText;
+  final TextStyle? labelStyle;
   final TextEditingController? controller;
   final bool obscureText;
   final TextInputType? keyboardType;
@@ -11,10 +13,13 @@ class AppTextField extends StatelessWidget {
   final Widget? prefixIcon;
   final String? Function(String?)? validator;
   final bool readOnly;
+  final int maxLines;
 
   const AppTextField({
     super.key,
     this.hintText,
+    this.labelText,
+    this.labelStyle,
     this.controller,
     this.obscureText = false,
     this.keyboardType,
@@ -22,6 +27,7 @@ class AppTextField extends StatelessWidget {
     this.prefixIcon,
     this.validator,
     this.readOnly = false,
+    this.maxLines = 1,
   });
 
   @override
@@ -36,9 +42,18 @@ class AppTextField extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (labelText != null) ...[
+              Text(
+                labelText!,
+                style: labelStyle ?? AppTextStyles.colitez400Italic16(),
+              ),
+              SizedBox(height: 8.h),
+            ],
             Container(
               width: double.infinity,
-              height: 44.h,
+              constraints: BoxConstraints(
+                minHeight: 44.h,
+              ),
               decoration: BoxDecoration(
                 color: const Color(0xFFFFFFFF),
                 borderRadius: BorderRadius.circular(20.r),
@@ -52,6 +67,7 @@ class AppTextField extends StatelessWidget {
                 controller: controller,
                 obscureText: obscureText,
                 readOnly: readOnly,
+                maxLines: maxLines,
                 keyboardType: keyboardType,
                 style: AppTextStyles.roboto300Light12(color: Colors.black),
                 onChanged: (val) {
@@ -65,7 +81,10 @@ class AppTextField extends StatelessWidget {
                   ),
                   border: InputBorder.none,
                   isDense: true,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.w),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: maxLines > 1 ? 12.h : 0,
+                  ),
                   prefixIcon: prefixIcon,
                   prefixIconConstraints: BoxConstraints(
                     minWidth: 40.w,

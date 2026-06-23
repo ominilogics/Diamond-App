@@ -35,10 +35,9 @@ class NotificationCard extends StatelessWidget {
           Container(
             width: 51.w,
             height: 51.w,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               gradient: AppColors.primaryButtonGradient,
               shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xFF000000), width: 0.5.w),
             ),
             child: Center(
               child: SvgPicture.asset(
@@ -46,7 +45,7 @@ class NotificationCard extends StatelessWidget {
                 width: 24.w,
                 height: 24.h,
                 colorFilter: const ColorFilter.mode(
-                  Color(0xFF000000),
+                  Colors.white,
                   BlendMode.srcIn,
                 ),
               ),
