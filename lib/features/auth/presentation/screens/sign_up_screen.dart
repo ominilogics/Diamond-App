@@ -1,3 +1,4 @@
+import 'package:daimond/core/routing/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -11,9 +12,11 @@ import '../../../../core/widgets/gradient_scaffold.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/or_divider.dart';
 import '../../../../core/widgets/social_auth_button.dart';
+import '../../../../core/widgets/custom_snackbar.dart';
 import '../../../../core/utils/app_assets.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/routing/app_routes.dart';
+import '../providers/auth_provider.dart';
 
 class SignUpScreen extends HookConsumerWidget {
   const SignUpScreen({super.key});
@@ -25,11 +28,42 @@ class SignUpScreen extends HookConsumerWidget {
     final emailController = useTextEditingController();
     final passwordController = useTextEditingController();
     final confirmPasswordController = useTextEditingController();
+    final nameFocus = useFocusNode();
+    final emailFocus = useFocusNode();
+    final passwordFocus = useFocusNode();
+    final confirmPasswordFocus = useFocusNode();
     final texts = AppLocalizations.of(context)!;
+
+    final isLoading = ref.watch(authProvider);
 
     void onSignUpPressed() {
       if (formKey.currentState!.validate()) {
-        // Proceed with sign up (to be hooked up with Riverpod provider)
+        debugPrint('Sign Up process started for email: ${emailController.text.trim()}');
+        ref
+            .read(authProvider.notifier)
+            .signUp(
+              emailController.text.trim(),
+              passwordController.text.trim(),
+              nameController.text.trim(),
+              (errorMessage) {
+                debugPrint('Sign Up failed: $errorMessage');
+                if (context.mounted) {
+                  CustomSnackbar.showError(context, errorMessage);
+                }
+              },
+              () {
+                debugPrint('Sign Up successful for email: ${emailController.text.trim()}');
+                if (context.mounted) {
+                  CustomSnackbar.showSuccess(
+                    context,
+                    texts.signUpSuccess,
+                  );
+                  context.goNamed(AppRoute.login.name);
+                }
+              },
+            );
+      } else {
+        debugPrint('Sign Up validation failed');
       }
     }
 
@@ -61,6 +95,9 @@ class SignUpScreen extends HookConsumerWidget {
                       label: texts.fullNameLabel,
                       hintText: texts.fullNameHint,
                       controller: nameController,
+                      focusNode: nameFocus,
+                      textInputAction: TextInputAction.next,
+                      onFieldSubmitted: (_) => emailFocus.requestFocus(),
                       validator: AppValidators.validateName,
                     ),
                     SizedBox(height: 16.h),
@@ -70,6 +107,9 @@ class SignUpScreen extends HookConsumerWidget {
                       hintText: texts.emailHint,
                       keyboardType: TextInputType.emailAddress,
                       controller: emailController,
+                      focusNode: emailFocus,
+                      textInputAction: TextInputAction.next,
+                      onFieldSubmitted: (_) => passwordFocus.requestFocus(),
                       validator: AppValidators.validateEmail,
                     ),
                     SizedBox(height: 16.h),
@@ -79,6 +119,10 @@ class SignUpScreen extends HookConsumerWidget {
                       hintText: texts.passwordHint,
                       isPassword: true,
                       controller: passwordController,
+                      focusNode: passwordFocus,
+                      textInputAction: TextInputAction.next,
+                      onFieldSubmitted: (_) =>
+                          confirmPasswordFocus.requestFocus(),
                       validator: AppValidators.validatePassword,
                     ),
                     SizedBox(height: 16.h),
@@ -88,6 +132,9 @@ class SignUpScreen extends HookConsumerWidget {
                       hintText: texts.confirmPasswordHint,
                       isPassword: true,
                       controller: confirmPasswordController,
+                      focusNode: confirmPasswordFocus,
+                      textInputAction: TextInputAction.done,
+                      onFieldSubmitted: (_) => onSignUpPressed(),
                       validator: (value) =>
                           AppValidators.validateConfirmPassword(
                             value,
@@ -100,6 +147,7 @@ class SignUpScreen extends HookConsumerWidget {
                     PrimaryButton(
                       text: texts.signUpText,
                       onPressed: onSignUpPressed,
+                      isLoading: isLoading,
                     ),
 
                     SizedBox(height: 32.h),
@@ -113,28 +161,33 @@ class SignUpScreen extends HookConsumerWidget {
                     ),
 
                     const Spacer(),
+                    SizedBox(height: 32.h),
 
                     Center(
                       child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
                         onTap: () {
                           // Navigate to Login
                           context.goNamed(AppRoute.login.name);
                         },
-                        child: RichText(
-                          text: TextSpan(
-                            text: texts.alreadyHaveAccount,
-                            style: AppTextStyles.roboto300Light13(),
-                            children: [
-                              TextSpan(
-                                text: texts.logIn,
-                                style: AppTextStyles.roboto400Regular13(),
-                              ),
-                            ],
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
+                          child: RichText(
+                            text: TextSpan(
+                              text: texts.alreadyHaveAccount,
+                              style: AppTextStyles.roboto300Light14(),
+                              children: [
+                                TextSpan(
+                                  text: texts.logIn,
+                                  style: AppTextStyles.roboto400Regular14(),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(height: 23.h), // Bottom padding
+                    SizedBox(height: 15.h), // Bottom padding
                   ],
                 ),
               ),

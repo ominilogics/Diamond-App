@@ -12,8 +12,8 @@ class AppValidators {
     if (value == null || value.trim().isEmpty) {
       return 'Please enter your email';
     }
-    // Simple regex for email validation
-    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+    final email = value.trim();
+    if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(email)) {
       return 'Please enter a valid email';
     }
     return null;

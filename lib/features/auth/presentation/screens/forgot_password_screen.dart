@@ -1,3 +1,4 @@
+import 'package:daimond/core/routing/app_router.dart';
 import 'package:daimond/core/routing/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -5,12 +6,14 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:daimond/l10n/app_localizations.dart';
+import '../providers/auth_provider.dart';
 
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/app_validators.dart';
 import '../../../../core/widgets/app_labelled_text_field.dart';
 import '../../../../core/widgets/gradient_scaffold.dart';
 import '../../../../core/widgets/primary_button.dart';
+import '../../../../core/widgets/custom_snackbar.dart';
 
 class ForgotPasswordScreen extends HookConsumerWidget {
   const ForgotPasswordScreen({super.key});
@@ -19,11 +22,39 @@ class ForgotPasswordScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = useMemoized(() => GlobalKey<FormState>());
     final emailController = useTextEditingController();
+    final emailFocus = useFocusNode();
     final texts = AppLocalizations.of(context)!;
+
+    final isLoading = ref.watch(authProvider);
 
     void onSendPressed() {
       if (formKey.currentState!.validate()) {
-        // Proceed with password reset
+        final email = emailController.text.trim();
+        debugPrint('Forgot Password reset link requested for email: $email');
+
+        ref
+            .read(authProvider.notifier)
+            .resetPassword(
+              email,
+              (errorMessage) {
+                debugPrint('Forgot Password reset link failed: $errorMessage');
+                if (context.mounted) {
+                  CustomSnackbar.showError(context, errorMessage);
+                }
+              },
+              () {
+                debugPrint('Forgot Password reset link sent successfully to email: $email');
+                if (context.mounted) {
+                  CustomSnackbar.showSuccess(
+                    context,
+                    texts.forgotPasswordSuccess,
+                  );
+                  context.goNamed(AppRoute.login.name);
+                }
+              },
+            );
+      } else {
+        debugPrint('Forgot Password validation failed');
       }
     }
 
@@ -56,6 +87,9 @@ class ForgotPasswordScreen extends HookConsumerWidget {
                       hintText: texts.emailHint,
                       keyboardType: TextInputType.emailAddress,
                       controller: emailController,
+                      focusNode: emailFocus,
+                      textInputAction: TextInputAction.done,
+                      onFieldSubmitted: (_) => onSendPressed(),
                       validator: AppValidators.validateEmail,
                     ),
 
@@ -64,30 +98,35 @@ class ForgotPasswordScreen extends HookConsumerWidget {
                     PrimaryButton(
                       text: texts.sendButton,
                       onPressed: onSendPressed,
+                      isLoading: isLoading,
                     ),
 
-                    SizedBox(height: 24.h),
+                    SizedBox(height: 16.h),
 
                     Center(
                       child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
                         onTap: () {
                           context.goNamed(AppRoute.login.name);
                         },
-                        child: RichText(
-                          text: TextSpan(
-                            text: texts.rememberPassword,
-                            style: AppTextStyles.roboto300Light13(),
-                            children: [
-                              TextSpan(
-                                text: texts.logIn,
-                                style: AppTextStyles.roboto400Regular13(),
-                              ),
-                            ],
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
+                          child: RichText(
+                            text: TextSpan(
+                              text: texts.rememberPassword,
+                              style: AppTextStyles.roboto300Light14(),
+                              children: [
+                                TextSpan(
+                                  text: texts.logIn,
+                                  style: AppTextStyles.roboto400Regular14(),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(height: 40.h),
+                    SizedBox(height: 32.h),
                   ],
                 ),
               ),

@@ -1,6 +1,6 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:isar/isar.dart';
+import '../database/app_database.dart';
 
-final isarProvider = Provider<Isar>((ref) {
-  throw UnimplementedError('isarProvider must be overridden in ProviderScope');
+final appDatabaseProvider = Provider<AppDatabase>((ref) {
+  throw UnimplementedError('appDatabaseProvider must be overridden in ProviderScope');
 });

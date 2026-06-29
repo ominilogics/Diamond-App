@@ -4,12 +4,16 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../theme/app_text_styles.dart';
+import '../theme/app_colors.dart';
 import '../utils/app_assets.dart';
+
+import '../routing/app_routes.dart';
 
 class AppBar2 extends StatelessWidget {
   final String title;
+  final VoidCallback? onBackPressed;
 
-  const AppBar2({super.key, required this.title});
+  const AppBar2({super.key, required this.title, this.onBackPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -17,11 +21,21 @@ class AppBar2 extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Row(
         children: [
-          GestureDetector(
-            onTap: () => context.pop(),
-            behavior: HitTestBehavior.opaque,
-            child: Padding(
-              padding: EdgeInsets.all(8.w),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onBackPressed ?? () {
+                if (context.canPop()) {
+                  context.pop();
+                } else {
+                  context.goNamed(AppRoute.main.name);
+                }
+              },
+              customBorder: const CircleBorder(),
+              splashColor: AppColors.primaryButtonGradientStart.withOpacity(0.2),
+              highlightColor: AppColors.primaryButtonGradientStart.withOpacity(0.1),
+              child: Padding(
+                padding: EdgeInsets.all(8.w),
               child: SvgPicture.asset(
                 AppAssets.backArrow,
                 width: 20.w,
@@ -32,6 +46,7 @@ class AppBar2 extends StatelessWidget {
                 ),
               ),
             ),
+          ),
           ),
           Expanded(
             child: Text(

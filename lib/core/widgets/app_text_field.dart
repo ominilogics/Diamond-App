@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../theme/app_text_styles.dart';
+import '../theme/app_colors.dart';
+import 'package:flutter/services.dart';
 
 class AppTextField extends StatelessWidget {
   final String? hintText;
@@ -14,6 +16,10 @@ class AppTextField extends StatelessWidget {
   final String? Function(String?)? validator;
   final bool readOnly;
   final int maxLines;
+  final FocusNode? focusNode;
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onFieldSubmitted;
+  final int? maxLength;
 
   const AppTextField({
     super.key,
@@ -28,6 +34,10 @@ class AppTextField extends StatelessWidget {
     this.validator,
     this.readOnly = false,
     this.maxLines = 1,
+    this.focusNode,
+    this.textInputAction,
+    this.onFieldSubmitted,
+    this.maxLength,
   });
 
   @override
@@ -63,27 +73,40 @@ class AppTextField extends StatelessWidget {
                 ),
               ),
               alignment: Alignment.centerLeft,
-              child: TextField(
-                controller: controller,
+              child: Theme(
+                data: Theme.of(context).copyWith(
+                  textSelectionTheme: TextSelectionThemeData(
+                    cursorColor: AppColors.primaryButtonGradientStart,
+                    selectionColor: AppColors.primaryButtonGradientStart.withOpacity(0.3),
+                    selectionHandleColor: AppColors.primaryButtonGradientStart,
+                  ),
+                ),
+                child: TextField(
+                  controller: controller,
+                focusNode: focusNode,
+                textInputAction: textInputAction,
+                onSubmitted: onFieldSubmitted,
                 obscureText: obscureText,
                 readOnly: readOnly,
                 maxLines: maxLines,
                 keyboardType: keyboardType,
-                style: AppTextStyles.roboto300Light12(color: Colors.black),
+                inputFormatters: maxLength != null ? [LengthLimitingTextInputFormatter(maxLength)] : null,
+                cursorColor: AppColors.primaryButtonGradientStart,
+                style: AppTextStyles.roboto400Regular14(color: Colors.black),
                 onChanged: (val) {
                   state.didChange(val);
                 },
                 textAlignVertical: TextAlignVertical.center,
                 decoration: InputDecoration(
                   hintText: hintText,
-                  hintStyle: AppTextStyles.roboto300Light12(
+                  hintStyle: AppTextStyles.roboto300Light14(
                     color: const Color(0xFFA8A8A8),
                   ),
                   border: InputBorder.none,
                   isDense: true,
                   contentPadding: EdgeInsets.symmetric(
                     horizontal: 16.w,
-                    vertical: maxLines > 1 ? 12.h : 0,
+                    vertical: 10.h,
                   ),
                   prefixIcon: prefixIcon,
                   prefixIconConstraints: BoxConstraints(
@@ -98,6 +121,7 @@ class AppTextField extends StatelessWidget {
                     maxHeight: 44.h,
                   ),
                 ),
+              ),
               ),
             ),
             if (hasError && state.errorText != null) ...[

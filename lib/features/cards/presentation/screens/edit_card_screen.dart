@@ -8,230 +8,397 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../core/widgets/app_bar2.dart';
+import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/gradient_scaffold.dart';
 import '../../../../core/widgets/primary_button.dart';
+import '../../../../core/widgets/confirmation_dialog.dart';
+import '../../../../core/providers/database_provider.dart';
+import '../../../../core/database/app_database.dart';
+import '../../../../core/routing/app_routes.dart';
+import 'package:go_router/go_router.dart';
+import 'package:daimond/l10n/app_localizations.dart';
+import '../widgets/custom_card_text_field.dart';
+import '../../../../core/widgets/custom_snackbar.dart';
+import 'package:drift/drift.dart' as drift;
 
 class EditCardScreen extends HookConsumerWidget {
   final String cardId;
 
-  const EditCardScreen({
-    super.key,
-    required this.cardId,
-  });
+  const EditCardScreen({super.key, required this.cardId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final message = useState('Your custom message here');
-    final textColor = useState<Color>(const Color(0xFF000000));
-    final textPosition = useState<Offset>(Offset(100.w, 100.h));
-    final isEditingText = useState(false);
-    final textController = useTextEditingController(text: message.value);
+    final currentPage = useState(0);
+    final pageController = usePageController(initialPage: 0);
+    final isRecipientStep = useState(false);
 
-    // Font selection
-    final fontIndex = useState(0);
-    final List<TextStyle Function({Color? color})> fonts = [
-      ({Color? color}) => AppTextStyles.colitez400Italic24(color: color),
-      ({Color? color}) => AppTextStyles.roboto400Regular20(color: color),
-      ({Color? color}) => AppTextStyles.colitez400Italic32(color: color),
-    ];
+    final coverTextController = useTextEditingController(
+      text:
+          "Loving you has been one of life's greatest gifts. No matter where life takes us, my heart will always find its way back to you.",
+    );
+    final insideMessageController = useTextEditingController(
+      text:
+          "Every day I spend with you reminds me how beautiful life can be when it's shared with someone who truly understands your heart. Your kindness, patience, and love have brought light into my life in ways I never imagined possible. Through every smile, every conversation, and every challenge we've faced together, you've shown me what unconditional love truly means.",
+    );
 
-    // Colors
-    final colors = [
-      const Color(0xFF000000),
-      const Color(0xFFFFFFFF),
-      AppColors.card1,
-      AppColors.card2,
-      AppColors.card3,
-      AppColors.card4,
-      AppColors.card5,
-    ];
+    final fromController = useTextEditingController();
+    final toController = useTextEditingController();
+    final fromFocusNode = useFocusNode();
+    final toFocusNode = useFocusNode();
+    final formKey = useMemoized(() => GlobalKey<FormState>());
+    
+    final texts = AppLocalizations.of(context)!;
 
-    return GradientScaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            SizedBox(height: 12.h),
-            const AppBar2(title: 'Customize Card'),
-            SizedBox(height: 24.h),
-            
-            // Canvas Area
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24.w),
-                child: Container(
-                  width: double.infinity,
-                  clipBehavior: Clip.hardEdge,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFFFFF),
-                    borderRadius: BorderRadius.circular(20.r),
-                    border: Border.all(color: const Color(0xFF000000), width: 0.5.w),
-                  ),
-                  child: Stack(
-                    children: [
-                      // Base Card SVG
-                      Positioned.fill(
-                        child: SvgPicture.asset(
-                          AppAssets.gatta,
-                          fit: BoxFit.contain,
+    void showExitDialog() {
+      showDialog(
+        context: context,
+        builder: (dialogContext) => ConfirmationDialog(
+          title: texts.discardChanges,
+          message: texts.discardChangesDesc,
+          confirmText: texts.discard,
+          cancelText: texts.keepEditing,
+          onConfirm: () {
+            Navigator.pop(dialogContext); // Close dialog
+            context.pop(); // Go back
+          },
+        ),
+      );
+    }
+
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {
+        if (didPop) return;
+        showExitDialog();
+      },
+      child: GradientScaffold(
+        body: SafeArea(
+          child: Column(
+            children: [
+              SizedBox(height: 12.h),
+              AppBar2(title: texts.customizeCard, onBackPressed: showExitDialog),
+              SizedBox(height: 24.h),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 24.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Carousel Container
+                        Container(
+                          width: double.infinity,
+                          height: 453.h,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFFFFF),
+                            borderRadius: BorderRadius.circular(20.r),
+                            border: Border.all(
+                              color: const Color(0xFF000000),
+                              width: 0.5.w,
+                            ),
+                          ),
+                          child: PageView(
+                            controller: pageController,
+                            onPageChanged: (index) {
+                              currentPage.value = index;
+                              if (index == 2 && !isRecipientStep.value) {
+                                isRecipientStep.value = true;
+                              } else if (index < 2 && isRecipientStep.value) {
+                                isRecipientStep.value = false;
+                              }
+                            },
+                            children: [
+                              // Front Cover
+                              Center(
+                                child: SvgPicture.asset(
+                                  AppAssets.gatta,
+                                  fit: BoxFit.contain,
+                                  width: 253.w,
+                                  height: 358.h,
+                                ),
+                              ),
+                              // Inside Card
+                              Center(
+                                child: SvgPicture.asset(
+                                  AppAssets.gatta,
+                                  fit: BoxFit.contain,
+                                  width: 253.w,
+                                  height: 358.h,
+                                ),
+                              ),
+                              // Envelope / Third Step
+                              Center(
+                                child: SvgPicture.asset(
+                                  AppAssets.gatta,
+                                  fit: BoxFit.contain,
+                                  width: 253.w,
+                                  height: 358.h,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      
-                      // Draggable Text
-                      Positioned(
-                        left: textPosition.value.dx,
-                        top: textPosition.value.dy,
-                        child: GestureDetector(
-                          onPanUpdate: (details) {
-                            textPosition.value = Offset(
-                              textPosition.value.dx + details.delta.dx,
-                              textPosition.value.dy + details.delta.dy,
+                        SizedBox(height: 16.h),
+                        // Carousel Indicator
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(3, (index) {
+                            final isActive = currentPage.value == index;
+                            return AnimatedOpacity(
+                              duration: const Duration(milliseconds: 300),
+                              opacity: isActive ? 1.0 : 0.3,
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 300),
+                                margin: EdgeInsets.symmetric(horizontal: 4.w),
+                                width: isActive ? 24.w : 8.w,
+                                height: 8.h,
+                                decoration: BoxDecoration(
+                                  gradient: AppColors.primaryButtonGradient,
+                                  borderRadius: BorderRadius.circular(4.r),
+                                ),
+                              ),
                             );
-                          },
-                          onTap: () {
-                            isEditingText.value = true;
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(8.w),
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: isEditingText.value ? Colors.blue : Colors.transparent,
-                                width: 1,
+                          }),
+                        ),
+                        SizedBox(height: 24.h),
+
+                        if (!isRecipientStep.value) ...[
+                          // Title and Price
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'HBD 01',
+                                style: AppTextStyles.colitez400Italic24(),
+                              ),
+                              Text(
+                                '\$ 5.99',
+                                style: AppTextStyles.colitez400Italic24(),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 24.h),
+
+                          // Edit Cover Text
+                          Text(
+                            texts.editCoverText,
+                            style: AppTextStyles.colitez400Italic16(),
+                          ),
+                          SizedBox(height: 8.h),
+                          CustomCardTextField(
+                            controller: coverTextController,
+                            maxLines: 4,
+                          ),
+                          SizedBox(height: 24.h),
+
+                          // Edit Inside Message
+                          Text(
+                            texts.editInsideMessage,
+                            style: AppTextStyles.colitez400Italic16(),
+                          ),
+                          SizedBox(height: 8.h),
+                          CustomCardTextField(
+                            controller: insideMessageController,
+                            maxLines: 5,
+                          ),
+                          SizedBox(height: 32.h),
+
+                          // Buttons
+                          PrimaryButton(
+                            text: texts.continueText,
+                            onPressed: () {
+                              if (coverTextController.text.trim().isEmpty || insideMessageController.text.trim().isEmpty) {
+                                CustomSnackbar.showError(context, 'Please fill out all message fields.');
+                                return;
+                              }
+                              if (fromController.text.trim().isEmpty || toController.text.trim().isEmpty) {
+                                CustomSnackbar.showError(context, 'Please fill out all recipient fields.');
+                                pageController.animateToPage(2, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+                                return;
+                              }
+                              // Navigate back to the Card Detail Screen with updated data
+                              context.pop({
+                                'coverText': coverTextController.text,
+                                'insideMessage': insideMessageController.text,
+                              });
+                            },
+                          ),
+                          SizedBox(height: 16.h),
+                          OutlinedButton(
+                            onPressed: () async {
+                              final draftNameController = TextEditingController();
+                              final result = await showDialog<String>(
+                                context: context,
+                                builder: (dialogContext) => Dialog(
+                                  backgroundColor: Colors.transparent,
+                                  elevation: 0,
+                                  insetPadding: EdgeInsets.symmetric(horizontal: 24.w),
+                                  child: Container(
+                                    width: 310.w,
+                                    padding: EdgeInsets.symmetric(vertical: 24.h),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFFFFFFF),
+                                      borderRadius: BorderRadius.circular(20.r),
+                                      border: Border.all(color: const Color(0xFF000000), width: 0.5),
+                                    ),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          'Save Draft',
+                                          style: AppTextStyles.colitez400Italic20(),
+                                        ),
+                                        SizedBox(height: 16.h),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(horizontal: 24.w),
+                                          child: AppTextField(
+                                            controller: draftNameController,
+                                            hintText: 'Enter draft name...',
+                                            maxLength: 15,
+                                          ),
+                                        ),
+                                        SizedBox(height: 24.h),
+                                        Padding(
+                                          padding: EdgeInsets.symmetric(horizontal: 16.w),
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: GestureDetector(
+                                                  onTap: () => Navigator.of(dialogContext).pop(),
+                                                  child: Container(
+                                                    height: 34.h,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius: BorderRadius.circular(20.r),
+                                                      border: Border.all(color: Colors.black, width: 0.5),
+                                                    ),
+                                                    alignment: Alignment.center,
+                                                    child: Text('Cancel', style: AppTextStyles.roboto500Medium14()),
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(width: 15.w),
+                                              Expanded(
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    final name = draftNameController.text.trim();
+                                                    if (name.isEmpty) {
+                                                      CustomSnackbar.showError(dialogContext, 'Please enter a name.');
+                                                      return;
+                                                    }
+                                                    if (name.length > 15) {
+                                                      CustomSnackbar.showError(dialogContext, 'Name cannot exceed 15 letters.');
+                                                      return;
+                                                    }
+                                                    Navigator.of(dialogContext).pop(name);
+                                                  },
+                                                  child: Container(
+                                                    height: 34.h,
+                                                    decoration: BoxDecoration(
+                                                      gradient: AppColors.primaryButtonGradient,
+                                                      borderRadius: BorderRadius.circular(20.r),
+                                                    ),
+                                                    alignment: Alignment.center,
+                                                    child: Text('Save', style: AppTextStyles.roboto500Medium14().copyWith(color: Colors.white)),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+
+                              if (result != null) {
+                                final db = ref.read(appDatabaseProvider);
+                                await db
+                                    .into(db.draftsTable)
+                                    .insert(
+                                      DraftsTableCompanion.insert(
+                                        cardId: cardId,
+                                        coverText: coverTextController.text,
+                                        insideMessage: insideMessageController.text,
+                                        savedAt: DateTime.now(),
+                                        draftName: drift.Value(result),
+                                      ),
+                                    );
+                                if (context.mounted) {
+                                  CustomSnackbar.showSuccess(context, texts.savedToMyDrafts);
+                                  context.goNamed(AppRoute.myDrafts.name);
+                                }
+                              }
+                            },
+                            style: OutlinedButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                              minimumSize: Size(double.infinity, 44.h),
+                              side: BorderSide(
+                                color: Colors.black,
+                                width: 0.5.w,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20.r),
                               ),
                             ),
                             child: Text(
-                              message.value,
-                              style: fonts[fontIndex.value](color: textColor.value),
+                              texts.saveDraft,
+                              style: AppTextStyles.colitez400Italic22(),
                             ),
                           ),
-                        ),
-                      ),
-                    ],
+                        ] else ...[
+                          Form(
+                            key: formKey,
+                            child: Column(
+                              children: [
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    texts.addRecipient,
+                                    style: AppTextStyles.colitez400Italic24(),
+                                  ),
+                                ),
+                                SizedBox(height: 24.h),
+                                AppTextField(
+                                  labelText: texts.fromLabel,
+                                  hintText: texts.fromHint,
+                                  controller: fromController,
+                                  focusNode: fromFocusNode,
+                                  textInputAction: TextInputAction.next,
+                                  onFieldSubmitted: (_) => toFocusNode.requestFocus(),
+                                  validator: (value) => value == null || value.trim().isEmpty ? 'This field is required' : null,
+                                ),
+                                SizedBox(height: 24.h),
+                                AppTextField(
+                                  labelText: texts.toLabel,
+                                  hintText: texts.toHint,
+                                  controller: toController,
+                                  focusNode: toFocusNode,
+                                  textInputAction: TextInputAction.done,
+                                  validator: (value) => value == null || value.trim().isEmpty ? 'This field is required' : null,
+                                ),
+                                SizedBox(height: 32.h),
+                                PrimaryButton(
+                                  text: texts.sendButton,
+                                  onPressed: () {
+                                    if (formKey.currentState?.validate() ?? false) {
+                                      // Handle send logic here
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                        SizedBox(height: 40.h),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            SizedBox(height: 24.h),
-
-            // Editing Toolbar
-            if (isEditingText.value) ...[
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24.w),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: textController,
-                        onChanged: (val) => message.value = val,
-                        decoration: InputDecoration(
-                          hintText: 'Enter your message',
-                          filled: true,
-                          fillColor: Colors.white,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.r),
-                            borderSide: BorderSide(color: Colors.black, width: 0.5.w),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.r),
-                            borderSide: BorderSide(color: Colors.black, width: 0.5.w),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 8.w),
-                    IconButton(
-                      icon: const Icon(Icons.check),
-                      onPressed: () => isEditingText.value = false,
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 16.h),
-            ] else ...[
-              // Tools
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Colors', style: AppTextStyles.roboto400Regular14()),
-                    SizedBox(height: 8.h),
-                    SizedBox(
-                      height: 40.h,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: colors.length,
-                        separatorBuilder: (_, __) => SizedBox(width: 12.w),
-                        itemBuilder: (context, index) {
-                          final color = colors[index];
-                          final isSelected = textColor.value == color;
-                          return GestureDetector(
-                            onTap: () => textColor.value = color,
-                            child: Container(
-                              width: 40.w,
-                              height: 40.w,
-                              decoration: BoxDecoration(
-                                color: color,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: isSelected ? Colors.blue : Colors.black,
-                                  width: isSelected ? 2.w : 0.5.w,
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-                    Text('Fonts', style: AppTextStyles.roboto400Regular14()),
-                    SizedBox(height: 8.h),
-                    SizedBox(
-                      height: 40.h,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: fonts.length,
-                        separatorBuilder: (_, __) => SizedBox(width: 12.w),
-                        itemBuilder: (context, index) {
-                          final isSelected = fontIndex.value == index;
-                          return GestureDetector(
-                            onTap: () => fontIndex.value = index,
-                            child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 16.w),
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: isSelected ? Colors.black : Colors.white,
-                                borderRadius: BorderRadius.circular(20.r),
-                                border: Border.all(color: Colors.black, width: 0.5.w),
-                              ),
-                              child: Text(
-                                'Font ${index + 1}',
-                                style: AppTextStyles.roboto400Regular14(
-                                  color: isSelected ? Colors.white : Colors.black,
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ],
-            
-            SizedBox(height: 24.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: PrimaryButton(
-                text: "Save & Continue",
-                onPressed: () {
-                  // Finalize logic here
-                },
-              ),
-            ),
-            SizedBox(height: 40.h),
-          ],
+          ),
         ),
       ),
     );

@@ -1,9 +1,10 @@
 import 'package:daimond/core/utils/either.dart';
+import 'package:drift/drift.dart';
 import '../../../../core/error/failures.dart';
+import '../../../../core/database/app_database.dart';
 import '../../domain/entities/favorite_entity.dart';
 import '../../domain/repositories/favorites_repository.dart';
 import '../datasources/local_favorites_datasource.dart';
-import '../models/favorite_model.dart';
 
 class FavoritesRepositoryImpl implements FavoritesRepository {
   final LocalFavoritesDataSource localDataSource;
@@ -31,14 +32,15 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
   @override
   Future<Either<Failure, void>> toggleFavorite(FavoriteEntity entity) async {
     try {
-      final model = FavoriteModel()
-        ..cardId = entity.cardId
-        ..title = entity.title
-        ..colorValue = entity.colorValue
-        ..supabaseUserId = entity.supabaseUserId
-        ..favoritedAt = entity.favoritedAt;
+      final companion = FavoritesTableCompanion(
+        cardId: Value(entity.cardId),
+        title: Value(entity.title),
+        colorValue: Value(entity.colorValue),
+        supabaseUserId: Value(entity.supabaseUserId),
+        favoritedAt: Value(entity.favoritedAt),
+      );
       
-      await localDataSource.toggleFavorite(model);
+      await localDataSource.toggleFavorite(companion);
       return Either.right(null);
     } catch (e) {
       return Either.left(DatabaseFailure('Failed to toggle favorite: $e'));

@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../../core/widgets/confirmation_dialog.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/gradient_scaffold.dart';
-import '../../../../core/utils/app_snackbars.dart';
+import '../../../../core/widgets/custom_snackbar.dart';
 
 class TestingScreen extends StatelessWidget {
   const TestingScreen({super.key});
@@ -40,12 +40,21 @@ class TestingScreen extends StatelessWidget {
             ),
             SizedBox(height: 24.h),
             PrimaryButton(
-              text: 'Show Error Snackbar',
+              text: 'Show Success Toast',
               onPressed: () {
-                AppSnackbars.showError(
+                CustomSnackbar.showSuccess(
                   context,
-                  title: l10n.loginFailedTitle,
-                  message: l10n.loginFailedMessage,
+                  'This is a success toast message!',
+                );
+              },
+            ),
+            SizedBox(height: 24.h),
+            PrimaryButton(
+              text: 'Show Error Toast',
+              onPressed: () {
+                CustomSnackbar.showError(
+                  context,
+                  'This is an error toast message!',
                 );
               },
             ),

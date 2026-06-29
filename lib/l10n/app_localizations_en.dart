@@ -75,11 +75,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get home => 'Home';
 
   @override
-  String get welcomeBack => 'Welcome back!';
+  String get welcomeBack => 'Welcome!';
 
   @override
   String get welcomeSubtitle =>
-      '   Someone\'s smile could start with a card from you today.';
+      'Someone\'s smile could start with a card from you today.';
 
   @override
   String get featuredCards => 'Featured Cards';
@@ -219,13 +219,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get preferences => 'Preferences';
 
   @override
-  String get myCart => 'My Cart';
+  String get orderHistory => 'Order History';
+
+  @override
+  String get emptyOrderHistory => 'No orders yet.';
 
   @override
   String get subscriptions => 'Subscriptions';
 
   @override
-  String get privacyPolicy => 'Privacy Policy';
+  String get privacyPolicy => 'Privacy';
 
   @override
   String get termsAndConditions => 'Terms and Conditions';
@@ -355,4 +358,141 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get logoutMessage =>
       'Are you sure you want to log out of your account?';
+
+  @override
+  String get subscriptionTitle => 'Choose your plan';
+
+  @override
+  String get subscriptionHeading => 'Choose your plan';
+
+  @override
+  String get subscriptionSubheading =>
+      'Never miss a special occasion. Choose a plan below to start sending beautifully designed cards directly to your loved ones every month.';
+
+  @override
+  String get subscriptionGuarantee => 'Cancel anytime. Secure payment.';
+
+  @override
+  String get restorePurchases => 'Restore Purchases';
+
+  @override
+  String get termsOfService => 'Terms';
+
+  @override
+  String get subscriptionBenefitsTitle => 'What\'s included in every plan:';
+
+  @override
+  String get subscriptionBenefit1 =>
+      'Unlimited access to all standard templates';
+
+  @override
+  String get subscriptionBenefit2 => 'Send cards instantly to anyone, anywhere';
+
+  @override
+  String get subscriptionBenefit3 => 'No hidden fees, cancel anytime';
+
+  @override
+  String get plan1Title => 'Standard';
+
+  @override
+  String get plan1Desc =>
+      'Perfect for sending occasional cards to your loved ones.';
+
+  @override
+  String get plan1Cards => '5 Cards';
+
+  @override
+  String get plan1Price => '\$4.99 / mo';
+
+  @override
+  String get plan2Title => 'Premium';
+
+  @override
+  String get plan2Desc =>
+      'For those who want to celebrate every moment in style.';
+
+  @override
+  String get plan2Cards => '10 Cards';
+
+  @override
+  String get plan2Price => '\$8.99 / mo';
+
+  @override
+  String get subscribeButton => 'Subscribe Now';
+
+  @override
+  String get loginSuccess => 'Login successful!';
+
+  @override
+  String get signUpSuccess => 'Sign up successful! You can now log in.';
+
+  @override
+  String get forgotPasswordSuccess => 'Password reset link sent to your email!';
+
+  @override
+  String get logoutSuccess => 'Logout successful!';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get myDrafts => 'My Drafts';
+
+  @override
+  String get noDraftsSavedYet => 'No drafts saved yet.';
+
+  @override
+  String get discardChanges => 'Discard Changes?';
+
+  @override
+  String get discardChangesDesc =>
+      'Are you sure you want to discard your edits?';
+
+  @override
+  String get keepEditing => 'Keep Editing';
+
+  @override
+  String get discard => 'Discard';
+
+  @override
+  String get customizeCard => 'Customize Card';
+
+  @override
+  String get editCoverText => 'Edit Cover Text';
+
+  @override
+  String get editInsideMessage => 'Edit Inside Message';
+
+  @override
+  String get saveDraft => 'Save Draft';
+
+  @override
+  String get savedToMyDrafts => 'Saved to My Drafts';
+
+  @override
+  String get addRecipient => 'Add Recipient';
+
+  @override
+  String get fromLabel => 'From';
+
+  @override
+  String get fromHint => 'Enter your name here.';
+
+  @override
+  String get toLabel => 'To';
+
+  @override
+  String get toHint => 'Enter recipient\'s name here.';
+
+  @override
+  String get continueText => 'Done';
+
+  @override
+  String get draftPrefix => 'Draft: ';
+
+  @override
+  String get coverPrefix => 'Cover: ';
+
+  @override
+  String get insidePrefix => 'Inside: ';
 }

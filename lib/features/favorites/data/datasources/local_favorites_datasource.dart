@@ -1,37 +1,37 @@
-import 'package:isar/isar.dart';
-import '../models/favorite_model.dart';
+import '../../../../core/database/app_database.dart';
+import 'package:drift/drift.dart';
 
 abstract class LocalFavoritesDataSource {
-  Future<List<FavoriteModel>> getFavorites();
-  Future<void> toggleFavorite(FavoriteModel favorite);
+  Future<List<FavoriteTableData>> getFavorites();
+  Future<void> toggleFavorite(FavoritesTableCompanion favorite);
   Future<bool> isFavorite(String cardId);
 }
 
 class LocalFavoritesDataSourceImpl implements LocalFavoritesDataSource {
-  final Isar isar;
+  final AppDatabase db;
 
-  LocalFavoritesDataSourceImpl(this.isar);
+  LocalFavoritesDataSourceImpl(this.db);
 
   @override
-  Future<List<FavoriteModel>> getFavorites() async {
-    return await isar.favoriteModels.where().sortByFavoritedAtDesc().findAll();
+  Future<List<FavoriteTableData>> getFavorites() async {
+    return await (db.select(db.favoritesTable)
+          ..orderBy([(t) => OrderingTerm(expression: t.favoritedAt, mode: OrderingMode.desc)]))
+        .get();
   }
 
   @override
-  Future<void> toggleFavorite(FavoriteModel favorite) async {
-    await isar.writeTxn(() async {
-      final existing = await isar.favoriteModels.where().cardIdEqualTo(favorite.cardId).findFirst();
-      if (existing != null) {
-        await isar.favoriteModels.delete(existing.id);
-      } else {
-        await isar.favoriteModels.put(favorite);
-      }
-    });
+  Future<void> toggleFavorite(FavoritesTableCompanion favorite) async {
+    final existing = await (db.select(db.favoritesTable)..where((t) => t.cardId.equals(favorite.cardId.value))).getSingleOrNull();
+    if (existing != null) {
+      await db.favoritesTable.deleteWhere((t) => t.id.equals(existing.id));
+    } else {
+      await db.into(db.favoritesTable).insert(favorite);
+    }
   }
 
   @override
   Future<bool> isFavorite(String cardId) async {
-    final existing = await isar.favoriteModels.where().cardIdEqualTo(cardId).findFirst();
+    final existing = await (db.select(db.favoritesTable)..where((t) => t.cardId.equals(cardId))).getSingleOrNull();
     return existing != null;
   }
 }

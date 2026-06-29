@@ -12,8 +12,11 @@ enum AppRoute {
   editProfile('/edit-profile'),
   cardDetail('/card-detail'),
   previewCard('/preview-card'),
+  editCard('/edit-card'),
   notificationSettings('/notification-settings'),
-  cart('/cart');
+  orderHistory('/orderHistory'),
+  subscription('/subscription'),
+  myDrafts('/my-drafts');
 
   const AppRoute(this.path);
   final String path;

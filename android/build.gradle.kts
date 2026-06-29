@@ -27,6 +27,17 @@ subprojects {
                     setNamespace.invoke(androidExt, newNamespace)
                 }
             }
+            val setCompileSdkVersion = androidExt.javaClass.methods.firstOrNull { it.name == "setCompileSdkVersion" }
+            if (setCompileSdkVersion != null) {
+                try {
+                    setCompileSdkVersion.invoke(androidExt, 36)
+                } catch (e: Exception) {
+                    try {
+                        setCompileSdkVersion.invoke(androidExt, "android-36")
+                    } catch (e2: Exception) {
+                    }
+                }
+            }
         }
     }
 }

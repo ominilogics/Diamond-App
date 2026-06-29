@@ -5,12 +5,14 @@ import 'package:go_router/go_router.dart';
 
 import '../routing/app_routes.dart';
 import '../theme/app_text_styles.dart';
+import '../theme/app_colors.dart';
 import '../utils/app_assets.dart';
 
 class AppBar1 extends StatelessWidget {
   final String title;
+  final TextStyle? textStyle;
 
-  const AppBar1({super.key, required this.title});
+  const AppBar1({super.key, required this.title, this.textStyle});
 
   @override
   Widget build(BuildContext context) {
@@ -19,14 +21,18 @@ class AppBar1 extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: AppTextStyles.colitez400Italic20()),
-          GestureDetector(
-            onTap: () {
-              context.pushNamed(AppRoute.notifications.name);
-            },
-            behavior: HitTestBehavior.opaque,
-            child: Padding(
-              padding: EdgeInsets.all(8.w),
+          Text(title, style: textStyle ?? AppTextStyles.colitez400Italic20()),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                context.pushNamed(AppRoute.notifications.name);
+              },
+              customBorder: const CircleBorder(),
+              splashColor: AppColors.primaryButtonGradientStart.withOpacity(0.2),
+              highlightColor: AppColors.primaryButtonGradientStart.withOpacity(0.1),
+              child: Padding(
+                padding: EdgeInsets.all(8.w),
               child: SvgPicture.asset(
                 AppAssets.notification,
                 width: 25.w,
@@ -37,6 +43,7 @@ class AppBar1 extends StatelessWidget {
                 ),
               ),
             ),
+          ),
           ),
         ],
       ),

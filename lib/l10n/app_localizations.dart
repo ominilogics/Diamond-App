@@ -223,13 +223,13 @@ abstract class AppLocalizations {
   /// No description provided for @welcomeBack.
   ///
   /// In en, this message translates to:
-  /// **'Welcome back!'**
+  /// **'Welcome!'**
   String get welcomeBack;
 
   /// No description provided for @welcomeSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'   Someone\'s smile could start with a card from you today.'**
+  /// **'Someone\'s smile could start with a card from you today.'**
   String get welcomeSubtitle;
 
   /// No description provided for @featuredCards.
@@ -496,11 +496,17 @@ abstract class AppLocalizations {
   /// **'Preferences'**
   String get preferences;
 
-  /// No description provided for @myCart.
+  /// No description provided for @orderHistory.
   ///
   /// In en, this message translates to:
-  /// **'My Cart'**
-  String get myCart;
+  /// **'Order History'**
+  String get orderHistory;
+
+  /// No description provided for @emptyOrderHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'No orders yet.'**
+  String get emptyOrderHistory;
 
   /// No description provided for @subscriptions.
   ///
@@ -511,7 +517,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacyPolicy.
   ///
   /// In en, this message translates to:
-  /// **'Privacy Policy'**
+  /// **'Privacy'**
   String get privacyPolicy;
 
   /// No description provided for @termsAndConditions.
@@ -759,6 +765,270 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Are you sure you want to log out of your account?'**
   String get logoutMessage;
+
+  /// No description provided for @subscriptionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your plan'**
+  String get subscriptionTitle;
+
+  /// No description provided for @subscriptionHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your plan'**
+  String get subscriptionHeading;
+
+  /// No description provided for @subscriptionSubheading.
+  ///
+  /// In en, this message translates to:
+  /// **'Never miss a special occasion. Choose a plan below to start sending beautifully designed cards directly to your loved ones every month.'**
+  String get subscriptionSubheading;
+
+  /// No description provided for @subscriptionGuarantee.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel anytime. Secure payment.'**
+  String get subscriptionGuarantee;
+
+  /// No description provided for @restorePurchases.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Purchases'**
+  String get restorePurchases;
+
+  /// No description provided for @termsOfService.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms'**
+  String get termsOfService;
+
+  /// No description provided for @subscriptionBenefitsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s included in every plan:'**
+  String get subscriptionBenefitsTitle;
+
+  /// No description provided for @subscriptionBenefit1.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited access to all standard templates'**
+  String get subscriptionBenefit1;
+
+  /// No description provided for @subscriptionBenefit2.
+  ///
+  /// In en, this message translates to:
+  /// **'Send cards instantly to anyone, anywhere'**
+  String get subscriptionBenefit2;
+
+  /// No description provided for @subscriptionBenefit3.
+  ///
+  /// In en, this message translates to:
+  /// **'No hidden fees, cancel anytime'**
+  String get subscriptionBenefit3;
+
+  /// No description provided for @plan1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard'**
+  String get plan1Title;
+
+  /// No description provided for @plan1Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'Perfect for sending occasional cards to your loved ones.'**
+  String get plan1Desc;
+
+  /// No description provided for @plan1Cards.
+  ///
+  /// In en, this message translates to:
+  /// **'5 Cards'**
+  String get plan1Cards;
+
+  /// No description provided for @plan1Price.
+  ///
+  /// In en, this message translates to:
+  /// **'\$4.99 / mo'**
+  String get plan1Price;
+
+  /// No description provided for @plan2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium'**
+  String get plan2Title;
+
+  /// No description provided for @plan2Desc.
+  ///
+  /// In en, this message translates to:
+  /// **'For those who want to celebrate every moment in style.'**
+  String get plan2Desc;
+
+  /// No description provided for @plan2Cards.
+  ///
+  /// In en, this message translates to:
+  /// **'10 Cards'**
+  String get plan2Cards;
+
+  /// No description provided for @plan2Price.
+  ///
+  /// In en, this message translates to:
+  /// **'\$8.99 / mo'**
+  String get plan2Price;
+
+  /// No description provided for @subscribeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribe Now'**
+  String get subscribeButton;
+
+  /// No description provided for @loginSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Login successful!'**
+  String get loginSuccess;
+
+  /// No description provided for @signUpSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign up successful! You can now log in.'**
+  String get signUpSuccess;
+
+  /// No description provided for @forgotPasswordSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset link sent to your email!'**
+  String get forgotPasswordSuccess;
+
+  /// No description provided for @logoutSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout successful!'**
+  String get logoutSuccess;
+
+  /// No description provided for @language.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// No description provided for @myDrafts.
+  ///
+  /// In en, this message translates to:
+  /// **'My Drafts'**
+  String get myDrafts;
+
+  /// No description provided for @noDraftsSavedYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No drafts saved yet.'**
+  String get noDraftsSavedYet;
+
+  /// No description provided for @discardChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard Changes?'**
+  String get discardChanges;
+
+  /// No description provided for @discardChangesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to discard your edits?'**
+  String get discardChangesDesc;
+
+  /// No description provided for @keepEditing.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep Editing'**
+  String get keepEditing;
+
+  /// No description provided for @discard.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get discard;
+
+  /// No description provided for @customizeCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize Card'**
+  String get customizeCard;
+
+  /// No description provided for @editCoverText.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Cover Text'**
+  String get editCoverText;
+
+  /// No description provided for @editInsideMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Inside Message'**
+  String get editInsideMessage;
+
+  /// No description provided for @saveDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Draft'**
+  String get saveDraft;
+
+  /// No description provided for @savedToMyDrafts.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to My Drafts'**
+  String get savedToMyDrafts;
+
+  /// No description provided for @addRecipient.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Recipient'**
+  String get addRecipient;
+
+  /// No description provided for @fromLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get fromLabel;
+
+  /// No description provided for @fromHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your name here.'**
+  String get fromHint;
+
+  /// No description provided for @toLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get toLabel;
+
+  /// No description provided for @toHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter recipient\'s name here.'**
+  String get toHint;
+
+  /// No description provided for @continueText.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get continueText;
+
+  /// No description provided for @draftPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft: '**
+  String get draftPrefix;
+
+  /// No description provided for @coverPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Cover: '**
+  String get coverPrefix;
+
+  /// No description provided for @insidePrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Inside: '**
+  String get insidePrefix;
 }
 
 class _AppLocalizationsDelegate

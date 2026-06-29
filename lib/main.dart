@@ -4,21 +4,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:daimond/l10n/app_localizations.dart';
 import 'core/routing/app_router.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:isar/isar.dart';
-import 'features/events/data/models/event_model.dart';
-import 'features/favorites/data/models/favorite_model.dart';
-import 'features/cart/data/models/cart_item_model.dart';
+import 'core/database/app_database.dart';
 import 'core/providers/database_provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final dir = await getApplicationDocumentsDirectory();
-  final isar = await Isar.open(
-    [EventModelSchema, FavoriteModelSchema, CartItemModelSchema],
-    directory: dir.path,
+  await dotenv.load(fileName: ".env");
+  await Supabase.initialize(
+    url: dotenv.env['SUPABASE_URL']!,
+    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
+
+  final appDatabase = AppDatabase();
 
   // Configure system UI overlays for Android edge-to-edge support
   SystemChrome.setSystemUIOverlayStyle(
@@ -38,7 +38,7 @@ void main() async {
   ]).then((_) {
     runApp(ProviderScope(
       overrides: [
-        isarProvider.overrideWithValue(isar),
+        appDatabaseProvider.overrideWithValue(appDatabase),
       ],
       child: const MyApp(),
     ));

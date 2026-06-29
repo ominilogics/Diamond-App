@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:daimond/l10n/app_localizations.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -9,12 +11,20 @@ import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/gradient_scaffold.dart';
 import '../../../../core/widgets/primary_button.dart';
 
-class EditProfileScreen extends StatelessWidget {
+class EditProfileScreen extends HookWidget {
   const EditProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final user = Supabase.instance.client.auth.currentUser;
+    final email = user?.email ?? l10n.profileEmail;
+    final rawName = user?.userMetadata?['full_name'] as String? ?? 
+                    user?.userMetadata?['name'] as String? ?? 
+                    l10n.profileName;
+    final initial = rawName.isNotEmpty ? rawName[0].toUpperCase() : 'U';
+
+    final nameController = useTextEditingController(text: rawName);
 
     return GradientScaffold(
       body: SingleChildScrollView(
@@ -47,7 +57,7 @@ class EditProfileScreen extends StatelessWidget {
                       ),
                       child: Center(
                         child: Text(
-                          l10n.profileInitial,
+                          initial,
                           style: TextStyle(
                             fontFamily: 'Roboto',
                             fontWeight: FontWeight.w300,
@@ -94,7 +104,7 @@ class EditProfileScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 8.h),
                   AppTextField(
-                    controller: TextEditingController(text: l10n.profileName),
+                    controller: nameController,
                   ),
                   SizedBox(height: 24.h),
                   Text(
@@ -102,7 +112,7 @@ class EditProfileScreen extends StatelessWidget {
                     style: AppTextStyles.colitez400Italic16(),
                   ),
                   SizedBox(height: 8.h),
-                  AppTextField(hintText: l10n.profileEmail, readOnly: true),
+                  AppTextField(hintText: email, readOnly: true),
                   SizedBox(height: 40.h),
                   PrimaryButton(text: l10n.saveChanges, onPressed: () {}),
                 ],

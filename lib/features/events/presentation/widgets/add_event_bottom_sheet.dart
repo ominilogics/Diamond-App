@@ -77,21 +77,6 @@ class AddEventBottomSheet extends HookConsumerWidget {
                         ],
                       ),
                     ),
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Container(
-                        padding: EdgeInsets.all(6.w),
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFD9D9D9),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.close,
-                          color: Colors.black,
-                          size: 20.w,
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -123,8 +108,14 @@ class AddEventBottomSheet extends HookConsumerWidget {
                     SizedBox(height: 24.h),
 
                     // Reminder Field
-                    PopupMenuButton<String>(
-                      initialValue: reminderController.text,
+                    Theme(
+                      data: Theme.of(context).copyWith(
+                        splashColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                      ),
+                      child: PopupMenuButton<String>(
+                        initialValue: reminderController.text,
                       onSelected: (val) => reminderController.text = val,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12.r),
@@ -172,6 +163,7 @@ class AddEventBottomSheet extends HookConsumerWidget {
                           ),
                         ),
                       ),
+                    ),
                     ),
                     SizedBox(height: 24.h),
 

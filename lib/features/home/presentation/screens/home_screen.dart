@@ -24,25 +24,17 @@ class HomeScreen extends StatelessWidget {
           SizedBox(height: 12.h),
 
           // 1. Top Bar
-          AppBar1(title: texts.home),
-          SizedBox(height: 24.h),
+          AppBar1(
+            title: texts.welcomeBack,
+            textStyle: AppTextStyles.colitez400Italic32(),
+          ),
 
           // 2. Welcome Section
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  texts.welcomeBack,
-                  style: AppTextStyles.colitez400Italic32(),
-                ),
-                // SizedBox(height: 4.h),
-                Text(
-                  texts.welcomeSubtitle,
-                  style: AppTextStyles.roboto300Light13(),
-                ),
-              ],
+            padding: EdgeInsets.only(left: 30.w, right: 60),
+            child: Text(
+              texts.welcomeSubtitle,
+              style: AppTextStyles.roboto300Light13(),
             ),
           ),
           SizedBox(height: 24.h),
@@ -83,10 +75,26 @@ class HomeScreen extends StatelessWidget {
                 childAspectRatio: 171.w / 204.h,
               ),
               children: [
-                FeaturedCard(cardId: 'home_card_1', title: texts.eidCard1, cardColor: AppColors.card1),
-                FeaturedCard(cardId: 'home_card_2', title: texts.eidCard1, cardColor: AppColors.card5),
-                FeaturedCard(cardId: 'home_card_3', title: texts.eidCard1, cardColor: AppColors.card3),
-                FeaturedCard(cardId: 'home_card_4', title: texts.eidCard1, cardColor: AppColors.card4),
+                FeaturedCard(
+                  cardId: 'home_card_1',
+                  title: texts.eidCard1,
+                  cardColor: AppColors.card1,
+                ),
+                FeaturedCard(
+                  cardId: 'home_card_2',
+                  title: texts.eidCard1,
+                  cardColor: AppColors.card5,
+                ),
+                FeaturedCard(
+                  cardId: 'home_card_3',
+                  title: texts.eidCard1,
+                  cardColor: AppColors.card3,
+                ),
+                FeaturedCard(
+                  cardId: 'home_card_4',
+                  title: texts.eidCard1,
+                  cardColor: AppColors.card4,
+                ),
               ],
             ),
           ),

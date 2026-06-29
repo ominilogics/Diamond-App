@@ -61,49 +61,64 @@ class ConfirmationDialog extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 24.h),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                    onTap: onCancel ?? () => Navigator.of(context).pop(),
-                    child: Container(
-                      width: 98.w,
-                      height: 34.h,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFFFFF),
-                        borderRadius: BorderRadius.circular(20.r),
-                        border: Border.all(
-                          color: const Color(0xFF000000),
-                          width: 0.5,
-                        ),
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        cancelText,
-                        style: AppTextStyles.roboto500Medium14(),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 15.w),
-                  GestureDetector(
-                    onTap: onConfirm,
-                    child: Container(
-                      width: 98.w,
-                      height: 34.h,
-                      decoration: BoxDecoration(
-                        gradient: AppColors.primaryButtonGradient,
-                        borderRadius: BorderRadius.circular(20.r),
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        confirmText,
-                        style: AppTextStyles.roboto500Medium14().copyWith(
-                          color: Colors.white,
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: onCancel ?? () => Navigator.of(context).pop(),
+                        child: Container(
+                          height: 34.h,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFFFFF),
+                            borderRadius: BorderRadius.circular(20.r),
+                            border: Border.all(
+                              color: const Color(0xFF000000),
+                              width: 0.5,
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 4.w),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                cancelText,
+                                style: AppTextStyles.roboto500Medium14(),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                    SizedBox(width: 15.w),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: onConfirm,
+                        child: Container(
+                          height: 34.h,
+                          decoration: BoxDecoration(
+                            gradient: AppColors.primaryButtonGradient,
+                            borderRadius: BorderRadius.circular(20.r),
+                          ),
+                          alignment: Alignment.center,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 4.w),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                confirmText,
+                                style: AppTextStyles.roboto500Medium14()
+                                    .copyWith(color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

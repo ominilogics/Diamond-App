@@ -1,9 +1,10 @@
 import '../../../../core/error/failures.dart';
 import '../../../../core/utils/either.dart';
+import 'package:drift/drift.dart';
+import '../../../../core/database/app_database.dart';
 import '../../domain/entities/event_entity.dart';
 import '../../domain/repositories/events_repository.dart';
 import '../datasources/local_events_datasource.dart';
-import '../models/event_model.dart';
 
 class EventsRepositoryImpl implements EventsRepository {
   final LocalEventsDataSource dataSource;
@@ -30,17 +31,15 @@ class EventsRepositoryImpl implements EventsRepository {
   @override
   Future<Either<Failure, void>> saveEvent(EventEntity event) async {
     try {
-      final model = EventModel()
-        ..title = event.title
-        ..date = event.date
-        ..reminder = event.reminder
-        ..isCustom = event.isCustom;
+      final companion = EventsTableCompanion(
+        id: event.id != -1 ? Value(event.id) : const Value.absent(),
+        title: Value(event.title),
+        date: Value(event.date),
+        reminder: Value(event.reminder),
+        isCustom: Value(event.isCustom),
+      );
       
-      if (event.id != -1) {
-        model.id = event.id;
-      }
-      
-      await dataSource.saveEvent(model);
+      await dataSource.saveEvent(companion);
       return Either.right(null);
     } catch (e) {
       return Either.left(DatabaseFailure('Failed to save event: $e'));

@@ -13,6 +13,9 @@ class AppLabelledTextField extends HookWidget {
   final TextInputType? keyboardType;
   final Widget? suffixIcon;
   final String? Function(String?)? validator;
+  final FocusNode? focusNode;
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onFieldSubmitted;
 
   const AppLabelledTextField({
     super.key,
@@ -23,6 +26,9 @@ class AppLabelledTextField extends HookWidget {
     this.keyboardType,
     this.suffixIcon,
     this.validator,
+    this.focusNode,
+    this.textInputAction,
+    this.onFieldSubmitted,
   });
 
   @override
@@ -61,6 +67,9 @@ class AppLabelledTextField extends HookWidget {
           keyboardType: keyboardType,
           suffixIcon: actualSuffixIcon,
           validator: validator,
+          focusNode: focusNode,
+          textInputAction: textInputAction,
+          onFieldSubmitted: onFieldSubmitted,
         ),
       ],
     );

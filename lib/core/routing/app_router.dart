@@ -1,4 +1,8 @@
+import 'dart:async';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/sign_up_screen.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
@@ -13,14 +17,34 @@ import '../../features/settings/presentation/screens/terms_and_conditions_screen
 import '../../features/settings/presentation/screens/notification_settings_screen.dart';
 import '../../features/cards/presentation/screens/card_detail_screen.dart';
 import '../../features/cards/presentation/screens/preview_card_screen.dart';
-import '../../features/cart/presentation/screens/cart_screen.dart';
+import '../../features/cards/presentation/screens/edit_card_screen.dart';
+import '../../features/orders/presentation/screens/order_history_screen.dart';
+import '../../features/subscription/presentation/screens/subscription_screen.dart';
+import '../../features/settings/presentation/screens/my_drafts_screen.dart';
 import 'app_routes.dart';
+
 
 class AppRouter {
   AppRouter._();
 
+  static final rootNavigatorKey = GlobalKey<NavigatorState>();
+
   static final router = GoRouter(
-    initialLocation: AppRoute.main.path,
+    navigatorKey: rootNavigatorKey,
+    initialLocation: Supabase.instance.client.auth.currentSession != null ? AppRoute.main.path : AppRoute.login.path,
+    redirect: (context, state) {
+      final session = Supabase.instance.client.auth.currentSession;
+      final isAuthRoute = state.matchedLocation == AppRoute.login.path || 
+                          state.matchedLocation == AppRoute.signup.path || 
+                          state.matchedLocation == AppRoute.forgotPassword.path;
+
+      if (session == null) {
+        if (!isAuthRoute) return AppRoute.login.path;
+      } else {
+        if (isAuthRoute) return AppRoute.main.path;
+      }
+      return null;
+    },
     routes: [
       GoRoute(
         name: AppRoute.editProfile.name,
@@ -88,8 +112,9 @@ class AppRouter {
           return CardDetailScreen(
             cardId: extra['cardId'] as String? ?? 'unknown',
             title: extra['title'] as String? ?? 'Card Details',
-            cartItemId: extra['cartItemId'] as int?,
+            orderId: extra['orderId'] as int?,
             initialMessage: extra['initialMessage'] as String?,
+            cardColorValue: extra['cardColorValue'] as int?,
           );
         },
       ),
@@ -104,14 +129,34 @@ class AppRouter {
         },
       ),
       GoRoute(
+        name: AppRoute.editCard.name,
+        path: AppRoute.editCard.path,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          return EditCardScreen(
+            cardId: extra['cardId'] as String? ?? 'unknown',
+          );
+        },
+      ),
+      GoRoute(
         name: AppRoute.notificationSettings.name,
         path: AppRoute.notificationSettings.path,
         builder: (context, state) => const NotificationSettingsScreen(),
       ),
       GoRoute(
-        name: AppRoute.cart.name,
-        path: AppRoute.cart.path,
-        builder: (context, state) => const CartScreen(),
+        name: AppRoute.orderHistory.name,
+        path: AppRoute.orderHistory.path,
+        builder: (context, state) => const OrderHistoryScreen(),
+      ),
+      GoRoute(
+        name: AppRoute.subscription.name,
+        path: AppRoute.subscription.path,
+        builder: (context, state) => const SubscriptionScreen(),
+      ),
+      GoRoute(
+        name: AppRoute.myDrafts.name,
+        path: AppRoute.myDrafts.path,
+        builder: (context, state) => const MyDraftsScreen(),
       ),
     ],
   );

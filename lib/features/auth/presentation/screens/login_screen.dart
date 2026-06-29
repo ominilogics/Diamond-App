@@ -1,3 +1,4 @@
+import 'package:daimond/core/routing/app_router.dart';
 import 'package:daimond/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -11,9 +12,11 @@ import '../../../../core/widgets/gradient_scaffold.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/or_divider.dart';
 import '../../../../core/widgets/social_auth_button.dart';
+import '../../../../core/widgets/custom_snackbar.dart';
 import '../../../../core/utils/app_assets.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/routing/app_routes.dart';
+import '../providers/auth_provider.dart';
 
 class LoginScreen extends HookConsumerWidget {
   const LoginScreen({super.key});
@@ -23,11 +26,36 @@ class LoginScreen extends HookConsumerWidget {
     final formKey = useMemoized(() => GlobalKey<FormState>());
     final emailController = useTextEditingController();
     final passwordController = useTextEditingController();
+    final emailFocus = useFocusNode();
+    final passwordFocus = useFocusNode();
     final texts = AppLocalizations.of(context)!;
+
+    final isLoading = ref.watch(authProvider);
 
     void onLoginPressed() {
       if (formKey.currentState!.validate()) {
-        // Proceed with login logic
+        debugPrint('Login process started for email: ${emailController.text.trim()}');
+        ref
+            .read(authProvider.notifier)
+            .signIn(
+              emailController.text.trim(),
+              passwordController.text.trim(),
+              (errorMessage) {
+                debugPrint('Login failed: $errorMessage');
+                if (context.mounted) {
+                  CustomSnackbar.showError(context, errorMessage);
+                }
+              },
+              () {
+                debugPrint('Login successful for email: ${emailController.text.trim()}');
+                if (context.mounted) {
+                  CustomSnackbar.showSuccess(context, texts.loginSuccess);
+                  context.goNamed(AppRoute.main.name);
+                }
+              },
+            );
+      } else {
+        debugPrint('Login validation failed');
       }
     }
 
@@ -60,6 +88,9 @@ class LoginScreen extends HookConsumerWidget {
                       hintText: texts.emailHint,
                       keyboardType: TextInputType.emailAddress,
                       controller: emailController,
+                      focusNode: emailFocus,
+                      textInputAction: TextInputAction.next,
+                      onFieldSubmitted: (_) => passwordFocus.requestFocus(),
                       validator: AppValidators.validateEmail,
                     ),
                     SizedBox(height: 16.h),
@@ -69,26 +100,36 @@ class LoginScreen extends HookConsumerWidget {
                       hintText: texts.passwordHint,
                       isPassword: true,
                       controller: passwordController,
+                      focusNode: passwordFocus,
+                      textInputAction: TextInputAction.done,
+                      onFieldSubmitted: (_) => onLoginPressed(),
                       validator: AppValidators.validateLoginPassword,
                     ),
-                    SizedBox(height: 8.h),
-
+                    // The top padding is handled by the GestureDetector's padding
                     Align(
                       alignment: Alignment.centerRight,
                       child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
                         onTap: () {
                           context.pushNamed(AppRoute.forgotPassword.name);
                         },
-                        child: Text(
-                          texts.forgotPasswordTitle,
-                          style: AppTextStyles.roboto300Light13(),
+                        child: Padding(
+                          padding: EdgeInsets.only(top: 8.h, bottom: 8.h, left: 16.w),
+                          child: Text(
+                            texts.forgotPasswordTitle,
+                            style: AppTextStyles.roboto400Regular14(),
+                          ),
                         ),
                       ),
                     ),
 
-                    SizedBox(height: 32.h),
+                    SizedBox(height: 24.h),
 
-                    PrimaryButton(text: texts.logIn, onPressed: onLoginPressed),
+                    PrimaryButton(
+                      text: texts.logIn,
+                      onPressed: onLoginPressed,
+                      isLoading: isLoading,
+                    ),
 
                     SizedBox(height: 32.h),
                     const OrDivider(),
@@ -101,28 +142,33 @@ class LoginScreen extends HookConsumerWidget {
                     ),
 
                     const Spacer(),
+                    SizedBox(height: 32.h),
 
                     Center(
                       child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
                         onTap: () {
                           // Navigate to Sign Up
                           context.goNamed(AppRoute.signup.name);
                         },
-                        child: RichText(
-                          text: TextSpan(
-                            text: texts.noAccount,
-                            style: AppTextStyles.roboto300Light13(),
-                            children: [
-                              TextSpan(
-                                text: texts.signUpText,
-                                style: AppTextStyles.roboto400Regular13(),
-                              ),
-                            ],
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
+                          child: RichText(
+                            text: TextSpan(
+                              text: texts.noAccount,
+                              style: AppTextStyles.roboto300Light14(),
+                              children: [
+                                TextSpan(
+                                  text: texts.signUpText,
+                                  style: AppTextStyles.roboto400Regular14(),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                    SizedBox(height: 23.h), // Bottom padding
+                    SizedBox(height: 15.h), // Bottom padding
                   ],
                 ),
               ),

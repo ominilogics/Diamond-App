@@ -6,8 +6,8 @@ import '../../data/datasources/local_favorites_datasource.dart';
 import '../../data/repositories/favorites_repository_impl.dart';
 
 final favoritesRepositoryProvider = Provider<FavoritesRepository>((ref) {
-  final isar = ref.watch(isarProvider);
-  final localDataSource = LocalFavoritesDataSourceImpl(isar);
+  final db = ref.watch(appDatabaseProvider);
+  final localDataSource = LocalFavoritesDataSourceImpl(db);
   return FavoritesRepositoryImpl(localDataSource);
 });
 

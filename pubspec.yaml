@@ -20,16 +20,20 @@ dependencies:
   flutter_riverpod: ^2.6.1
   flutter_hooks: ^0.21.3+1
   hooks_riverpod: ^2.6.1
-  isar: ^3.1.0+1
-  isar_flutter_libs: ^3.1.0+1
   path_provider: ^2.1.6
+  drift: ^2.20.0
+  sqlite3_flutter_libs: ^0.5.20
+  path: ^1.9.0
+  supabase_flutter: ^2.5.4
+  flutter_dotenv: ^5.1.0
+  fluttertoast: ^9.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-  isar_generator: ^3.1.0+1
   build_runner: ^2.4.13
+  drift_dev: ^2.20.0
 
 flutter:
   uses-material-design: true
@@ -38,6 +42,7 @@ flutter:
   assets:
     - assets/icons/
     - assets/pictures/
+    - .env
 
   fonts:
     - family: ColitezSerif

@@ -38,6 +38,7 @@ class FeaturedCard extends ConsumerWidget {
               extra: {
                 'cardId': cardId,
                 'title': title,
+                'cardColorValue': cardColor.value,
               },
             );
           },

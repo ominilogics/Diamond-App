@@ -6,8 +6,8 @@ import '../../domain/entities/event_entity.dart';
 import '../../domain/repositories/events_repository.dart';
 
 final eventsRepositoryProvider = Provider<EventsRepository>((ref) {
-  final isar = ref.watch(isarProvider);
-  final dataSource = LocalEventsDataSource(isar);
+  final db = ref.watch(appDatabaseProvider);
+  final dataSource = LocalEventsDataSource(db);
   return EventsRepositoryImpl(dataSource);
 });
 

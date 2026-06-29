@@ -32,4 +32,5 @@ class AppAssets {
   static const String google = '$_iconsPath/google.svg';
   static const String warning = '$_iconsPath/warning.svg';
   static const String cancel = '$_iconsPath/cancel.svg';
+  static const String cart = '$_iconsPath/cart.svg';
 }

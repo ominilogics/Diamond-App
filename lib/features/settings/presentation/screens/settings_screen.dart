@@ -1,8 +1,12 @@
+import 'package:daimond/core/routing/app_router.dart';
+import 'package:daimond/features/auth/presentation/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:daimond/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/routing/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -10,15 +14,17 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../core/widgets/app_bar1.dart';
 import '../../../../core/widgets/confirmation_dialog.dart';
+import '../../../../core/widgets/custom_snackbar.dart';
 import '../../../../core/widgets/primary_button.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final texts = AppLocalizations.of(context)!;
-    const bool isLoggedIn = true;
+    final user = Supabase.instance.client.auth.currentUser;
+    final bool isLoggedIn = user != null;
 
     return Column(
       children: [
@@ -27,7 +33,7 @@ class SettingsScreen extends StatelessWidget {
         SizedBox(height: 24.h),
         Expanded(
           child: isLoggedIn
-              ? _buildLoggedInContent(context, texts)
+              ? _buildLoggedInContent(context, texts, ref)
               : _buildLoggedOutContent(context, texts),
         ),
       ],
@@ -60,7 +66,14 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLoggedInContent(BuildContext context, AppLocalizations texts) {
+  Widget _buildLoggedInContent(BuildContext context, AppLocalizations texts, WidgetRef ref) {
+    final user = Supabase.instance.client.auth.currentUser;
+    final email = user?.email ?? texts.profileEmail;
+    final rawName = user?.userMetadata?['full_name'] as String? ?? 
+                    user?.userMetadata?['name'] as String? ?? 
+                    texts.profileName;
+    final initial = rawName.isNotEmpty ? rawName[0].toUpperCase() : 'U';
+
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -97,7 +110,7 @@ class SettingsScreen extends StatelessWidget {
                       ),
                       child: Center(
                         child: Text(
-                          texts.profileInitial,
+                          initial,
                           style: AppTextStyles.roboto400Regular20(
                             color: const Color(0xFF000000),
                             fontSize: 24.sp,
@@ -112,12 +125,12 @@ class SettingsScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            texts.profileName,
+                            rawName,
                             style: AppTextStyles.roboto400Regular18(),
                           ),
                           SizedBox(height: 2.h),
                           Text(
-                            texts.profileEmail,
+                            email,
                             style: AppTextStyles.roboto300Light12(
                               color: Colors.black,
                             ),
@@ -160,21 +173,32 @@ class SettingsScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    texts.preferences,
-                    style: AppTextStyles.colitez400Italic24(),
-                  ),
-                  SizedBox(height: 24.h),
+
                   _buildPreferenceItem(
-                    texts.myCart,
-                    onTap: () => context.pushNamed(AppRoute.cart.name),
+                    texts.subscriptions,
+                    onTap: () => context.pushNamed(AppRoute.subscription.name),
                   ),
                   _buildDivider(),
-                  _buildPreferenceItem(texts.subscriptions),
+                  _buildPreferenceItem(
+                    texts.orderHistory,
+                    onTap: () => context.pushNamed(AppRoute.orderHistory.name),
+                  ),
+                  _buildDivider(),
+                  _buildPreferenceItem(
+                    texts.myDrafts,
+                    onTap: () => context.pushNamed(AppRoute.myDrafts.name),
+                  ),
                   _buildDivider(),
                   _buildPreferenceItem(
                     texts.notificationsTitle,
                     onTap: () => context.pushNamed(AppRoute.notificationSettings.name),
+                  ),
+                  _buildDivider(),
+                  _buildPreferenceItem(
+                    texts.language,
+                    onTap: () {
+                      // Navigate to Language settings or show bottom sheet
+                    },
                   ),
                   _buildDivider(),
                   _buildPreferenceItem(
@@ -192,14 +216,18 @@ class SettingsScreen extends StatelessWidget {
                     onTap: () {
                       showDialog(
                         context: context,
-                        builder: (context) => ConfirmationDialog(
+                        builder: (dialogContext) => ConfirmationDialog(
                           title: texts.logoutConfirmation,
                           message: texts.logoutMessage,
                           confirmText: texts.yes,
                           cancelText: texts.no,
-                          onConfirm: () {
-                            Navigator.of(context).pop();
-                            // Handle logout logic
+                          onConfirm: () async {
+                            Navigator.of(dialogContext).pop();
+                            await ref.read(authProvider.notifier).signOut();
+                            if (context.mounted) {
+                              CustomSnackbar.showSuccess(context, texts.logoutSuccess);
+                              context.goNamed(AppRoute.login.name);
+                            }
                           },
                         ),
                       );
@@ -213,13 +241,13 @@ class SettingsScreen extends StatelessWidget {
                     onTap: () {
                       showDialog(
                         context: context,
-                        builder: (context) => ConfirmationDialog(
+                        builder: (dialogContext) => ConfirmationDialog(
                           title: texts.deleteAccountTitle,
                           message: texts.deleteAccountMessage,
                           confirmText: texts.yes,
                           cancelText: texts.no,
                           onConfirm: () {
-                            Navigator.of(context).pop();
+                            Navigator.of(dialogContext).pop();
                             // Handle delete logic
                           },
                         ),
