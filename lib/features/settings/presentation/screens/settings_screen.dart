@@ -66,205 +66,235 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildLoggedInContent(BuildContext context, AppLocalizations texts, WidgetRef ref) {
-    final user = Supabase.instance.client.auth.currentUser;
-    final email = user?.email ?? texts.profileEmail;
-    final rawName = user?.userMetadata?['full_name'] as String? ?? 
-                    user?.userMetadata?['name'] as String? ?? 
-                    texts.profileName;
-    final initial = rawName.isNotEmpty ? rawName[0].toUpperCase() : 'U';
+  Widget _buildLoggedInContent(
+    BuildContext context,
+    AppLocalizations texts,
+    WidgetRef ref,
+  ) {
+    return StreamBuilder<AuthState>(
+      stream: Supabase.instance.client.auth.onAuthStateChange,
+      builder: (context, snapshot) {
+        final user = Supabase.instance.client.auth.currentUser;
+        final email = user?.email ?? texts.profileEmail;
+        final rawName =
+            user?.userMetadata?['full_name'] as String? ??
+            user?.userMetadata?['name'] as String? ??
+            texts.profileName;
+        final initial = rawName.isNotEmpty ? rawName[0].toUpperCase() : 'U';
 
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          // Header Profile Container
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
-            child: GestureDetector(
-              onTap: () => context.pushNamed(AppRoute.editProfile.name),
-              child: Container(
-                width: double.infinity,
-                height: 93.h,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFFFFF),
-                  borderRadius: BorderRadius.circular(20.r),
-                  border: Border.all(
-                    color: const Color(0xFF000000),
-                    width: 0.5.w,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    SizedBox(width: 20.w),
-                    // Avatar
-                    Container(
-                      width: 57.w,
-                      height: 57.w,
-                      decoration: BoxDecoration(
-                        color: AppColors.card2, // The purple color
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: const Color(0xFF000000),
-                          width: 0.5.w,
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          initial,
-                          style: AppTextStyles.roboto400Regular20(
-                            color: const Color(0xFF000000),
-                            fontSize: 24.sp,
-                          ),
-                        ),
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+              // Header Profile Container
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                child: GestureDetector(
+                  onTap: () => context.pushNamed(AppRoute.editProfile.name),
+                  child: Container(
+                    width: double.infinity,
+                    height: 93.h,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFFFFF),
+                      borderRadius: BorderRadius.circular(20.r),
+                      border: Border.all(
+                        color: const Color(0xFF000000),
+                        width: 0.5.w,
                       ),
                     ),
-                    SizedBox(width: 16.w),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            rawName,
-                            style: AppTextStyles.roboto400Regular18(),
-                          ),
-                          SizedBox(height: 2.h),
-                          Text(
-                            email,
-                            style: AppTextStyles.roboto300Light12(
-                              color: Colors.black,
+                    child: Row(
+                      children: [
+                        SizedBox(width: 20.w),
+                        // Avatar
+                        Container(
+                          width: 57.w,
+                          height: 57.w,
+                          decoration: BoxDecoration(
+                            color: AppColors.card2, // The purple color
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: const Color(0xFF000000),
+                              width: 0.5.w,
                             ),
                           ),
-                        ],
-                      ),
+                          child: Center(
+                            child: Text(
+                              initial,
+                              style: AppTextStyles.roboto400Regular20(
+                                color: const Color(0xFF000000),
+                                fontSize: 24.sp,
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 16.w),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                rawName,
+                                style: AppTextStyles.roboto400Regular18(),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              SizedBox(height: 2.h),
+                              Text(
+                                email,
+                                style: AppTextStyles.roboto300Light12(
+                                  color: Colors.black,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                        SvgPicture.asset(
+                          AppAssets.forwardArrow,
+                          width: 8.w,
+                          height: 14.h,
+                          colorFilter: const ColorFilter.mode(
+                            Colors.black,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        SizedBox(width: 20.w),
+                      ],
                     ),
-                    SvgPicture.asset(
-                      AppAssets.forwardArrow,
-                      width: 8.w,
-                      height: 14.h,
-                      colorFilter: const ColorFilter.mode(
-                        Colors.black,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    SizedBox(width: 20.w),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ),
 
-          SizedBox(height: 16.h),
+              SizedBox(height: 16.h),
 
-          // Preferences Container
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
-            child: Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 24.h),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFFFFF),
-                borderRadius: BorderRadius.circular(20.r),
-                border: Border.all(
-                  color: const Color(0xFF000000),
-                  width: 0.5.w,
+              // Preferences Container
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                child: Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 24.w,
+                    vertical: 24.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFFFFF),
+                    borderRadius: BorderRadius.circular(20.r),
+                    border: Border.all(
+                      color: const Color(0xFF000000),
+                      width: 0.5.w,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildPreferenceItem(
+                        texts.subscriptions,
+                        onTap: () =>
+                            context.pushNamed(AppRoute.subscription.name),
+                      ),
+                      _buildDivider(),
+                      _buildPreferenceItem(
+                        texts.orderHistory,
+                        onTap: () =>
+                            context.pushNamed(AppRoute.orderHistory.name),
+                      ),
+                      _buildDivider(),
+                      _buildPreferenceItem(
+                        texts.myDrafts,
+                        onTap: () => context.pushNamed(AppRoute.myDrafts.name),
+                      ),
+                      _buildDivider(),
+                      _buildPreferenceItem(
+                        texts.notificationsTitle,
+                        onTap: () => context.pushNamed(
+                          AppRoute.notificationSettings.name,
+                        ),
+                      ),
+                      _buildDivider(),
+                      _buildPreferenceItem(
+                        texts.language,
+                        onTap: () {
+                          // Navigate to Language settings or show bottom sheet
+                        },
+                      ),
+                      _buildDivider(),
+                      _buildPreferenceItem(
+                        texts.privacyPolicy,
+                        onTap: () =>
+                            context.pushNamed(AppRoute.privacyPolicy.name),
+                      ),
+                      _buildDivider(),
+                      _buildPreferenceItem(
+                        texts.termsAndConditions,
+                        onTap: () =>
+                            context.pushNamed(AppRoute.termsAndConditions.name),
+                      ),
+                      _buildDivider(),
+                      _buildPreferenceItem(
+                        texts.logout,
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (dialogContext) => ConfirmationDialog(
+                              title: texts.logoutConfirmation,
+                              message: texts.logoutMessage,
+                              confirmText: texts.yes,
+                              cancelText: texts.no,
+                              onConfirm: () async {
+                                Navigator.of(dialogContext).pop();
+                                await ref.read(authProvider.notifier).signOut();
+                                if (context.mounted) {
+                                  CustomSnackbar.showSuccess(
+                                    context,
+                                    texts.logoutSuccess,
+                                  );
+                                  context.goNamed(AppRoute.login.name);
+                                }
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                      _buildDivider(),
+                      _buildPreferenceItem(
+                        texts.deleteAccount,
+                        isLast: true,
+                        isGradient: true,
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (dialogContext) => ConfirmationDialog(
+                              title: texts.deleteAccountTitle,
+                              message: texts.deleteAccountMessage,
+                              confirmText: texts.yes,
+                              cancelText: texts.no,
+                              onConfirm: () {
+                                Navigator.of(dialogContext).pop();
+                                // Handle delete logic
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-
-                  _buildPreferenceItem(
-                    texts.subscriptions,
-                    onTap: () => context.pushNamed(AppRoute.subscription.name),
-                  ),
-                  _buildDivider(),
-                  _buildPreferenceItem(
-                    texts.orderHistory,
-                    onTap: () => context.pushNamed(AppRoute.orderHistory.name),
-                  ),
-                  _buildDivider(),
-                  _buildPreferenceItem(
-                    texts.myDrafts,
-                    onTap: () => context.pushNamed(AppRoute.myDrafts.name),
-                  ),
-                  _buildDivider(),
-                  _buildPreferenceItem(
-                    texts.notificationsTitle,
-                    onTap: () => context.pushNamed(AppRoute.notificationSettings.name),
-                  ),
-                  _buildDivider(),
-                  _buildPreferenceItem(
-                    texts.language,
-                    onTap: () {
-                      // Navigate to Language settings or show bottom sheet
-                    },
-                  ),
-                  _buildDivider(),
-                  _buildPreferenceItem(
-                    texts.privacyPolicy,
-                    onTap: () => context.pushNamed(AppRoute.privacyPolicy.name),
-                  ),
-                  _buildDivider(),
-                  _buildPreferenceItem(
-                    texts.termsAndConditions,
-                    onTap: () => context.pushNamed(AppRoute.termsAndConditions.name),
-                  ),
-                  _buildDivider(),
-                  _buildPreferenceItem(
-                    texts.logout,
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (dialogContext) => ConfirmationDialog(
-                          title: texts.logoutConfirmation,
-                          message: texts.logoutMessage,
-                          confirmText: texts.yes,
-                          cancelText: texts.no,
-                          onConfirm: () async {
-                            Navigator.of(dialogContext).pop();
-                            await ref.read(authProvider.notifier).signOut();
-                            if (context.mounted) {
-                              CustomSnackbar.showSuccess(context, texts.logoutSuccess);
-                              context.goNamed(AppRoute.login.name);
-                            }
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                  _buildDivider(),
-                  _buildPreferenceItem(
-                    texts.deleteAccount,
-                    isLast: true,
-                    isGradient: true,
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (dialogContext) => ConfirmationDialog(
-                          title: texts.deleteAccountTitle,
-                          message: texts.deleteAccountMessage,
-                          confirmText: texts.yes,
-                          cancelText: texts.no,
-                          onConfirm: () {
-                            Navigator.of(dialogContext).pop();
-                            // Handle delete logic
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
+              SizedBox(height: 40.h),
+            ],
           ),
-          SizedBox(height: 40.h),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildPreferenceItem(String title, {bool isLast = false, bool isGradient = false, VoidCallback? onTap}) {
+  Widget _buildPreferenceItem(
+    String title, {
+    bool isLast = false,
+    bool isGradient = false,
+    VoidCallback? onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -275,9 +305,10 @@ class SettingsScreen extends ConsumerWidget {
           children: [
             isGradient
                 ? ShaderMask(
-                    shaderCallback: (bounds) => AppColors.primaryButtonGradient.createShader(
-                      Rect.fromLTWH(0, 0, bounds.width, bounds.height),
-                    ),
+                    shaderCallback: (bounds) =>
+                        AppColors.primaryButtonGradient.createShader(
+                          Rect.fromLTWH(0, 0, bounds.width, bounds.height),
+                        ),
                     blendMode: BlendMode.srcIn,
                     child: Text(
                       title,
@@ -289,7 +320,10 @@ class SettingsScreen extends ConsumerWidget {
               AppAssets.forwardArrow,
               width: 8.w,
               height: 14.h,
-              colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+              colorFilter: const ColorFilter.mode(
+                Colors.black,
+                BlendMode.srcIn,
+              ),
             ),
           ],
         ),

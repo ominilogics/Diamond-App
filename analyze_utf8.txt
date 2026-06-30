@@ -1,0 +1,61 @@
+﻿Analyzing daimond...                                            
+
+warning - Unused import: 'dart:async' - lib\core\routing\app_router.dart:1:8 - unused_import
+warning - Unused import: 'package:flutter/foundation.dart' - lib\core\routing\app_router.dart:2:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\core\widgets\app_bar1.dart:32:65 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\core\widgets\app_bar1.dart:33:68 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\core\widgets\app_bar2.dart:35:65 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\core\widgets\app_bar2.dart:36:68 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\core\widgets\app_text_field.dart:80:74 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\core\widgets\custom_snackbar.dart:92:33 - deprecated_member_use
+  error - The class 'GoogleSignIn' doesn't have an unnamed constructor - lib\features\auth\data\datasources\remote_auth_datasource.dart:64:39 - new_with_undefined_constructor_default
+  error - The method 'signIn' isn't defined for the type 'GoogleSignIn' - lib\features\auth\data\datasources\remote_auth_datasource.dart:65:43 - undefined_method
+  error - Classes can only extend other classes - lib\features\auth\presentation\providers\auth_provider.dart:17:28 - extends_non_class
+  error - Too many positional arguments: 0 expected, but 1 found - lib\features\auth\presentation\providers\auth_provider.dart:20:41 - extra_positional_arguments
+  error - Undefined name 'state' - lib\features\auth\presentation\providers\auth_provider.dart:28:5 - undefined_identifier
+  error - Undefined name 'state' - lib\features\auth\presentation\providers\auth_provider.dart:30:5 - undefined_identifier
+  error - Undefined name 'state' - lib\features\auth\presentation\providers\auth_provider.dart:41:5 - undefined_identifier
+  error - Undefined name 'state' - lib\features\auth\presentation\providers\auth_provider.dart:43:5 - undefined_identifier
+  error - Undefined name 'state' - lib\features\auth\presentation\providers\auth_provider.dart:52:5 - undefined_identifier
+  error - Undefined name 'state' - lib\features\auth\presentation\providers\auth_provider.dart:54:5 - undefined_identifier
+  error - Undefined name 'state' - lib\features\auth\presentation\providers\auth_provider.dart:59:5 - undefined_identifier
+  error - Undefined name 'state' - lib\features\auth\presentation\providers\auth_provider.dart:61:5 - undefined_identifier
+  error - Undefined name 'state' - lib\features\auth\presentation\providers\auth_provider.dart:68:5 - undefined_identifier
+  error - Undefined name 'state' - lib\features\auth\presentation\providers\auth_provider.dart:70:5 - undefined_identifier
+  error - The function 'StateNotifierProvider' isn't defined - lib\features\auth\presentation\providers\auth_provider.dart:75:22 - undefined_function
+warning - Unused import: 'package:daimond/core/routing/app_router.dart' - lib\features\auth\presentation\screens\forgot_password_screen.dart:1:8 - unused_import
+warning - Unused import: 'package:daimond/core/routing/app_router.dart' - lib\features\auth\presentation\screens\login_screen.dart:1:8 - unused_import
+warning - Unused import: 'package:daimond/core/routing/app_router.dart' - lib\features\auth\presentation\screens\sign_up_screen.dart:1:8 - unused_import
+  error - The getter 'valueOrNull' isn't defined for the type 'AsyncValue<bool>' - lib\features\cards\presentation\screens\card_detail_screen.dart:57:40 - undefined_getter
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\cards\presentation\screens\card_detail_screen.dart:115:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\cards\presentation\screens\card_detail_screen.dart:168:59 - deprecated_member_use
+   info - 'onPopInvoked' is deprecated and shouldn't be used. Use onPopInvokedWithResult instead. This feature was deprecated after v3.22.0-12.0.pre - lib\features\cards\presentation\screens\edit_card_screen.dart:70:7 - deprecated_member_use
+warning - Unused import: 'package:go_router/go_router.dart' - lib\features\cards\presentation\screens\preview_card_screen.dart:3:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\cards\presentation\widgets\custom_card_text_field.dart:22:64 - deprecated_member_use
+warning - Unused import: 'package:flutter_hooks/flutter_hooks.dart' - lib\features\events\presentation\screens\events_screen.dart:4:8 - unused_import
+  error - The getter 'valueOrNull' isn't defined for the type 'AsyncValue<List<EventEntity>>' - lib\features\events\presentation\screens\events_screen.dart:30:32 - undefined_getter
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\events\presentation\screens\events_screen.dart:43:33 - deprecated_member_use
+   info - The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' - lib\features\events\presentation\widgets\add_event_bottom_sheet.dart:1:8 - unnecessary_import
+warning - Unused import: '../../../../core/theme/app_colors.dart' - lib\features\events\presentation\widgets\add_event_bottom_sheet.dart:9:8 - unused_import
+warning - Unused import: '../../../../core/theme/app_colors.dart' - lib\features\favorites\presentation\screens\favorites_screen.dart:6:8 - unused_import
+  error - The getter 'valueOrNull' isn't defined for the type 'AsyncValue<List<FavoriteEntity>>' - lib\features\favorites\presentation\screens\favorites_screen.dart:22:38 - undefined_getter
+  error - The getter 'valueOrNull' isn't defined for the type 'AsyncValue<bool>' - lib\features\home\presentation\widgets\featured_card.dart:31:40 - undefined_getter
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\features\home\presentation\widgets\featured_card.dart:41:45 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use component accessors like .r or .g, or toARGB32 for an explicit conversion - lib\features\home\presentation\widgets\featured_card.dart:86:49 - deprecated_member_use
+  error - The function 'StateProvider' isn't defined - lib\features\main\presentation\screens\main_screen.dart:11:32 - undefined_function
+warning - Unused import: 'package:drift/drift.dart' - lib\features\orders\data\datasources\local_order_datasource.dart:3:8 - unused_import
+  error - The function 'StateNotifierProvider' isn't defined - lib\features\orders\presentation\providers\order_provider.dart:13:23 - undefined_function
+  error - Classes can only extend other classes - lib\features\orders\presentation\providers\order_provider.dart:17:29 - extends_non_class
+  error - Too many positional arguments: 0 expected, but 1 found - lib\features\orders\presentation\providers\order_provider.dart:20:43 - extra_positional_arguments
+  error - Undefined name 'state' - lib\features\orders\presentation\providers\order_provider.dart:26:7 - undefined_identifier
+  error - Undefined name 'state' - lib\features\orders\presentation\providers\order_provider.dart:28:7 - undefined_identifier
+  error - Undefined name 'state' - lib\features\orders\presentation\providers\order_provider.dart:30:7 - undefined_identifier
+  error - Undefined name 'state' - lib\features\orders\presentation\providers\order_provider.dart:39:7 - undefined_identifier
+  error - Undefined name 'state' - lib\features\orders\presentation\providers\order_provider.dart:48:7 - undefined_identifier
+   info - Unnecessary use of multiple underscores - lib\features\orders\presentation\screens\order_history_screen.dart:60:43 - unnecessary_underscores
+   info - The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' - lib\features\settings\presentation\screens\notification_settings_screen.dart:2:8 - unnecessary_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\settings\presentation\screens\notification_settings_screen.dart:143:41 - deprecated_member_use
+warning - Unused import: 'package:daimond/core/routing/app_router.dart' - lib\features\settings\presentation\screens\settings_screen.dart:1:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\subscription\presentation\widgets\subscription_plan_card.dart:41:35 - deprecated_member_use
+   info - 'anonKey' is deprecated and shouldn't be used. Use publishableKey instead. anonKey will be removed in a future major version - lib\main.dart:18:5 - deprecated_member_use
+

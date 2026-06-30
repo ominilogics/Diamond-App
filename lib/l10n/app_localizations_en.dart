@@ -495,4 +495,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get insidePrefix => 'Inside: ';
+
+  @override
+  String get enterDraftName => 'Enter draft name...';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get pleaseEnterName => 'Please enter a name.';
+
+  @override
+  String get nameExceeds15Letters => 'Name cannot exceed 15 letters.';
 }

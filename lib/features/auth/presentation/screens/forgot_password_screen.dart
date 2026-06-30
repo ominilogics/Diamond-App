@@ -43,7 +43,9 @@ class ForgotPasswordScreen extends HookConsumerWidget {
                 }
               },
               () {
-                debugPrint('Forgot Password reset link sent successfully to email: $email');
+                debugPrint(
+                  'Forgot Password reset link sent successfully to email: $email',
+                );
                 if (context.mounted) {
                   CustomSnackbar.showSuccess(
                     context,
@@ -110,7 +112,10 @@ class ForgotPasswordScreen extends HookConsumerWidget {
                           context.goNamed(AppRoute.login.name);
                         },
                         child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
+                          padding: EdgeInsets.symmetric(
+                            vertical: 8.h,
+                            horizontal: 16.w,
+                          ),
                           child: RichText(
                             text: TextSpan(
                               text: texts.rememberPassword,

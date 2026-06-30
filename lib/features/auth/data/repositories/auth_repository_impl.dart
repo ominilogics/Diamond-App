@@ -17,33 +17,49 @@ class AuthRepositoryImpl implements AuthRepository {
       await remoteDataSource.signIn(email, password);
       return Either.right(null);
     } on TimeoutException {
-      return Either.left(AuthFailure('Connection timed out. Please check your internet.'));
+      return Either.left(
+        AuthFailure('Connection timed out. Please check your internet.'),
+      );
     } on SocketException {
-      return Either.left(AuthFailure('No internet connection. Please try again.'));
+      return Either.left(
+        AuthFailure('No internet connection. Please try again.'),
+      );
     } on AuthException catch (e) {
       return Either.left(AuthFailure(_parseErrorMessage(e.message)));
     } on PostgrestException catch (e) {
       return Either.left(AuthFailure(_parseErrorMessage(e.message)));
     } catch (e) {
-      return Either.left(AuthFailure('An unexpected error occurred during login.'));
+      return Either.left(
+        AuthFailure('An unexpected error occurred during login.'),
+      );
     }
   }
 
   @override
-  Future<Either<Failure, void>> signUp(String email, String password, String fullName) async {
+  Future<Either<Failure, void>> signUp(
+    String email,
+    String password,
+    String fullName,
+  ) async {
     try {
       await remoteDataSource.signUp(email, password, fullName);
       return Either.right(null);
     } on TimeoutException {
-      return Either.left(AuthFailure('Connection timed out. Please check your internet.'));
+      return Either.left(
+        AuthFailure('Connection timed out. Please check your internet.'),
+      );
     } on SocketException {
-      return Either.left(AuthFailure('No internet connection. Please try again.'));
+      return Either.left(
+        AuthFailure('No internet connection. Please try again.'),
+      );
     } on AuthException catch (e) {
       return Either.left(AuthFailure(_parseErrorMessage(e.message)));
     } on PostgrestException catch (e) {
       return Either.left(AuthFailure(_parseErrorMessage(e.message)));
     } catch (e) {
-      return Either.left(AuthFailure('An unexpected error occurred during sign up.'));
+      return Either.left(
+        AuthFailure('An unexpected error occurred during sign up.'),
+      );
     }
   }
 
@@ -53,15 +69,23 @@ class AuthRepositoryImpl implements AuthRepository {
       await remoteDataSource.resetPassword(email);
       return Either.right(null);
     } on TimeoutException {
-      return Either.left(AuthFailure('Connection timed out. Please check your internet.'));
+      return Either.left(
+        AuthFailure('Connection timed out. Please check your internet.'),
+      );
     } on SocketException {
-      return Either.left(AuthFailure('No internet connection. Please try again.'));
+      return Either.left(
+        AuthFailure('No internet connection. Please try again.'),
+      );
     } on AuthException catch (e) {
       return Either.left(AuthFailure(_parseErrorMessage(e.message)));
     } on PostgrestException catch (e) {
       return Either.left(AuthFailure(_parseErrorMessage(e.message)));
     } catch (e) {
-      return Either.left(AuthFailure('An unexpected error occurred while sending the reset link.'));
+      return Either.left(
+        AuthFailure(
+          'An unexpected error occurred while sending the reset link.',
+        ),
+      );
     }
   }
 
@@ -72,6 +96,54 @@ class AuthRepositoryImpl implements AuthRepository {
       return Either.right(null);
     } catch (e) {
       return Either.left(AuthFailure('An error occurred during sign out.'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> signInWithGoogle() async {
+    try {
+      await remoteDataSource.signInWithGoogle();
+      return Either.right(null);
+    } on TimeoutException {
+      return Either.left(
+        AuthFailure('Connection timed out. Please check your internet.'),
+      );
+    } on SocketException {
+      return Either.left(
+        AuthFailure('No internet connection. Please try again.'),
+      );
+    } on AuthException catch (e) {
+      return Either.left(AuthFailure(_parseErrorMessage(e.message)));
+    } on PostgrestException catch (e) {
+      return Either.left(AuthFailure(_parseErrorMessage(e.message)));
+    } catch (e) {
+      return Either.left(
+        AuthFailure('An unexpected error occurred during Google Sign-In.'),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateProfile(String fullName) async {
+    try {
+      await remoteDataSource.updateProfile(fullName);
+      return Either.right(null);
+    } on TimeoutException {
+      return Either.left(
+        AuthFailure('Connection timed out. Please check your internet.'),
+      );
+    } on SocketException {
+      return Either.left(
+        AuthFailure('No internet connection. Please try again.'),
+      );
+    } on AuthException catch (e) {
+      return Either.left(AuthFailure(_parseErrorMessage(e.message)));
+    } on PostgrestException catch (e) {
+      return Either.left(AuthFailure(_parseErrorMessage(e.message)));
+    } catch (e) {
+      return Either.left(
+        AuthFailure('An unexpected error occurred while updating profile.'),
+      );
     }
   }
 

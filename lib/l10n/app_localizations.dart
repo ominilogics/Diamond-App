@@ -1029,6 +1029,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Inside: '**
   String get insidePrefix;
+
+  /// No description provided for @enterDraftName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter draft name...'**
+  String get enterDraftName;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @pleaseEnterName.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a name.'**
+  String get pleaseEnterName;
+
+  /// No description provided for @nameExceeds15Letters.
+  ///
+  /// In en, this message translates to:
+  /// **'Name cannot exceed 15 letters.'**
+  String get nameExceeds15Letters;
 }
 
 class _AppLocalizationsDelegate

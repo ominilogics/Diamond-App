@@ -1,10 +1,13 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 abstract class RemoteAuthDataSource {
   Future<void> signIn(String email, String password);
   Future<void> signUp(String email, String password, String fullName);
   Future<void> resetPassword(String email);
   Future<void> signOut();
+  Future<void> signInWithGoogle();
+  Future<void> updateProfile(String fullName);
 }
 
 class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
@@ -14,7 +17,10 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
 
   @override
   Future<void> signIn(String email, String password) async {
-    await supabaseClient.auth.signInWithPassword(email: email, password: password);
+    await supabaseClient.auth.signInWithPassword(
+      email: email,
+      password: password,
+    );
   }
 
   @override
@@ -24,7 +30,7 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
       password: password,
       data: {'full_name': fullName},
     );
-    
+
     // Auto-confirm might auto-login the user, we want them to explicitly log in.
     if (response.session != null) {
       await supabaseClient.auth.signOut();
@@ -39,7 +45,9 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
     );
 
     if (!emailExists) {
-      throw const AuthException('Please use the correct email. This email is not registered.');
+      throw const AuthException(
+        'Please use the correct email. This email is not registered.',
+      );
     }
 
     await supabaseClient.auth.resetPasswordForEmail(email);
@@ -48,5 +56,39 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
   @override
   Future<void> signOut() async {
     await supabaseClient.auth.signOut();
+  }
+
+  @override
+  Future<void> signInWithGoogle() async {
+    const webClientId =
+        '672659691643-ebersoi5iqd20siva6ajdm5vjpb69lhp.apps.googleusercontent.com';
+    final GoogleSignIn googleSignIn = GoogleSignIn(serverClientId: webClientId);
+    final googleUser = await googleSignIn.signIn();
+    if (googleUser == null) {
+      throw const AuthException('Google sign in was aborted.');
+    }
+    final googleAuth = await googleUser.authentication;
+    final accessToken = googleAuth.accessToken;
+    final idToken = googleAuth.idToken;
+
+    if (idToken == null) {
+      throw const AuthException('No ID Token found.');
+    }
+
+    await supabaseClient.auth.signInWithIdToken(
+      provider: OAuthProvider.google,
+      idToken: idToken,
+      accessToken: accessToken,
+    );
+  }
+
+  @override
+  Future<void> updateProfile(String fullName) async {
+    final response = await supabaseClient.auth.updateUser(
+      UserAttributes(data: {'full_name': fullName}),
+    );
+    if (response.user == null) {
+      throw const AuthException('Failed to update profile.');
+    }
   }
 }

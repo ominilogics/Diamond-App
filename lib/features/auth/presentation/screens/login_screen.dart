@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/app_validators.dart';
@@ -34,7 +37,9 @@ class LoginScreen extends HookConsumerWidget {
 
     void onLoginPressed() {
       if (formKey.currentState!.validate()) {
-        debugPrint('Login process started for email: ${emailController.text.trim()}');
+        debugPrint(
+          'Login process started for email: ${emailController.text.trim()}',
+        );
         ref
             .read(authProvider.notifier)
             .signIn(
@@ -47,11 +52,35 @@ class LoginScreen extends HookConsumerWidget {
                 }
               },
               () {
-                debugPrint('Login successful for email: ${emailController.text.trim()}');
+                debugPrint(
+                  'Login successful for email: ${emailController.text.trim()}',
+                );
+
                 if (context.mounted) {
                   CustomSnackbar.showSuccess(context, texts.loginSuccess);
                   context.goNamed(AppRoute.main.name);
                 }
+
+                // Request Notification Permission based on Android versions in the background
+                Future.microtask(() async {
+                  if (Platform.isAndroid) {
+                    final androidInfo = await DeviceInfoPlugin().androidInfo;
+                    final sdkInt = androidInfo.version.sdkInt;
+
+                    if (sdkInt < 29) {
+                      // Android below 10
+                      await Permission.notification.request();
+                    } else if (sdkInt >= 29 && sdkInt < 33) {
+                      // Android 10 to 12
+                      await Permission.notification.request();
+                    } else {
+                      // Android 13+ (12+)
+                      await Permission.notification.request();
+                    }
+                  } else {
+                    await Permission.notification.request();
+                  }
+                });
               },
             );
       } else {
@@ -114,7 +143,11 @@ class LoginScreen extends HookConsumerWidget {
                           context.pushNamed(AppRoute.forgotPassword.name);
                         },
                         child: Padding(
-                          padding: EdgeInsets.only(top: 8.h, bottom: 8.h, left: 16.w),
+                          padding: EdgeInsets.only(
+                            top: 8.h,
+                            bottom: 8.h,
+                            left: 16.w,
+                          ),
                           child: Text(
                             texts.forgotPasswordTitle,
                             style: AppTextStyles.roboto400Regular14(),
@@ -138,7 +171,48 @@ class LoginScreen extends HookConsumerWidget {
                     SocialAuthButton(
                       text: 'Continue with Google',
                       iconPath: AppAssets.google,
-                      onPressed: () {},
+                      onPressed: () {
+                        ref
+                            .read(authProvider.notifier)
+                            .signInWithGoogle(
+                              (errorMessage) {
+                                if (context.mounted) {
+                                  CustomSnackbar.showError(
+                                    context,
+                                    errorMessage,
+                                  );
+                                }
+                              },
+                              () {
+                                if (context.mounted) {
+                                  CustomSnackbar.showSuccess(
+                                    context,
+                                    texts.loginSuccess,
+                                  );
+                                  context.goNamed(AppRoute.main.name);
+                                }
+
+                                // Request Notification Permission based on Android versions in the background
+                                Future.microtask(() async {
+                                  if (Platform.isAndroid) {
+                                    final androidInfo =
+                                        await DeviceInfoPlugin().androidInfo;
+                                    final sdkInt = androidInfo.version.sdkInt;
+
+                                    if (sdkInt < 29) {
+                                      await Permission.notification.request();
+                                    } else if (sdkInt >= 29 && sdkInt < 33) {
+                                      await Permission.notification.request();
+                                    } else {
+                                      await Permission.notification.request();
+                                    }
+                                  } else {
+                                    await Permission.notification.request();
+                                  }
+                                });
+                              },
+                            );
+                      },
                     ),
 
                     const Spacer(),
@@ -152,7 +226,10 @@ class LoginScreen extends HookConsumerWidget {
                           context.goNamed(AppRoute.signup.name);
                         },
                         child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
+                          padding: EdgeInsets.symmetric(
+                            vertical: 8.h,
+                            horizontal: 16.w,
+                          ),
                           child: RichText(
                             text: TextSpan(
                               text: texts.noAccount,

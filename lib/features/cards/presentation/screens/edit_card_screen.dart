@@ -245,7 +245,7 @@ class EditCardScreen extends HookConsumerWidget {
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Text(
-                                          'Save Draft',
+                                          texts.saveDraft,
                                           style: AppTextStyles.colitez400Italic20(),
                                         ),
                                         SizedBox(height: 16.h),
@@ -253,7 +253,7 @@ class EditCardScreen extends HookConsumerWidget {
                                           padding: EdgeInsets.symmetric(horizontal: 24.w),
                                           child: AppTextField(
                                             controller: draftNameController,
-                                            hintText: 'Enter draft name...',
+                                            hintText: texts.enterDraftName,
                                             maxLength: 15,
                                           ),
                                         ),
@@ -273,7 +273,7 @@ class EditCardScreen extends HookConsumerWidget {
                                                       border: Border.all(color: Colors.black, width: 0.5),
                                                     ),
                                                     alignment: Alignment.center,
-                                                    child: Text('Cancel', style: AppTextStyles.roboto500Medium14()),
+                                                    child: Text(texts.cancel, style: AppTextStyles.roboto500Medium14()),
                                                   ),
                                                 ),
                                               ),
@@ -283,11 +283,11 @@ class EditCardScreen extends HookConsumerWidget {
                                                   onTap: () {
                                                     final name = draftNameController.text.trim();
                                                     if (name.isEmpty) {
-                                                      CustomSnackbar.showError(dialogContext, 'Please enter a name.');
+                                                      CustomSnackbar.showError(dialogContext, texts.pleaseEnterName);
                                                       return;
                                                     }
                                                     if (name.length > 15) {
-                                                      CustomSnackbar.showError(dialogContext, 'Name cannot exceed 15 letters.');
+                                                      CustomSnackbar.showError(dialogContext, texts.nameExceeds15Letters);
                                                       return;
                                                     }
                                                     Navigator.of(dialogContext).pop(name);
@@ -299,7 +299,7 @@ class EditCardScreen extends HookConsumerWidget {
                                                       borderRadius: BorderRadius.circular(20.r),
                                                     ),
                                                     alignment: Alignment.center,
-                                                    child: Text('Save', style: AppTextStyles.roboto500Medium14().copyWith(color: Colors.white)),
+                                                    child: Text(texts.save, style: AppTextStyles.roboto500Medium14().copyWith(color: Colors.white)),
                                                   ),
                                                 ),
                                               ),

@@ -156,5 +156,10 @@
   "continueText": "Done",
   "draftPrefix": "Draft: ",
   "coverPrefix": "Cover: ",
-  "insidePrefix": "Inside: "
+  "insidePrefix": "Inside: ",
+  "enterDraftName": "Enter draft name...",
+  "cancel": "Cancel",
+  "save": "Save",
+  "pleaseEnterName": "Please enter a name.",
+  "nameExceeds15Letters": "Name cannot exceed 15 letters."
 }

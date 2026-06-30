@@ -19,40 +19,67 @@ class AuthNotifier extends StateNotifier<bool> {
 
   AuthNotifier(this.repository) : super(false);
 
-  Future<void> signIn(String email, String password, Function(String) onError, Function() onSuccess) async {
+  Future<void> signIn(
+    String email,
+    String password,
+    Function(String) onError,
+    Function() onSuccess,
+  ) async {
     state = true;
     final result = await repository.signIn(email, password);
     state = false;
-    result.fold(
-      (failure) => onError(failure.message),
-      (_) => onSuccess(),
-    );
+    result.fold((failure) => onError(failure.message), (_) => onSuccess());
   }
 
-  Future<void> signUp(String email, String password, String fullName, Function(String) onError, Function() onSuccess) async {
+  Future<void> signUp(
+    String email,
+    String password,
+    String fullName,
+    Function(String) onError,
+    Function() onSuccess,
+  ) async {
     state = true;
     final result = await repository.signUp(email, password, fullName);
     state = false;
-    result.fold(
-      (failure) => onError(failure.message),
-      (_) => onSuccess(),
-    );
+    result.fold((failure) => onError(failure.message), (_) => onSuccess());
   }
 
-  Future<void> resetPassword(String email, Function(String) onError, Function() onSuccess) async {
+  Future<void> resetPassword(
+    String email,
+    Function(String) onError,
+    Function() onSuccess,
+  ) async {
     state = true;
     final result = await repository.resetPassword(email);
     state = false;
-    result.fold(
-      (failure) => onError(failure.message),
-      (_) => onSuccess(),
-    );
+    result.fold((failure) => onError(failure.message), (_) => onSuccess());
   }
 
   Future<void> signOut() async {
     state = true;
     await repository.signOut();
     state = false;
+  }
+
+  Future<void> signInWithGoogle(
+    Function(String) onError,
+    Function() onSuccess,
+  ) async {
+    state = true;
+    final result = await repository.signInWithGoogle();
+    state = false;
+    result.fold((failure) => onError(failure.message), (_) => onSuccess());
+  }
+
+  Future<void> updateProfile(
+    String fullName,
+    Function(String) onError,
+    Function() onSuccess,
+  ) async {
+    state = true;
+    final result = await repository.updateProfile(fullName);
+    state = false;
+    result.fold((failure) => onError(failure.message), (_) => onSuccess());
   }
 }
 

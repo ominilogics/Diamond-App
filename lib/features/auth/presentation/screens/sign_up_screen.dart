@@ -4,6 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:daimond/l10n/app_localizations.dart';
+import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/app_validators.dart';
@@ -38,7 +41,9 @@ class SignUpScreen extends HookConsumerWidget {
 
     void onSignUpPressed() {
       if (formKey.currentState!.validate()) {
-        debugPrint('Sign Up process started for email: ${emailController.text.trim()}');
+        debugPrint(
+          'Sign Up process started for email: ${emailController.text.trim()}',
+        );
         ref
             .read(authProvider.notifier)
             .signUp(
@@ -52,12 +57,11 @@ class SignUpScreen extends HookConsumerWidget {
                 }
               },
               () {
-                debugPrint('Sign Up successful for email: ${emailController.text.trim()}');
+                debugPrint(
+                  'Sign Up successful for email: ${emailController.text.trim()}',
+                );
                 if (context.mounted) {
-                  CustomSnackbar.showSuccess(
-                    context,
-                    texts.signUpSuccess,
-                  );
+                  CustomSnackbar.showSuccess(context, texts.signUpSuccess);
                   context.goNamed(AppRoute.login.name);
                 }
               },
@@ -157,7 +161,48 @@ class SignUpScreen extends HookConsumerWidget {
                     SocialAuthButton(
                       text: 'Continue with Google',
                       iconPath: AppAssets.google,
-                      onPressed: () {},
+                      onPressed: () {
+                        ref
+                            .read(authProvider.notifier)
+                            .signInWithGoogle(
+                              (errorMessage) {
+                                if (context.mounted) {
+                                  CustomSnackbar.showError(
+                                    context,
+                                    errorMessage,
+                                  );
+                                }
+                              },
+                              () {
+                                if (context.mounted) {
+                                  CustomSnackbar.showSuccess(
+                                    context,
+                                    texts.signUpSuccess,
+                                  );
+                                  context.goNamed(AppRoute.main.name);
+                                }
+
+                                // Request Notification Permission based on Android versions in the background
+                                Future.microtask(() async {
+                                  if (Platform.isAndroid) {
+                                    final androidInfo =
+                                        await DeviceInfoPlugin().androidInfo;
+                                    final sdkInt = androidInfo.version.sdkInt;
+
+                                    if (sdkInt < 29) {
+                                      await Permission.notification.request();
+                                    } else if (sdkInt >= 29 && sdkInt < 33) {
+                                      await Permission.notification.request();
+                                    } else {
+                                      await Permission.notification.request();
+                                    }
+                                  } else {
+                                    await Permission.notification.request();
+                                  }
+                                });
+                              },
+                            );
+                      },
                     ),
 
                     const Spacer(),
@@ -171,7 +216,10 @@ class SignUpScreen extends HookConsumerWidget {
                           context.goNamed(AppRoute.login.name);
                         },
                         child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 16.w),
+                          padding: EdgeInsets.symmetric(
+                            vertical: 8.h,
+                            horizontal: 16.w,
+                          ),
                           child: RichText(
                             text: TextSpan(
                               text: texts.alreadyHaveAccount,
