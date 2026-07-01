@@ -170,9 +170,11 @@ class AddEventBottomSheet extends HookConsumerWidget {
                     // Date Field
                     GestureDetector(
                       onTap: () async {
+                        final now = DateTime.now();
                         final selectedDate = await CustomDatePickerDialog.show(
                           context,
-                          DateTime.now(),
+                          now,
+                          minDate: DateTime(now.year, now.month, now.day),
                         );
                         if (selectedDate != null) {
                           selectedDateState.value = selectedDate;

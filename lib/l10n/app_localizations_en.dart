@@ -510,4 +510,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get nameExceeds15Letters => 'Name cannot exceed 15 letters.';
+
+  @override
+  String get dateOfBirthLabel => 'Date of Birth';
+
+  @override
+  String get dateOfBirthHint => 'Select Date (Optional)';
 }

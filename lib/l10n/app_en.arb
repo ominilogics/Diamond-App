@@ -161,5 +161,7 @@
   "cancel": "Cancel",
   "save": "Save",
   "pleaseEnterName": "Please enter a name.",
-  "nameExceeds15Letters": "Name cannot exceed 15 letters."
+  "nameExceeds15Letters": "Name cannot exceed 15 letters.",
+  "dateOfBirthLabel": "Date of Birth",
+  "dateOfBirthHint": "Select Date (Optional)"
 }

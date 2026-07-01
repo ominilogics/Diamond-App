@@ -3,11 +3,11 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 abstract class RemoteAuthDataSource {
   Future<void> signIn(String email, String password);
-  Future<void> signUp(String email, String password, String fullName);
+  Future<void> signUp(String email, String password, String fullName, {String? dateOfBirth});
   Future<void> resetPassword(String email);
   Future<void> signOut();
   Future<void> signInWithGoogle();
-  Future<void> updateProfile(String fullName);
+  Future<void> updateProfile(String fullName, {String? dateOfBirth});
 }
 
 class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
@@ -24,11 +24,15 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
   }
 
   @override
-  Future<void> signUp(String email, String password, String fullName) async {
+  Future<void> signUp(String email, String password, String fullName, {String? dateOfBirth}) async {
+    final data = {'custom_name': fullName, 'full_name': fullName};
+    if (dateOfBirth != null) {
+      data['date_of_birth'] = dateOfBirth;
+    }
     final response = await supabaseClient.auth.signUp(
       email: email,
       password: password,
-      data: {'full_name': fullName},
+      data: data,
     );
 
     // Auto-confirm might auto-login the user, we want them to explicitly log in.
@@ -83,9 +87,13 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
   }
 
   @override
-  Future<void> updateProfile(String fullName) async {
+  Future<void> updateProfile(String fullName, {String? dateOfBirth}) async {
+    final data = {'custom_name': fullName, 'full_name': fullName};
+    if (dateOfBirth != null) {
+      data['date_of_birth'] = dateOfBirth;
+    }
     final response = await supabaseClient.auth.updateUser(
-      UserAttributes(data: {'full_name': fullName}),
+      UserAttributes(data: data),
     );
     if (response.user == null) {
       throw const AuthException('Failed to update profile.');

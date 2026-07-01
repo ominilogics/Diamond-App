@@ -7,13 +7,29 @@ import '../../../../core/widgets/primary_button.dart';
 
 class CustomDatePickerDialog extends StatefulWidget {
   final DateTime initialDate;
+  final DateTime? minDate;
+  final DateTime? maxDate;
 
-  const CustomDatePickerDialog({super.key, required this.initialDate});
+  const CustomDatePickerDialog({
+    super.key, 
+    required this.initialDate,
+    this.minDate,
+    this.maxDate,
+  });
 
-  static Future<DateTime?> show(BuildContext context, DateTime initialDate) {
+  static Future<DateTime?> show(
+    BuildContext context, 
+    DateTime initialDate, {
+    DateTime? minDate,
+    DateTime? maxDate,
+  }) {
     return showDialog<DateTime>(
       context: context,
-      builder: (context) => CustomDatePickerDialog(initialDate: initialDate),
+      builder: (context) => CustomDatePickerDialog(
+        initialDate: initialDate,
+        minDate: minDate,
+        maxDate: maxDate,
+      ),
     );
   }
 
@@ -27,7 +43,7 @@ class _CustomDatePickerDialogState extends State<CustomDatePickerDialog> {
   late int selectedYear;
 
   late final int baseYear;
-  final int maxYearCount = 100;
+  late final int maxYearCount;
 
   late FixedExtentScrollController _dayController;
   late FixedExtentScrollController _monthController;
@@ -42,12 +58,25 @@ class _CustomDatePickerDialogState extends State<CustomDatePickerDialog> {
   void initState() {
     super.initState();
     
-    DateTime now = DateTime.now();
-    baseYear = now.year;
+    if (widget.minDate != null) {
+      baseYear = widget.minDate!.year;
+    } else {
+      baseYear = DateTime.now().year;
+    }
+
+    if (widget.maxDate != null) {
+      maxYearCount = widget.maxDate!.year - baseYear + 1;
+      if (maxYearCount < 1) maxYearCount = 1;
+    } else {
+      maxYearCount = 100;
+    }
 
     DateTime initDate = widget.initialDate;
-    if (initDate.isBefore(DateTime(now.year, now.month, now.day))) {
-      initDate = now;
+    
+    if (widget.minDate != null && initDate.isBefore(widget.minDate!)) {
+      initDate = widget.minDate!;
+    } else if (widget.maxDate != null && initDate.isAfter(widget.maxDate!)) {
+      initDate = widget.maxDate!;
     }
 
     selectedDay = initDate.day;
@@ -67,18 +96,23 @@ class _CustomDatePickerDialogState extends State<CustomDatePickerDialog> {
     super.dispose();
   }
 
-  void _enforceFutureDate() {
-    DateTime now = DateTime.now();
-    DateTime today = DateTime(now.year, now.month, now.day);
+  void _enforceConstraints() {
     DateTime selected = DateTime(selectedYear, selectedMonth, selectedDay);
+    DateTime? target;
 
-    if (selected.isBefore(today)) {
+    if (widget.minDate != null && selected.isBefore(widget.minDate!)) {
+      target = widget.minDate!;
+    } else if (widget.maxDate != null && selected.isAfter(widget.maxDate!)) {
+      target = widget.maxDate!;
+    }
+
+    if (target != null) {
       setState(() {
-        selectedYear = today.year;
-        selectedMonth = today.month;
-        selectedDay = today.day;
+        selectedYear = target!.year;
+        selectedMonth = target.month;
+        selectedDay = target.day;
       });
-      // Snap the wheels back to today
+      // Snap the wheels back to the target date
       _dayController.animateToItem(selectedDay - 1, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
       _monthController.animateToItem(selectedMonth - 1, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
       _yearController.animateToItem(selectedYear - baseYear, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
@@ -120,7 +154,7 @@ class _CustomDatePickerDialogState extends State<CustomDatePickerDialog> {
                         setState(() {
                           selectedDay = index + 1;
                         });
-                        _enforceFutureDate();
+                        _enforceConstraints();
                       },
                       children: List.generate(maxDays, (index) {
                         bool isActive = index == (selectedDay - 1);
@@ -149,7 +183,7 @@ class _CustomDatePickerDialogState extends State<CustomDatePickerDialog> {
                             _dayController.jumpToItem(selectedDay - 1);
                           }
                         });
-                        _enforceFutureDate();
+                        _enforceConstraints();
                       },
                       children: List.generate(12, (index) {
                         bool isActive = index == (selectedMonth - 1);
@@ -178,7 +212,7 @@ class _CustomDatePickerDialogState extends State<CustomDatePickerDialog> {
                             _dayController.jumpToItem(selectedDay - 1);
                           }
                         });
-                        _enforceFutureDate();
+                        _enforceConstraints();
                       },
                       children: List.generate(maxYearCount, (index) {
                         bool isActive = index == (selectedYear - baseYear);

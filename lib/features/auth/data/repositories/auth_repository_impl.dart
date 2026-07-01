@@ -39,10 +39,11 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, void>> signUp(
     String email,
     String password,
-    String fullName,
-  ) async {
+    String fullName, {
+    String? dateOfBirth,
+  }) async {
     try {
-      await remoteDataSource.signUp(email, password, fullName);
+      await remoteDataSource.signUp(email, password, fullName, dateOfBirth: dateOfBirth);
       return Either.right(null);
     } on TimeoutException {
       return Either.left(
@@ -124,9 +125,9 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, void>> updateProfile(String fullName) async {
+  Future<Either<Failure, void>> updateProfile(String fullName, {String? dateOfBirth}) async {
     try {
-      await remoteDataSource.updateProfile(fullName);
+      await remoteDataSource.updateProfile(fullName, dateOfBirth: dateOfBirth);
       return Either.right(null);
     } on TimeoutException {
       return Either.left(

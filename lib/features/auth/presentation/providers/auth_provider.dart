@@ -35,11 +35,12 @@ class AuthNotifier extends StateNotifier<bool> {
     String email,
     String password,
     String fullName,
+    String? dateOfBirth,
     Function(String) onError,
     Function() onSuccess,
   ) async {
     state = true;
-    final result = await repository.signUp(email, password, fullName);
+    final result = await repository.signUp(email, password, fullName, dateOfBirth: dateOfBirth);
     state = false;
     result.fold((failure) => onError(failure.message), (_) => onSuccess());
   }
@@ -73,11 +74,12 @@ class AuthNotifier extends StateNotifier<bool> {
 
   Future<void> updateProfile(
     String fullName,
+    String? dateOfBirth,
     Function(String) onError,
     Function() onSuccess,
   ) async {
     state = true;
-    final result = await repository.updateProfile(fullName);
+    final result = await repository.updateProfile(fullName, dateOfBirth: dateOfBirth);
     state = false;
     result.fold((failure) => onError(failure.message), (_) => onSuccess());
   }

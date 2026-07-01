@@ -1059,6 +1059,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Name cannot exceed 15 letters.'**
   String get nameExceeds15Letters;
+
+  /// No description provided for @dateOfBirthLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date of Birth'**
+  String get dateOfBirthLabel;
+
+  /// No description provided for @dateOfBirthHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Date (Optional)'**
+  String get dateOfBirthHint;
 }
 
 class _AppLocalizationsDelegate

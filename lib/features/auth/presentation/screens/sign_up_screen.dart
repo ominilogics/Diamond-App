@@ -7,6 +7,7 @@ import 'package:daimond/l10n/app_localizations.dart';
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/app_validators.dart';
@@ -20,6 +21,7 @@ import '../../../../core/utils/app_assets.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/routing/app_routes.dart';
 import '../providers/auth_provider.dart';
+import '../../../events/presentation/widgets/custom_date_picker_dialog.dart';
 
 class SignUpScreen extends HookConsumerWidget {
   const SignUpScreen({super.key});
@@ -28,6 +30,8 @@ class SignUpScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = useMemoized(() => GlobalKey<FormState>());
     final nameController = useTextEditingController();
+    final dobController = useTextEditingController();
+    final selectedDobState = useState<DateTime?>(null);
     final emailController = useTextEditingController();
     final passwordController = useTextEditingController();
     final confirmPasswordController = useTextEditingController();
@@ -50,6 +54,7 @@ class SignUpScreen extends HookConsumerWidget {
               emailController.text.trim(),
               passwordController.text.trim(),
               nameController.text.trim(),
+              dobController.text.trim().isEmpty ? null : dobController.text.trim(),
               (errorMessage) {
                 debugPrint('Sign Up failed: $errorMessage');
                 if (context.mounted) {
@@ -115,6 +120,34 @@ class SignUpScreen extends HookConsumerWidget {
                       textInputAction: TextInputAction.next,
                       onFieldSubmitted: (_) => passwordFocus.requestFocus(),
                       validator: AppValidators.validateEmail,
+                    ),
+                    SizedBox(height: 16.h),
+
+                    GestureDetector(
+                      onTap: () async {
+                        final now = DateTime.now();
+                        final initialDate = selectedDobState.value ?? now;
+                        final selectedDate = await CustomDatePickerDialog.show(
+                          context,
+                          initialDate,
+                          minDate: DateTime(1900, 1, 1),
+                          maxDate: now,
+                        );
+                        if (selectedDate != null) {
+                          selectedDobState.value = selectedDate;
+                          dobController.text = DateFormat('MMM dd, yyyy')
+                              .format(selectedDate)
+                              .toUpperCase();
+                        }
+                      },
+                      behavior: HitTestBehavior.opaque,
+                      child: AbsorbPointer(
+                        child: AppLabelledTextField(
+                          label: texts.dateOfBirthLabel,
+                          hintText: texts.dateOfBirthHint,
+                          controller: dobController,
+                        ),
+                      ),
                     ),
                     SizedBox(height: 16.h),
 

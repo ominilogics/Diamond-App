@@ -77,10 +77,13 @@ class SettingsScreen extends ConsumerWidget {
         final user = Supabase.instance.client.auth.currentUser;
         final email = user?.email ?? texts.profileEmail;
         final rawName =
+            user?.userMetadata?['custom_name'] as String? ??
             user?.userMetadata?['full_name'] as String? ??
             user?.userMetadata?['name'] as String? ??
             texts.profileName;
         final initial = rawName.isNotEmpty ? rawName[0].toUpperCase() : 'U';
+        final avatarUrl = user?.userMetadata?['avatar_url'] as String? ??
+                          user?.userMetadata?['picture'] as String?;
 
         return SingleChildScrollView(
           child: Column(
@@ -116,15 +119,33 @@ class SettingsScreen extends ConsumerWidget {
                               width: 0.5.w,
                             ),
                           ),
-                          child: Center(
-                            child: Text(
-                              initial,
-                              style: AppTextStyles.roboto400Regular20(
-                                color: const Color(0xFF000000),
-                                fontSize: 24.sp,
-                              ),
-                            ),
-                          ),
+                          child: avatarUrl != null && avatarUrl.isNotEmpty
+                              ? ClipOval(
+                                  child: Image.network(
+                                    avatarUrl,
+                                    width: 57.w,
+                                    height: 57.w,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) => Center(
+                                      child: Text(
+                                        initial,
+                                        style: AppTextStyles.roboto400Regular20(
+                                          color: const Color(0xFF000000),
+                                          fontSize: 24.sp,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : Center(
+                                  child: Text(
+                                    initial,
+                                    style: AppTextStyles.roboto400Regular20(
+                                      color: const Color(0xFF000000),
+                                      fontSize: 24.sp,
+                                    ),
+                                  ),
+                                ),
                         ),
                         SizedBox(width: 16.w),
                         Expanded(

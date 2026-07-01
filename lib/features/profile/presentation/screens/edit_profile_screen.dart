@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -15,6 +16,7 @@ import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/utils/app_validators.dart';
 import '../../../../core/widgets/custom_snackbar.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../events/presentation/widgets/custom_date_picker_dialog.dart';
 
 class EditProfileScreen extends HookConsumerWidget {
   const EditProfileScreen({super.key});
@@ -25,12 +27,18 @@ class EditProfileScreen extends HookConsumerWidget {
     final user = Supabase.instance.client.auth.currentUser;
     final email = user?.email ?? l10n.profileEmail;
     final rawName =
+        user?.userMetadata?['custom_name'] as String? ??
         user?.userMetadata?['full_name'] as String? ??
         user?.userMetadata?['name'] as String? ??
         l10n.profileName;
+    final rawDob = user?.userMetadata?['date_of_birth'] as String? ?? '';
     final initial = rawName.isNotEmpty ? rawName[0].toUpperCase() : 'U';
+    final avatarUrl = user?.userMetadata?['avatar_url'] as String? ??
+                      user?.userMetadata?['picture'] as String?;
 
     final nameController = useTextEditingController(text: rawName);
+    final dobController = useTextEditingController(text: rawDob);
+    final selectedDobState = useState<DateTime?>(null);
     final formKey = useMemoized(() => GlobalKey<FormState>());
     final isLoading = ref.watch(authProvider);
 
@@ -39,7 +47,8 @@ class EditProfileScreen extends HookConsumerWidget {
         FocusScope.of(context).unfocus();
 
         final newName = nameController.text.trim();
-        if (newName == rawName) {
+        final newDob = dobController.text.trim();
+        if (newName == rawName && newDob == rawDob) {
           if (context.mounted) {
             CustomSnackbar.showError(context, 'No changes detected.');
           }
@@ -50,6 +59,7 @@ class EditProfileScreen extends HookConsumerWidget {
             .read(authProvider.notifier)
             .updateProfile(
               newName,
+              newDob.isEmpty ? null : newDob,
               (errorMessage) {
                 if (context.mounted) {
                   CustomSnackbar.showError(context, errorMessage);
@@ -77,27 +87,40 @@ class EditProfileScreen extends HookConsumerWidget {
             AppBar2(title: l10n.editProfile),
             SizedBox(height: 32.h),
 
-            // Avatar with Badge
+            // Avatar
             Center(
-              child: SizedBox(
+              child: Container(
                 width: 90.w,
                 height: 90.w,
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    // Avatar Circle
-                    Container(
-                      width: 90.w,
-                      height: 90.w,
-                      decoration: BoxDecoration(
-                        color: AppColors.card2,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: const Color(0xFF000000),
-                          width: 0.5.w,
+                decoration: BoxDecoration(
+                  color: AppColors.card2,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: const Color(0xFF000000),
+                    width: 0.5.w,
+                  ),
+                ),
+                child: avatarUrl != null && avatarUrl.isNotEmpty
+                    ? ClipOval(
+                        child: Image.network(
+                          avatarUrl,
+                          width: 90.w,
+                          height: 90.w,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Center(
+                            child: Text(
+                              initial,
+                              style: TextStyle(
+                                fontFamily: 'Roboto',
+                                fontWeight: FontWeight.w300,
+                                fontSize: 40.sp,
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                      child: Center(
+                      )
+                    : Center(
                         child: Text(
                           initial,
                           style: TextStyle(
@@ -108,27 +131,6 @@ class EditProfileScreen extends HookConsumerWidget {
                           ),
                         ),
                       ),
-                    ),
-                    // Edit Badge
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        width: 28.w,
-                        height: 28.w,
-                        decoration: const BoxDecoration(
-                          gradient: AppColors.primaryButtonGradient,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.edit,
-                          size: 14.w,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
               ),
             ),
 
@@ -161,6 +163,38 @@ class EditProfileScreen extends HookConsumerWidget {
                     ),
                     SizedBox(height: 8.h),
                     AppTextField(hintText: email, readOnly: true),
+                    SizedBox(height: 24.h),
+                    Text(
+                      l10n.dateOfBirthLabel,
+                      style: AppTextStyles.colitez400Italic16(),
+                    ),
+                    SizedBox(height: 8.h),
+                    GestureDetector(
+                      onTap: () async {
+                        final now = DateTime.now();
+                        final initialDate = selectedDobState.value ?? now;
+                        final selectedDate = await CustomDatePickerDialog.show(
+                          context,
+                          initialDate,
+                          minDate: DateTime(1900, 1, 1),
+                          maxDate: now,
+                        );
+                        if (selectedDate != null) {
+                          selectedDobState.value = selectedDate;
+                          dobController.text = DateFormat(
+                            'MMM dd, yyyy',
+                          ).format(selectedDate).toUpperCase();
+                        }
+                      },
+                      behavior: HitTestBehavior.opaque,
+                      child: AbsorbPointer(
+                        child: AppTextField(
+                          controller: dobController,
+                          hintText: l10n.dateOfBirthHint,
+                          readOnly: true,
+                        ),
+                      ),
+                    ),
                     SizedBox(height: 40.h),
                     PrimaryButton(
                       text: l10n.saveChanges,
