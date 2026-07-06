@@ -4,6 +4,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/routing/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -26,6 +28,8 @@ class CardDetailScreen extends HookConsumerWidget {
   final int? orderId;
   final String? initialMessage;
   final int? cardColorValue;
+  final String? coverImageUrl;
+  final String? frontMessage;
 
   const CardDetailScreen({
     super.key,
@@ -34,6 +38,8 @@ class CardDetailScreen extends HookConsumerWidget {
     this.orderId,
     this.initialMessage,
     this.cardColorValue,
+    this.coverImageUrl,
+    this.frontMessage,
   });
 
   @override
@@ -45,17 +51,16 @@ class CardDetailScreen extends HookConsumerWidget {
     final currentPage = useState(0);
     final quantity = useState(1);
     final pageController = usePageController();
-    
+
     final fromController = useTextEditingController();
     final toController = useTextEditingController();
     final fromFocusNode = useFocusNode();
     final toFocusNode = useFocusNode();
-    
+
     final formKey = useMemoized(() => GlobalKey<FormState>());
 
     final isFavoriteAsync = ref.watch(isFavoriteProvider(cardId));
     final isFavorite = isFavoriteAsync.valueOrNull ?? false;
-
 
     useEffect(() {
       void listener() {
@@ -102,19 +107,42 @@ class CardDetailScreen extends HookConsumerWidget {
                               child: Stack(
                                 alignment: Alignment.center,
                                 children: [
-                                  SvgPicture.asset(
-                                    AppAssets.gatta,
-                                    fit: BoxFit.contain,
-                                    width: 253.w,
-                                    height: 358.h,
-                                  ),
-                                  Text(
-                                    'Front Cover Design',
-                                    textAlign: TextAlign.center,
-                                    style: AppTextStyles.colitez400Italic32(
-                                      color: Colors.black.withOpacity(0.3),
+                                  if (coverImageUrl != null &&
+                                      coverImageUrl!.isNotEmpty)
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.r),
+                                      child: CachedNetworkImage(
+                                        imageUrl: coverImageUrl!,
+                                        fit: BoxFit.cover,
+                                        width: 253.w,
+                                        height: 358.h,
+                                      ),
+                                    )
+                                  else
+                                    SvgPicture.asset(
+                                      AppAssets.gatta,
+                                      fit: BoxFit.contain,
+                                      width: 253.w,
+                                      height: 358.h,
                                     ),
-                                  ),
+                                  if (frontMessage != null &&
+                                      frontMessage!.isNotEmpty)
+                                    Positioned(
+                                      top: 255
+                                          .h, // ~57% of 358.h height (right under the divider)
+                                      left: 25.w,
+                                      right: 25.w,
+                                      child: Text(
+                                        frontMessage!.toUpperCase(),
+                                        textAlign: TextAlign.center,
+                                        style: AppTextStyles.bizudMincho(
+                                          fontSize: 14.sp,
+                                          color: Colors.white,
+                                          height: 1.3,
+                                          letterSpacing: -0.5,
+                                        ),
+                                      ),
+                                    ),
                                 ],
                               ),
                             ),
@@ -123,26 +151,36 @@ class CardDetailScreen extends HookConsumerWidget {
                               child: Stack(
                                 alignment: Alignment.center,
                                 children: [
-                                  SvgPicture.asset(
-                                    AppAssets.gatta,
-                                    fit: BoxFit.contain,
-                                    width: 253.w,
-                                    height: 358.h,
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8.r),
+                                    child: Image.asset(
+                                      AppAssets.backSide,
+                                      fit: BoxFit.cover,
+                                      width: 253.w,
+                                      height: 358.h,
+                                    ),
                                   ),
-                                  SizedBox(
-                                    width: 200.w, // Limit text field width
-                                    child: TextField(
-                                      controller: textController,
-                                      textAlign: TextAlign.center,
-                                      maxLines: null,
-                                      style: AppTextStyles.colitez400Italic32(
-                                        color: Colors.black,
-                                      ),
-                                      decoration: const InputDecoration(
-                                        border: InputBorder.none,
-                                        hintText: 'Type your message...',
-                                        hintStyle: TextStyle(
-                                          color: Colors.black54,
+                                  Positioned(
+                                    top: 40.h,
+                                    bottom: 40.h,
+                                    left: 24.w,
+                                    right: 24.w,
+                                    child: Center(
+                                      child: TextField(
+                                        controller: textController,
+                                        textAlign: TextAlign.center,
+                                        maxLines: null,
+                                        style: AppTextStyles.bizudMincho(
+                                          fontSize: 15.sp, // Reduced size
+                                          color: Colors.black87,
+                                          height: 1.4,
+                                        ),
+                                        decoration: InputDecoration(
+                                          border: InputBorder.none,
+                                          hintText: 'Type your message...',
+                                          hintStyle: AppTextStyles.bizudMincho(
+                                            color: Colors.black54,
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -197,7 +235,7 @@ class CardDetailScreen extends HookConsumerWidget {
                         }),
                       ),
                       SizedBox(height: 24.h),
-                      
+
                       if (currentPage.value < 2) ...[
                         // Title and Price Row
                         Row(
@@ -215,7 +253,7 @@ class CardDetailScreen extends HookConsumerWidget {
                           ],
                         ),
                         SizedBox(height: 12.h),
-                        
+
                         // Description
                         Text(
                           "Loving you has been one of life's greatest gifts. No matter where life takes us, my heart will always find its way back to you.",
@@ -224,7 +262,7 @@ class CardDetailScreen extends HookConsumerWidget {
                         SizedBox(height: 24.h),
 
                         // Buttons Section
-                        
+
                         // Row 1: Quantity and Preview
                         Row(
                           children: [
@@ -249,19 +287,36 @@ class CardDetailScreen extends HookConsumerWidget {
                                       if (quantity.value > 1) quantity.value--;
                                     },
                                     child: Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                                      child: Text('-', style: AppTextStyles.colitez400Italic22()),
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 16.w,
+                                        vertical: 8.h,
+                                      ),
+                                      child: Text(
+                                        '-',
+                                        style:
+                                            AppTextStyles.colitez400Italic22(),
+                                      ),
                                     ),
                                   ),
-                                  Text('${quantity.value}', style: AppTextStyles.colitez400Italic22()),
+                                  Text(
+                                    '${quantity.value}',
+                                    style: AppTextStyles.colitez400Italic22(),
+                                  ),
                                   GestureDetector(
                                     behavior: HitTestBehavior.opaque,
                                     onTap: () {
                                       quantity.value++;
                                     },
                                     child: Padding(
-                                      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                                      child: Text('+', style: AppTextStyles.colitez400Italic22()),
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 16.w,
+                                        vertical: 8.h,
+                                      ),
+                                      child: Text(
+                                        '+',
+                                        style:
+                                            AppTextStyles.colitez400Italic22(),
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -273,12 +328,25 @@ class CardDetailScreen extends HookConsumerWidget {
                               child: OutlinedButton(
                                 onPressed: () {
                                   if (textController.text.trim().isEmpty) {
-                                    CustomSnackbar.showError(context, 'Please enter a message for the card.');
+                                    CustomSnackbar.showError(
+                                      context,
+                                      'Please enter a message for the card.',
+                                    );
                                     return;
                                   }
-                                  if (fromController.text.trim().isEmpty || toController.text.trim().isEmpty) {
-                                    CustomSnackbar.showError(context, 'Please fill out all recipient fields.');
-                                    pageController.animateToPage(2, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+                                  if (fromController.text.trim().isEmpty ||
+                                      toController.text.trim().isEmpty) {
+                                    CustomSnackbar.showError(
+                                      context,
+                                      'Please fill out all recipient fields.',
+                                    );
+                                    pageController.animateToPage(
+                                      2,
+                                      duration: const Duration(
+                                        milliseconds: 300,
+                                      ),
+                                      curve: Curves.easeInOut,
+                                    );
                                     return;
                                   }
                                   context.pushNamed(
@@ -309,7 +377,7 @@ class CardDetailScreen extends HookConsumerWidget {
                           ],
                         ),
                         SizedBox(height: 40.h),
-                        
+
                         // Row 2: Continue and Heart
                         Row(
                           children: [
@@ -318,12 +386,25 @@ class CardDetailScreen extends HookConsumerWidget {
                                 text: 'Continue',
                                 onPressed: () {
                                   if (textController.text.trim().isEmpty) {
-                                    CustomSnackbar.showError(context, 'Please enter a message for the card.');
+                                    CustomSnackbar.showError(
+                                      context,
+                                      'Please enter a message for the card.',
+                                    );
                                     return;
                                   }
-                                  if (fromController.text.trim().isEmpty || toController.text.trim().isEmpty) {
-                                    CustomSnackbar.showError(context, 'Please fill out all recipient fields.');
-                                    pageController.animateToPage(2, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+                                  if (fromController.text.trim().isEmpty ||
+                                      toController.text.trim().isEmpty) {
+                                    CustomSnackbar.showError(
+                                      context,
+                                      'Please fill out all recipient fields.',
+                                    );
+                                    pageController.animateToPage(
+                                      2,
+                                      duration: const Duration(
+                                        milliseconds: 300,
+                                      ),
+                                      curve: Curves.easeInOut,
+                                    );
                                     return;
                                   }
                                   final order = OrderEntity(
@@ -332,15 +413,27 @@ class CardDetailScreen extends HookConsumerWidget {
                                     message: message.value,
                                     addedAt: DateTime.now(),
                                   );
-                                  ref.read(orderProvider.notifier).addOrder(order);
-                                  CustomSnackbar.showSuccess(context, 'Order Placed');
+                                  ref
+                                      .read(orderProvider.notifier)
+                                      .addOrder(order);
+                                  CustomSnackbar.showSuccess(
+                                    context,
+                                    'Order Placed',
+                                  );
 
-                                  Future.delayed(const Duration(milliseconds: 1000), () {
-                                    if (context.mounted) {
-                                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                                      context.pushNamed(AppRoute.orderHistory.name);
-                                    }
-                                  });
+                                  Future.delayed(
+                                    const Duration(milliseconds: 1000),
+                                    () {
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).hideCurrentSnackBar();
+                                        context.pushNamed(
+                                          AppRoute.orderHistory.name,
+                                        );
+                                      }
+                                    },
+                                  );
                                 },
                               ),
                             ),
@@ -361,15 +454,19 @@ class CardDetailScreen extends HookConsumerWidget {
                                 child: AnimatedLikeButton(
                                   isLiked: isFavorite,
                                   onTap: () {
-                                    ref.read(favoritesProvider.notifier).toggleFavorite(
-                                      FavoriteEntity(
-                                        cardId: cardId,
-                                        title: title,
-                                        colorValue: cardColorValue ?? 0xFFFFA7A7, // Default to AppColors.card1
-                                        supabaseUserId: 'dummy_user_uid',
-                                        favoritedAt: DateTime.now(),
-                                      ),
-                                    );
+                                    ref
+                                        .read(favoritesProvider.notifier)
+                                        .toggleFavorite(
+                                          FavoriteEntity(
+                                            cardId: cardId,
+                                            title: title,
+                                            colorValue:
+                                                cardColorValue ??
+                                                0xFFFFA7A7, // Default to AppColors.card1
+                                            supabaseUserId: 'dummy_user_uid',
+                                            favoritedAt: DateTime.now(),
+                                          ),
+                                        );
                                   },
                                   size: 22.w,
                                 ),
@@ -378,13 +475,18 @@ class CardDetailScreen extends HookConsumerWidget {
                           ],
                         ),
                         SizedBox(height: 10.h),
-                        
+
                         // Row 3: Customize Card
                         OutlinedButton(
                           onPressed: () {
                             context.pushNamed(
                               AppRoute.editCard.name,
-                              extra: {'cardId': cardId},
+                              extra: {
+                                'cardId': cardId,
+                                'coverImageUrl': coverImageUrl,
+                                'frontMessage': frontMessage,
+                                'initialMessage': initialMessage,
+                              },
                             );
                           },
                           style: OutlinedButton.styleFrom(
@@ -408,7 +510,10 @@ class CardDetailScreen extends HookConsumerWidget {
                             children: [
                               Align(
                                 alignment: Alignment.centerLeft,
-                                child: Text('Add Recipient', style: AppTextStyles.colitez400Italic24()),
+                                child: Text(
+                                  'Add Recipient',
+                                  style: AppTextStyles.colitez400Italic24(),
+                                ),
                               ),
                               SizedBox(height: 24.h),
                               AppTextField(
@@ -417,8 +522,12 @@ class CardDetailScreen extends HookConsumerWidget {
                                 controller: fromController,
                                 focusNode: fromFocusNode,
                                 textInputAction: TextInputAction.next,
-                                onFieldSubmitted: (_) => toFocusNode.requestFocus(),
-                                validator: (value) => value == null || value.trim().isEmpty ? 'This field is required' : null,
+                                onFieldSubmitted: (_) =>
+                                    toFocusNode.requestFocus(),
+                                validator: (value) =>
+                                    value == null || value.trim().isEmpty
+                                    ? 'This field is required'
+                                    : null,
                               ),
                               SizedBox(height: 24.h),
                               AppTextField(
@@ -427,13 +536,17 @@ class CardDetailScreen extends HookConsumerWidget {
                                 controller: toController,
                                 focusNode: toFocusNode,
                                 textInputAction: TextInputAction.done,
-                                validator: (value) => value == null || value.trim().isEmpty ? 'This field is required' : null,
+                                validator: (value) =>
+                                    value == null || value.trim().isEmpty
+                                    ? 'This field is required'
+                                    : null,
                               ),
                               SizedBox(height: 32.h),
                               PrimaryButton(
                                 text: 'Send',
                                 onPressed: () {
-                                  if (formKey.currentState?.validate() ?? false) {
+                                  if (formKey.currentState?.validate() ??
+                                      false) {
                                     // Handle send logic here
                                   }
                                 },

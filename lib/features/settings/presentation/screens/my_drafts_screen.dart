@@ -10,6 +10,8 @@ import '../../../../core/widgets/app_bar2.dart';
 import '../../../../core/widgets/gradient_scaffold.dart';
 import '../../../../core/routing/app_routes.dart';
 import '../../../home/presentation/widgets/featured_card.dart';
+import '../../../cards/presentation/providers/cards_provider.dart';
+import 'package:collection/collection.dart';
 
 class MyDraftsScreen extends ConsumerWidget {
   const MyDraftsScreen({super.key});
@@ -19,6 +21,9 @@ class MyDraftsScreen extends ConsumerWidget {
     final db = ref.watch(appDatabaseProvider);
     final draftsStream = db.select(db.draftsTable).watch();
     final texts = AppLocalizations.of(context)!;
+    
+    final allCardsState = ref.watch(allCardsStreamProvider);
+    final allCards = allCardsState.valueOrNull ?? [];
 
     return GradientScaffold(
       body: SafeArea(
@@ -56,14 +61,24 @@ class MyDraftsScreen extends ConsumerWidget {
                     ),
                     itemBuilder: (context, index) {
                       final draft = drafts[index];
+                      final card = allCards.firstWhereOrNull((c) => c.id == draft.cardId);
+
                       return FeaturedCard(
                         cardId: draft.cardId,
                         title: draft.draftName ?? 'Draft',
                         cardColor: const Color(0xFFFFA7A7), // Default card color
+                        coverImageUrl: card?.coverImageUrl,
+                        frontMessage: card?.defaultFrontMessage,
+                        insideMessage: card?.defaultInsideMessage,
                         onTap: () {
                           context.pushNamed(
                             AppRoute.editCard.name,
-                            extra: {'cardId': draft.cardId},
+                            extra: {
+                              'cardId': draft.cardId,
+                              'coverImageUrl': card?.coverImageUrl,
+                              'frontMessage': draft.coverText,
+                              'initialMessage': draft.insideMessage,
+                            },
                           );
                         },
                       );

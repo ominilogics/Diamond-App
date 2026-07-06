@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -42,13 +43,13 @@ class AppLabelledTextField extends HookWidget {
           obscureText.value = !obscureText.value;
         },
         child: Padding(
-          padding: EdgeInsets.only(right: 16.w),
+          padding: EdgeInsets.only(right: kIsWeb ? 16 : 16.w),
           child: Icon(
             obscureText.value
                 ? Icons.visibility_off_outlined
                 : Icons.visibility_outlined,
             color: Colors.black54,
-            size: 20.sp,
+            size: kIsWeb ? 20 : 20.sp,
           ),
         ),
       );

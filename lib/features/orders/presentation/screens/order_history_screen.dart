@@ -1,3 +1,4 @@
+import 'package:daimond/features/cards/presentation/providers/cards_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -11,6 +12,8 @@ import '../../../../core/utils/app_assets.dart';
 import '../../../../core/routing/app_routes.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/order_provider.dart';
+import 'package:collection/collection.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class OrderHistoryScreen extends HookConsumerWidget {
   const OrderHistoryScreen({super.key});
@@ -19,6 +22,9 @@ class OrderHistoryScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final ordersAsync = ref.watch(orderProvider);
     final texts = AppLocalizations.of(context)!;
+    
+    final allCardsState = ref.watch(allCardsStreamProvider);
+    final allCards = allCardsState.valueOrNull ?? [];
 
     return GradientScaffold(
       body: SafeArea(
@@ -60,6 +66,9 @@ class OrderHistoryScreen extends HookConsumerWidget {
                     separatorBuilder: (_, __) => SizedBox(height: 16.h),
                     itemBuilder: (context, index) {
                       final item = items[index];
+                      final card = allCards.firstWhereOrNull((c) => c.id == item.cardId);
+                      final hasImage = card != null && card.coverImageUrl.isNotEmpty;
+
                       return GestureDetector(
                         behavior: HitTestBehavior.opaque,
                         onTap: () {
@@ -82,12 +91,22 @@ class OrderHistoryScreen extends HookConsumerWidget {
                           ),
                           child: Row(
                             children: [
-                              SvgPicture.asset(
-                                AppAssets.gatta,
-                                width: 60.w,
-                                height: 60.w,
-                                fit: BoxFit.contain,
-                              ),
+                              hasImage 
+                                ? ClipRRect(
+                                    borderRadius: BorderRadius.circular(4.r),
+                                    child: CachedNetworkImage(
+                                      imageUrl: card.coverImageUrl,
+                                      width: 60.w,
+                                      height: 60.w,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )
+                                : SvgPicture.asset(
+                                    AppAssets.gatta,
+                                    width: 60.w,
+                                    height: 60.w,
+                                    fit: BoxFit.contain,
+                                  ),
                               SizedBox(width: 16.w),
                               Expanded(
                                 child: Column(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../theme/app_colors.dart';
@@ -20,7 +21,7 @@ class PrimaryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: 44.h,
+      height: kIsWeb ? 44 : 44.h,
       decoration: BoxDecoration(
         gradient: AppColors.primaryButtonGradient,
         borderRadius: BorderRadius.circular(20.r),
@@ -33,8 +34,8 @@ class PrimaryButton extends StatelessWidget {
           child: Center(
             child: isLoading
                 ? SizedBox(
-                    width: 24.w,
-                    height: 24.w,
+                    width: kIsWeb ? 24 : 24.w,
+                    height: kIsWeb ? 24 : 24.w,
                     child: const CircularProgressIndicator(
                       color: Colors.black, // Matching the default text color
                       strokeWidth: 2.0,

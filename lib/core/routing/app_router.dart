@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -21,6 +20,7 @@ import '../../features/cards/presentation/screens/edit_card_screen.dart';
 import '../../features/orders/presentation/screens/order_history_screen.dart';
 import '../../features/subscription/presentation/screens/subscription_screen.dart';
 import '../../features/settings/presentation/screens/my_drafts_screen.dart';
+import '../../features/admin/presentation/screens/admin_dashboard_screen.dart';
 import 'app_routes.dart';
 
 
@@ -31,7 +31,9 @@ class AppRouter {
 
   static final router = GoRouter(
     navigatorKey: rootNavigatorKey,
-    initialLocation: Supabase.instance.client.auth.currentSession != null ? AppRoute.main.path : AppRoute.login.path,
+    initialLocation: Supabase.instance.client.auth.currentSession != null 
+        ? (kIsWeb ? AppRoute.adminDashboard.path : AppRoute.main.path) 
+        : AppRoute.login.path,
     redirect: (context, state) {
       final session = Supabase.instance.client.auth.currentSession;
       final isAuthRoute = state.matchedLocation == AppRoute.login.path || 
@@ -41,7 +43,18 @@ class AppRouter {
       if (session == null) {
         if (!isAuthRoute) return AppRoute.login.path;
       } else {
-        if (isAuthRoute) return AppRoute.main.path;
+        if (isAuthRoute) {
+          // If on web, redirect directly to admin dashboard
+          if (kIsWeb) {
+            return AppRoute.adminDashboard.path;
+          }
+          return AppRoute.main.path;
+        }
+        
+        // Prevent web users from accessing consumer app routes
+        if (kIsWeb && state.matchedLocation != AppRoute.adminDashboard.path) {
+           return AppRoute.adminDashboard.path;
+        }
       }
       return null;
     },
@@ -85,8 +98,22 @@ class AppRouter {
         name: AppRoute.cards.name,
         path: AppRoute.cards.path,
         builder: (context, state) {
-          final title = state.extra as String?;
-          return CardsScreen(title: title, showBackButton: true);
+          String? title;
+          String? categoryId;
+          
+          if (state.extra is String) {
+            title = state.extra as String;
+          } else if (state.extra is Map<String, dynamic>) {
+            final extra = state.extra as Map<String, dynamic>;
+            title = extra['title'] as String?;
+            categoryId = extra['categoryId'] as String?;
+          }
+          
+          return CardsScreen(
+            title: title, 
+            showBackButton: true,
+            initialCategoryId: categoryId,
+          );
         },
       ),
       GoRoute(
@@ -115,6 +142,8 @@ class AppRouter {
             orderId: extra['orderId'] as int?,
             initialMessage: extra['initialMessage'] as String?,
             cardColorValue: extra['cardColorValue'] as int?,
+            coverImageUrl: extra['coverImageUrl'] as String?,
+            frontMessage: extra['frontMessage'] as String?,
           );
         },
       ),
@@ -135,6 +164,9 @@ class AppRouter {
           final extra = state.extra as Map<String, dynamic>? ?? {};
           return EditCardScreen(
             cardId: extra['cardId'] as String? ?? 'unknown',
+            coverImageUrl: extra['coverImageUrl'] as String?,
+            frontMessage: extra['frontMessage'] as String?,
+            initialMessage: extra['initialMessage'] as String?,
           );
         },
       ),
@@ -157,6 +189,11 @@ class AppRouter {
         name: AppRoute.myDrafts.name,
         path: AppRoute.myDrafts.path,
         builder: (context, state) => const MyDraftsScreen(),
+      ),
+      GoRoute(
+        name: AppRoute.adminDashboard.name,
+        path: AppRoute.adminDashboard.path,
+        builder: (context, state) => const AdminDashboardScreen(),
       ),
     ],
   );

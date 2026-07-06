@@ -1036,6 +1036,12 @@ abstract class AppLocalizations {
   /// **'Enter draft name...'**
   String get enterDraftName;
 
+  /// No description provided for @fieldsCannotBeEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Cover and inside text cannot be empty.'**
+  String get fieldsCannotBeEmpty;
+
   /// No description provided for @cancel.
   ///
   /// In en, this message translates to:
@@ -1071,6 +1077,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select Date (Optional)'**
   String get dateOfBirthHint;
+
+  /// No description provided for @congratulations.
+  ///
+  /// In en, this message translates to:
+  /// **'Congratulations'**
+  String get congratulations;
+
+  /// No description provided for @mothersDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Mother\'s Day'**
+  String get mothersDay;
+
+  /// No description provided for @fathersDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Father\'s Day'**
+  String get fathersDay;
+
+  /// No description provided for @belatedBirthday.
+  ///
+  /// In en, this message translates to:
+  /// **'Belated Birthday'**
+  String get belatedBirthday;
+
+  /// No description provided for @friendship.
+  ///
+  /// In en, this message translates to:
+  /// **'Friendship'**
+  String get friendship;
+
+  /// No description provided for @sympathy.
+  ///
+  /// In en, this message translates to:
+  /// **'Sympathy'**
+  String get sympathy;
+
+  /// No description provided for @missingYou.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing You'**
+  String get missingYou;
+
+  /// No description provided for @troubledRelationship.
+  ///
+  /// In en, this message translates to:
+  /// **'Troubled Relationship'**
+  String get troubledRelationship;
+
+  /// No description provided for @advice.
+  ///
+  /// In en, this message translates to:
+  /// **'Advice'**
+  String get advice;
+
+  /// No description provided for @wedding.
+  ///
+  /// In en, this message translates to:
+  /// **'Wedding'**
+  String get wedding;
+
+  /// No description provided for @goodLuck.
+  ///
+  /// In en, this message translates to:
+  /// **'Good Luck'**
+  String get goodLuck;
+
+  /// No description provided for @today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// No description provided for @noNotificationsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications yet'**
+  String get noNotificationsYet;
+
+  /// No description provided for @errorOccurred.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: '**
+  String get errorOccurred;
 }
 
 class _AppLocalizationsDelegate

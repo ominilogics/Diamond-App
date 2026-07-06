@@ -29,7 +29,10 @@ class EventsScreen extends HookConsumerWidget {
     final eventsState = ref.watch(eventsProvider);
     final events = eventsState.valueOrNull ?? [];
     final customEvents = events.where((e) => e.isCustom).toList();
+    final systemEvents = events.where((e) => !e.isCustom).toList();
     final hasCustomEvents = customEvents.isNotEmpty;
+    final hasSystemEvents = systemEvents.isNotEmpty;
+    final hasAnyEvents = hasCustomEvents || hasSystemEvents;
 
     Widget fab = Container(
       width: 56.w,
@@ -73,57 +76,58 @@ class EventsScreen extends HookConsumerWidget {
             ],
           ),
         ),
-        if (hasCustomEvents)
+        if (hasAnyEvents)
           SliverToBoxAdapter(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                SizedBox(height: 24.h),
-                ListView.separated(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: EdgeInsets.symmetric(horizontal: 24.w),
-                  itemCount: customEvents.length,
-                  separatorBuilder: (context, index) => SizedBox(height: 16.h),
-                  itemBuilder: (context, index) {
-                    final event = customEvents[index];
-                    return MyEventCard(
-                      date: DateFormat(
-                        'MMM dd, yyyy',
-                      ).format(event.date).toUpperCase(),
-                      title: event.title,
-                      reminder: event.reminder,
-                    );
-                  },
-                ),
-                SizedBox(height: 40.h),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w),
-                  child: Text(
-                    texts.upcomingOccasions,
-                    style: AppTextStyles.colitez400Italic24(),
+                if (hasCustomEvents) ...[
+                  SizedBox(height: 24.h),
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: EdgeInsets.symmetric(horizontal: 24.w),
+                    itemCount: customEvents.length,
+                    separatorBuilder: (context, index) => SizedBox(height: 16.h),
+                    itemBuilder: (context, index) {
+                      final event = customEvents[index];
+                      return MyEventCard(
+                        date: DateFormat(
+                          'MMM dd, yyyy',
+                        ).format(event.date).toUpperCase(),
+                        title: event.title,
+                        reminder: event.reminder,
+                      );
+                    },
                   ),
-                ),
-                SizedBox(height: 16.h),
-                ListView.separated(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: EdgeInsets.symmetric(horizontal: 24.w),
-                  itemCount: 3,
-                  separatorBuilder: (context, index) => SizedBox(height: 16.h),
-                  itemBuilder: (context, index) {
-                    final titles = ["Mother's Day", "Father's Day", "New Year"];
-                    final dates = [
-                      "MAY 12, 2024",
-                      "MAY 12, 2024",
-                      "JAN 01, 2027",
-                    ];
-                    return UpcomingOccasionCard(
-                      date: dates[index],
-                      title: titles[index],
-                    );
-                  },
-                ),
+                ],
+                if (hasSystemEvents) ...[
+                  SizedBox(height: 40.h),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 24.w),
+                    child: Text(
+                      texts.upcomingOccasions,
+                      style: AppTextStyles.colitez400Italic24(),
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
+                  ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: EdgeInsets.symmetric(horizontal: 24.w),
+                    itemCount: systemEvents.length,
+                    separatorBuilder: (context, index) => SizedBox(height: 16.h),
+                    itemBuilder: (context, index) {
+                      final event = systemEvents[index];
+                      return UpcomingOccasionCard(
+                        date: DateFormat(
+                          'MMM dd, yyyy',
+                        ).format(event.date).toUpperCase(),
+                        title: event.title,
+                      );
+                    },
+                  ),
+                ],
                 SizedBox(height: 80.h),
               ],
             ),

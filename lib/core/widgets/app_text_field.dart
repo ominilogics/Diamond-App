@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../theme/app_text_styles.dart';
 import '../theme/app_colors.dart';
@@ -19,6 +20,7 @@ class AppTextField extends StatelessWidget {
   final FocusNode? focusNode;
   final TextInputAction? textInputAction;
   final ValueChanged<String>? onFieldSubmitted;
+  final ValueChanged<String>? onChanged;
   final int? maxLength;
 
   const AppTextField({
@@ -37,6 +39,7 @@ class AppTextField extends StatelessWidget {
     this.focusNode,
     this.textInputAction,
     this.onFieldSubmitted,
+    this.onChanged,
     this.maxLength,
   });
 
@@ -95,6 +98,7 @@ class AppTextField extends StatelessWidget {
                 style: AppTextStyles.roboto400Regular14(color: Colors.black),
                 onChanged: (val) {
                   state.didChange(val);
+                  onChanged?.call(val);
                 },
                 textAlignVertical: TextAlignVertical.center,
                 decoration: InputDecoration(
@@ -105,20 +109,20 @@ class AppTextField extends StatelessWidget {
                   border: InputBorder.none,
                   isDense: true,
                   contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16.w,
-                    vertical: 10.h,
+                    horizontal: kIsWeb ? 16 : 16.w,
+                    vertical: kIsWeb ? 16 : 10.h,
                   ),
                   prefixIcon: prefixIcon,
                   prefixIconConstraints: BoxConstraints(
-                    minWidth: 40.w,
-                    minHeight: 20.h,
-                    maxHeight: 44.h,
+                    minWidth: kIsWeb ? 40 : 40.w,
+                    minHeight: kIsWeb ? 20 : 20.h,
+                    maxHeight: kIsWeb ? 44 : 44.h,
                   ),
                   suffixIcon: suffixIcon,
                   suffixIconConstraints: BoxConstraints(
-                    minWidth: 40.w,
-                    minHeight: 20.h,
-                    maxHeight: 44.h,
+                    minWidth: kIsWeb ? 40 : 40.w,
+                    minHeight: kIsWeb ? 20 : 20.h,
+                    maxHeight: kIsWeb ? 44 : 44.h,
                   ),
                 ),
               ),

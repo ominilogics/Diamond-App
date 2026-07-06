@@ -3,32 +3,26 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:daimond/l10n/app_localizations.dart';
+import 'package:collection/collection.dart';
 
 import '../../../../core/routing/app_routes.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/app_assets.dart';
+import '../../../../core/widgets/shimmers/category_shimmer.dart';
+import '../../../../core/utils/category_localization.dart';
+import '../../../cards/presentation/providers/cards_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import '../../../cards/domain/entities/category_entity.dart';
 
-class CategoriesSection extends StatelessWidget {
+class CategoriesSection extends ConsumerWidget {
   const CategoriesSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final texts = AppLocalizations.of(context)!;
-
-    final titles = [
-      texts.love,
-      texts.birthday,
-      texts.thankYou,
-      texts.anniversary,
-    ];
-
-    final colors = [
-      AppColors.card1,
-      AppColors.card2,
-      AppColors.card3,
-      AppColors.card4,
-    ];
+    final categoriesAsync = ref.watch(categoriesStreamProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,62 +59,138 @@ class CategoriesSection extends StatelessWidget {
         ),
         SizedBox(height: 16.h),
         SizedBox(
-          height: 102
-              .h, // Precisely sized for 72 circle + 10 gap + text to remove extra vertical space
-          child: ListView.separated(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
-            scrollDirection: Axis.horizontal,
-            itemCount: titles.length,
-            separatorBuilder: (context, index) => SizedBox(width: 20.w),
-            itemBuilder: (context, index) {
-              return Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 72.w,
-                    height: 72.w,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFFFFF),
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: const Color(0xFF000000),
-                        width: 0.5.w,
-                      ),
-                    ),
-                    child: ClipOval(
-                      child: SizedBox(
-                        width: 72.w,
-                        height: 72.w,
-                        child: Align(
-                          alignment: Alignment.topCenter,
-                          child: Padding(
-                            padding: EdgeInsets.only(top: 16.h),
-                            child: SvgPicture.asset(
-                              AppAssets.gatta,
-                              width: 44.w,
-                              height: 67.h,
-                              fit: BoxFit.fill,
-                              colorFilter: ColorFilter.mode(
-                                colors[index],
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10.h),
-                  Text(
-                    titles[index],
-                    style: AppTextStyles.roboto400Regular14(),
-                  ),
-                ],
+          height: 102.h,
+          child: categoriesAsync.when(
+            loading: () => Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              child: Row(
+                children: List.generate(4, (index) => const Expanded(
+                  child: Center(child: CategoryShimmer()),
+                )),
+              ),
+            ),
+            error: (error, stack) => const Center(child: Text('Error loading categories')),
+            data: (categories) {
+              if (categories.isEmpty) {
+                return Center(child: Text('No categories available', style: AppTextStyles.roboto300Light13()));
+              }
+              final displayCategories = categories.take(4).toList();
+              
+              return Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: displayCategories.map((cat) => Expanded(
+                    child: _CategoryItem(cat: cat)
+                  )).toList(),
+                ),
               );
             },
           ),
         ),
       ],
+    );
+  }
+}
+
+class _CategoryItem extends ConsumerWidget {
+  final CategoryEntity cat;
+  const _CategoryItem({required this.cat});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final texts = AppLocalizations.of(context)!;
+    final firstCardAsync = ref.watch(categoryCardsStreamProvider(cat.id));
+    final firstCard = firstCardAsync.valueOrNull?.firstOrNull;
+    final hasImage = firstCard != null && firstCard.coverImageUrl.isNotEmpty;
+
+    return GestureDetector(
+      onTap: () {
+        context.pushNamed(
+          AppRoute.cards.name,
+          extra: {
+            'title': texts.categories,
+            'categoryId': cat.id,
+          },
+        );
+      },
+      behavior: HitTestBehavior.opaque,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 72.w,
+            height: 72.w,
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFFFFF),
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: const Color(0xFF000000),
+                width: 0.5.w,
+              ),
+            ),
+            child: ClipOval(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Padding(
+                  padding: EdgeInsets.only(top: 16.h),
+                  child: hasImage
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(4.r), // Adds subtle rounding to the tiny card
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              CachedNetworkImage(
+                                imageUrl: firstCard.coverImageUrl,
+                                width: 44.w,
+                                height: 67.h,
+                                fit: BoxFit.cover,
+                                fadeInDuration: Duration.zero,
+                                fadeOutDuration: Duration.zero,
+                              ),
+                              if (firstCard.defaultFrontMessage != null && firstCard.defaultFrontMessage!.isNotEmpty)
+                                Positioned(
+                                  top: 47.h, // ~70% of 67.h height
+                                  left: 5.w,
+                                  right: 5.w,
+                                  child: Text(
+                                    firstCard.defaultFrontMessage!.toUpperCase(),
+                                    textAlign: TextAlign.center,
+                                    style: AppTextStyles.bizudMincho(
+                                      fontSize: 4.sp,
+                                      color: Colors.white,
+                                      height: 1.1,
+                                      letterSpacing: -0.1,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        )
+                      : SvgPicture.asset(
+                          AppAssets.gatta,
+                          width: 44.w,
+                          height: 67.h,
+                          fit: BoxFit.fill,
+                          colorFilter: const ColorFilter.mode(
+                            AppColors.card1,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 10.h),
+          Text(
+            cat.name.localized(texts),
+            style: AppTextStyles.roboto400Regular14(),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
     );
   }
 }

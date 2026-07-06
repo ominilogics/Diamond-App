@@ -24,6 +24,7 @@ class SearchBarWidget extends HookWidget {
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: AppTextField(
         controller: internalController,
+        onChanged: onChanged,
         hintText: texts.searchHint,
         prefixIcon: Padding(
           padding: EdgeInsets.only(left: 16.w, right: 8.w),

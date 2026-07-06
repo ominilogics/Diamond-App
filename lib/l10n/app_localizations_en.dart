@@ -500,6 +500,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enterDraftName => 'Enter draft name...';
 
   @override
+  String get fieldsCannotBeEmpty => 'Cover and inside text cannot be empty.';
+
+  @override
   String get cancel => 'Cancel';
 
   @override
@@ -516,4 +519,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dateOfBirthHint => 'Select Date (Optional)';
+
+  @override
+  String get congratulations => 'Congratulations';
+
+  @override
+  String get mothersDay => 'Mother\'s Day';
+
+  @override
+  String get fathersDay => 'Father\'s Day';
+
+  @override
+  String get belatedBirthday => 'Belated Birthday';
+
+  @override
+  String get friendship => 'Friendship';
+
+  @override
+  String get sympathy => 'Sympathy';
+
+  @override
+  String get missingYou => 'Missing You';
+
+  @override
+  String get troubledRelationship => 'Troubled Relationship';
+
+  @override
+  String get advice => 'Advice';
+
+  @override
+  String get wedding => 'Wedding';
+
+  @override
+  String get goodLuck => 'Good Luck';
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get noNotificationsYet => 'No notifications yet';
+
+  @override
+  String get errorOccurred => 'Error: ';
 }

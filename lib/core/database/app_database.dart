@@ -1,22 +1,25 @@
-import 'dart:io';
 import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
+import 'connection/shared.dart'
+    if (dart.library.io) 'connection/connection_native.dart'
+    if (dart.library.html) 'connection/connection_web.dart';
 
 import '../../features/favorites/data/models/favorite_table.dart';
 import '../../features/orders/data/models/order_table.dart';
 import '../../features/events/data/models/event_table.dart';
 import '../../features/drafts/data/models/draft_table.dart';
+import '../../features/cards/data/models/remote_category_table.dart';
+import '../../features/cards/data/models/remote_card_table.dart';
+
+import '../../features/notifications/data/models/notification_table.dart';
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [FavoritesTable, OrdersTable, EventsTable, DraftsTable])
+@DriftDatabase(tables: [FavoritesTable, OrdersTable, EventsTable, DraftsTable, RemoteCategoriesTable, RemoteCardsTable, NotificationsTable])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(_openConnection());
+  AppDatabase() : super(openConnection());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration {
@@ -34,15 +37,14 @@ class AppDatabase extends _$AppDatabase {
         if (from < 4) {
           await m.addColumn(draftsTable, draftsTable.draftName);
         }
+        if (from < 5) {
+          await m.createTable(remoteCategoriesTable);
+          await m.createTable(remoteCardsTable);
+        }
+        if (from < 6) {
+          await m.createTable(notificationsTable);
+        }
       },
     );
   }
-}
-
-LazyDatabase _openConnection() {
-  return LazyDatabase(() async {
-    final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dbFolder.path, 'daimond.sqlite'));
-    return NativeDatabase.createInBackground(file);
-  });
 }

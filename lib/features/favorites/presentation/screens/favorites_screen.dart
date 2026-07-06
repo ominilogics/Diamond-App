@@ -10,6 +10,8 @@ import '../../../../core/widgets/app_bar1.dart';
 import '../../../home/presentation/widgets/featured_card.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/favorites_provider.dart';
+import '../../../cards/presentation/providers/cards_provider.dart';
+import 'package:collection/collection.dart';
 
 class FavoritesScreen extends ConsumerWidget {
   const FavoritesScreen({super.key});
@@ -20,6 +22,9 @@ class FavoritesScreen extends ConsumerWidget {
 
     final favoritesState = ref.watch(favoritesProvider);
     final favorites = favoritesState.valueOrNull ?? [];
+    
+    final allCardsState = ref.watch(allCardsStreamProvider);
+    final allCards = allCardsState.valueOrNull ?? [];
 
     if (favorites.isEmpty) {
       return Column(
@@ -69,10 +74,15 @@ class FavoritesScreen extends ConsumerWidget {
               ),
               itemBuilder: (context, index) {
                 final favorite = favorites[index];
+                final card = allCards.firstWhereOrNull((c) => c.id == favorite.cardId);
+                
                 return FeaturedCard(
                   cardId: favorite.cardId,
                   title: favorite.title,
                   cardColor: Color(favorite.colorValue),
+                  coverImageUrl: card?.coverImageUrl,
+                  frontMessage: card?.defaultFrontMessage,
+                  insideMessage: card?.defaultInsideMessage,
                 );
               },
             ),

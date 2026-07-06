@@ -1,0 +1,214 @@
+{
+  "categories": [
+    {
+      "name": "Love",
+      "sort_order": 1,
+      "cards": [
+        {
+          "title": "Love",
+          "image_filename": "card_template_front_love.jpg",
+          "default_front_message": "Type your message here...",
+          "default_inside_message": "Type your custom message here...",
+          "price": 5.99,
+          "is_featured": true,
+          "color_value": "0xFFFFA7A7"
+        }
+      ]
+    },
+    {
+      "name": "Congratulations",
+      "sort_order": 2,
+      "cards": [
+        {
+          "title": "Congratulations",
+          "image_filename": "card_template_front_congratulations.jpg",
+          "default_front_message": "Type your message here...",
+          "default_inside_message": "Type your custom message here...",
+          "price": 5.99,
+          "is_featured": false,
+          "color_value": "0xFFFFDCA7"
+        }
+      ]
+    },
+    {
+      "name": "Birthday",
+      "sort_order": 3,
+      "cards": [
+        {
+          "title": "Happy Birthday",
+          "image_filename": "card_template_front_birthday.jpg",
+          "default_front_message": "Type your message here...",
+          "default_inside_message": "Type your custom message here...",
+          "price": 5.99,
+          "is_featured": true,
+          "color_value": "0xFFA7C1FF"
+        }
+      ]
+    },
+    {
+      "name": "Mother's Day",
+      "sort_order": 4,
+      "cards": [
+        {
+          "title": "Mother's Day",
+          "image_filename": "card_template_front_mothers_day.jpg",
+          "default_front_message": "Type your message here...",
+          "default_inside_message": "Type your custom message here...",
+          "price": 5.99,
+          "is_featured": false,
+          "color_value": "0xFFFFB5E8"
+        }
+      ]
+    },
+    {
+      "name": "Father's Day",
+      "sort_order": 5,
+      "cards": [
+        {
+          "title": "Father's Day",
+          "image_filename": "card_template_front_fathers_day.jpg",
+          "default_front_message": "Type your message here...",
+          "default_inside_message": "Type your custom message here...",
+          "price": 5.99,
+          "is_featured": false,
+          "color_value": "0xFFA7E8FF"
+        }
+      ]
+    },
+    {
+      "name": "Thank You",
+      "sort_order": 6,
+      "cards": [
+        {
+          "title": "Thank You",
+          "image_filename": "card_template_front_thank_you.jpg",
+          "default_front_message": "Type your message here...",
+          "default_inside_message": "Type your custom message here...",
+          "price": 5.99,
+          "is_featured": false,
+          "color_value": "0xFFB5FFA7"
+        }
+      ]
+    },
+    {
+      "name": "Belated Birthday",
+      "sort_order": 7,
+      "cards": [
+        {
+          "title": "Belated Birthday",
+          "image_filename": "card_template_front_belated_birthday.jpg",
+          "default_front_message": "Type your message here...",
+          "default_inside_message": "Type your custom message here...",
+          "price": 5.99,
+          "is_featured": false,
+          "color_value": "0xFFE8A7FF"
+        }
+      ]
+    },
+    {
+      "name": "Friendship",
+      "sort_order": 8,
+      "cards": [
+        {
+          "title": "Friendship",
+          "image_filename": "card_template_front_friendship.jpg",
+          "default_front_message": "Type your message here...",
+          "default_inside_message": "Type your custom message here...",
+          "price": 5.99,
+          "is_featured": false,
+          "color_value": "0xFFFFFFA7"
+        }
+      ]
+    },
+    {
+      "name": "Sympathy",
+      "sort_order": 9,
+      "cards": [
+        {
+          "title": "Sympathy",
+          "image_filename": "card_template_front_sympathy.jpg",
+          "default_front_message": "Type your message here...",
+          "default_inside_message": "Type your custom message here...",
+          "price": 5.99,
+          "is_featured": false,
+          "color_value": "0xFFDCDCDC"
+        }
+      ]
+    },
+    {
+      "name": "Missing You",
+      "sort_order": 10,
+      "cards": [
+        {
+          "title": "Missing You",
+          "image_filename": "card_template_front_missing_you.jpg",
+          "default_front_message": "Type your message here...",
+          "default_inside_message": "Type your custom message here...",
+          "price": 5.99,
+          "is_featured": false,
+          "color_value": "0xFFFFDCA7"
+        }
+      ]
+    },
+    {
+      "name": "Troubled Relationship",
+      "sort_order": 11,
+      "cards": [
+        {
+          "title": "Troubled Relationship",
+          "image_filename": "card_template_front_troubled_relationship.jpg",
+          "default_front_message": "Type your message here...",
+          "default_inside_message": "Type your custom message here...",
+          "price": 5.99,
+          "is_featured": false,
+          "color_value": "0xFFA7A7A7"
+        }
+      ]
+    },
+    {
+      "name": "Advice",
+      "sort_order": 12,
+      "cards": [
+        {
+          "title": "Advice",
+          "image_filename": "card_template_front_advice.jpg",
+          "default_front_message": "Type your message here...",
+          "default_inside_message": "Type your custom message here...",
+          "price": 5.99,
+          "is_featured": false,
+          "color_value": "0xFFA7FFDC"
+        }
+      ]
+    },
+    {
+      "name": "Wedding",
+      "sort_order": 13,
+      "cards": [
+        {
+          "title": "Happy Wedding",
+          "image_filename": "card_template_front_wedding.jpg",
+          "default_front_message": "Type your message here...",
+          "default_inside_message": "Type your custom message here...",
+          "price": 5.99,
+          "is_featured": false,
+          "color_value": "0xFFFFFFFF"
+        }
+      ]
+    },
+    {
+      "name": "Good Luck",
+      "sort_order": 14,
+      "cards": [
+        {
+          "title": "Good Luck",
+          "image_filename": "card_template_front_good_luck.jpg",
+          "default_front_message": "Type your message here...",
+          "default_inside_message": "Type your custom message here...",
+          "price": 5.99,
+          "is_featured": false,
+          "color_value": "0xFFDCA7FF"
+        }
+      ]
+    }
+  ]
+}

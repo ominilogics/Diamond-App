@@ -16,7 +16,8 @@ enum AppRoute {
   notificationSettings('/notification-settings'),
   orderHistory('/orderHistory'),
   subscription('/subscription'),
-  myDrafts('/my-drafts');
+  myDrafts('/my-drafts'),
+  adminDashboard('/admin-dashboard');
 
   const AppRoute(this.path);
   final String path;

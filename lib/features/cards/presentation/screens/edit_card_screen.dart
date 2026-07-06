@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -20,11 +22,22 @@ import 'package:daimond/l10n/app_localizations.dart';
 import '../widgets/custom_card_text_field.dart';
 import '../../../../core/widgets/custom_snackbar.dart';
 import 'package:drift/drift.dart' as drift;
+import '../providers/cards_provider.dart';
 
 class EditCardScreen extends HookConsumerWidget {
   final String cardId;
 
-  const EditCardScreen({super.key, required this.cardId});
+  final String? coverImageUrl;
+  final String? frontMessage;
+  final String? initialMessage;
+
+  const EditCardScreen({
+    super.key, 
+    required this.cardId,
+    this.coverImageUrl,
+    this.frontMessage,
+    this.initialMessage,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -33,12 +46,10 @@ class EditCardScreen extends HookConsumerWidget {
     final isRecipientStep = useState(false);
 
     final coverTextController = useTextEditingController(
-      text:
-          "Loving you has been one of life's greatest gifts. No matter where life takes us, my heart will always find its way back to you.",
+      text: frontMessage ?? "Loving you has been one of life's greatest gifts. No matter where life takes us, my heart will always find its way back to you.",
     );
     final insideMessageController = useTextEditingController(
-      text:
-          "Every day I spend with you reminds me how beautiful life can be when it's shared with someone who truly understands your heart. Your kindness, patience, and love have brought light into my life in ways I never imagined possible. Through every smile, every conversation, and every challenge we've faced together, you've shown me what unconditional love truly means.",
+      text: initialMessage ?? "Every day I spend with you reminds me how beautiful life can be when it's shared with someone who truly understands your heart. Your kindness, patience, and love have brought light into my life in ways I never imagined possible. Through every smile, every conversation, and every challenge we've faced together, you've shown me what unconditional love truly means.",
     );
 
     final fromController = useTextEditingController();
@@ -48,6 +59,8 @@ class EditCardScreen extends HookConsumerWidget {
     final formKey = useMemoized(() => GlobalKey<FormState>());
     
     final texts = AppLocalizations.of(context)!;
+    final cardAsync = ref.watch(cardDetailProvider(cardId));
+    final card = cardAsync.valueOrNull;
 
     void showExitDialog() {
       showDialog(
@@ -110,20 +123,88 @@ class EditCardScreen extends HookConsumerWidget {
                             children: [
                               // Front Cover
                               Center(
-                                child: SvgPicture.asset(
-                                  AppAssets.gatta,
-                                  fit: BoxFit.contain,
-                                  width: 253.w,
-                                  height: 358.h,
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    if (coverImageUrl != null && coverImageUrl!.isNotEmpty)
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(8.r),
+                                        child: CachedNetworkImage(
+                                          imageUrl: coverImageUrl!,
+                                          fit: BoxFit.cover,
+                                          width: 253.w,
+                                          height: 358.h,
+                                        ),
+                                      )
+                                    else
+                                      SvgPicture.asset(
+                                        AppAssets.gatta,
+                                        fit: BoxFit.contain,
+                                        width: 253.w,
+                                        height: 358.h,
+                                      ),
+                                    ValueListenableBuilder<TextEditingValue>(
+                                      valueListenable: coverTextController,
+                                      builder: (context, value, child) {
+                                        if (value.text.isEmpty) return const SizedBox.shrink();
+                                        return Positioned(
+                                          top: 250.h,
+                                          left: 30.w,
+                                          right: 30.w,
+                                          child: Text(
+                                            value.text.toUpperCase(),
+                                            textAlign: TextAlign.center,
+                                            style: AppTextStyles.bizudMincho(
+                                              fontSize: 14.sp,
+                                              color: Colors.white,
+                                              height: 1.3,
+                                              letterSpacing: -0.5,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ],
                                 ),
                               ),
                               // Inside Card
                               Center(
-                                child: SvgPicture.asset(
-                                  AppAssets.gatta,
-                                  fit: BoxFit.contain,
-                                  width: 253.w,
-                                  height: 358.h,
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.r),
+                                      child: Image.asset(
+                                        AppAssets.backSide,
+                                        fit: BoxFit.cover,
+                                        width: 253.w,
+                                        height: 358.h,
+                                      ),
+                                    ),
+                                    ValueListenableBuilder<TextEditingValue>(
+                                      valueListenable: insideMessageController,
+                                      builder: (context, value, child) {
+                                        if (value.text.isEmpty) return const SizedBox.shrink();
+                                        return Positioned(
+                                          top: 40.h,
+                                          bottom: 40.h,
+                                          left: 24.w,
+                                          right: 24.w,
+                                          child: Center(
+                                            child: Text(
+                                              value.text,
+                                              textAlign: TextAlign.center,
+                                              style: AppTextStyles.bizudMincho(
+                                                fontSize: 15.sp,
+                                                color: Colors.black87,
+                                                height: 1.4,
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ],
                                 ),
                               ),
                               // Envelope / Third Step
@@ -168,11 +249,11 @@ class EditCardScreen extends HookConsumerWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'HBD 01',
+                                card?.title ?? '',
                                 style: AppTextStyles.colitez400Italic24(),
                               ),
                               Text(
-                                '\$ 5.99',
+                                '\$ 5.99', // Keep price hardcoded or use card.price if it exists later
                                 style: AppTextStyles.colitez400Italic24(),
                               ),
                             ],
@@ -226,6 +307,14 @@ class EditCardScreen extends HookConsumerWidget {
                           SizedBox(height: 16.h),
                           OutlinedButton(
                             onPressed: () async {
+                              final coverText = coverTextController.text.trim();
+                              final insideText = insideMessageController.text.trim();
+                              
+                              if (coverText.isEmpty || insideText.isEmpty) {
+                                CustomSnackbar.showError(context, texts.fieldsCannotBeEmpty);
+                                return;
+                              }
+
                               final draftNameController = TextEditingController();
                               final result = await showDialog<String>(
                                 context: context,
