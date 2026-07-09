@@ -33,8 +33,9 @@ class EditProfileScreen extends HookConsumerWidget {
         l10n.profileName;
     final rawDob = user?.userMetadata?['date_of_birth'] as String? ?? '';
     final initial = rawName.isNotEmpty ? rawName[0].toUpperCase() : 'U';
-    final avatarUrl = user?.userMetadata?['avatar_url'] as String? ??
-                      user?.userMetadata?['picture'] as String?;
+    final avatarUrl =
+        user?.userMetadata?['avatar_url'] as String? ??
+        user?.userMetadata?['picture'] as String?;
 
     final nameController = useTextEditingController(text: rawName);
     final dobController = useTextEditingController(text: rawDob);
@@ -79,35 +80,73 @@ class EditProfileScreen extends HookConsumerWidget {
     }
 
     return GradientScaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 12.h),
-            AppBar2(title: l10n.editProfile),
-            SizedBox(height: 32.h),
-
-            // Avatar
-            Center(
-              child: Container(
-                width: 90.w,
-                height: 90.w,
-                decoration: BoxDecoration(
-                  color: AppColors.card2,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: const Color(0xFF000000),
-                    width: 0.5.w,
-                  ),
+      body: CustomScrollView(
+        slivers: [
+          SliverLayoutBuilder(
+            builder: (context, constraints) {
+              final isScrolled = constraints.scrollOffset > 0;
+              return SliverAppBar(
+                floating: true,
+                snap: true,
+                backgroundColor: isScrolled
+                    ? const Color(0xFFE7FFEC)
+                    : Colors.transparent,
+                surfaceTintColor: Colors.transparent,
+                elevation: 0,
+                scrolledUnderElevation: 3.0,
+                automaticallyImplyLeading: false,
+                toolbarHeight: 60.h,
+                titleSpacing: 0,
+                title: Column(
+                  children: [
+                    SizedBox(height: 12.h),
+                    AppBar2(title: l10n.editProfile),
+                  ],
                 ),
-                child: avatarUrl != null && avatarUrl.isNotEmpty
-                    ? ClipOval(
-                        child: Image.network(
-                          avatarUrl,
-                          width: 90.w,
-                          height: 90.w,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Center(
+              );
+            },
+          ),
+          SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: 32.h),
+
+                // Avatar
+                Center(
+                  child: Container(
+                    width: 90.w,
+                    height: 90.w,
+                    decoration: BoxDecoration(
+                      color: AppColors.card2,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: const Color(0xFF000000),
+                        width: 0.5.w,
+                      ),
+                    ),
+                    child: avatarUrl != null && avatarUrl.isNotEmpty
+                        ? ClipOval(
+                            child: Image.network(
+                              avatarUrl,
+                              width: 90.w,
+                              height: 90.w,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Center(
+                                    child: Text(
+                                      initial,
+                                      style: TextStyle(
+                                        fontFamily: 'Roboto',
+                                        fontWeight: FontWeight.w300,
+                                        fontSize: 40.sp,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                            ),
+                          )
+                        : Center(
                             child: Text(
                               initial,
                               style: TextStyle(
@@ -118,95 +157,85 @@ class EditProfileScreen extends HookConsumerWidget {
                               ),
                             ),
                           ),
+                  ),
+                ),
+
+                SizedBox(height: 40.h),
+
+                // Form Fields
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.fullNameLabel,
+                          style: AppTextStyles.colitez400Italic16(),
                         ),
-                      )
-                    : Center(
-                        child: Text(
-                          initial,
-                          style: TextStyle(
-                            fontFamily: 'Roboto',
-                            fontWeight: FontWeight.w300,
-                            fontSize: 40.sp,
-                            color: Colors.black,
+                        SizedBox(height: 8.h),
+                        AppTextField(
+                          controller: nameController,
+                          validator: AppValidators.validateName,
+                          textInputAction: TextInputAction.done,
+                          maxLength: 30,
+                          onFieldSubmitted: (_) => onSave(),
+                        ),
+                        SizedBox(height: 24.h),
+                        Text(
+                          l10n.emailLabel,
+                          style: AppTextStyles.colitez400Italic16(),
+                        ),
+                        SizedBox(height: 8.h),
+                        AppTextField(hintText: email, readOnly: true),
+                        SizedBox(height: 24.h),
+                        Text(
+                          l10n.dateOfBirthLabel,
+                          style: AppTextStyles.colitez400Italic16(),
+                        ),
+                        SizedBox(height: 8.h),
+                        GestureDetector(
+                          onTap: () async {
+                            final now = DateTime.now();
+                            final initialDate = selectedDobState.value ?? now;
+                            final selectedDate =
+                                await CustomDatePickerDialog.show(
+                                  context,
+                                  initialDate,
+                                  minDate: DateTime(1900, 1, 1),
+                                  maxDate: now,
+                                );
+                            if (selectedDate != null) {
+                              selectedDobState.value = selectedDate;
+                              dobController.text = DateFormat(
+                                'MMM dd, yyyy',
+                              ).format(selectedDate).toUpperCase();
+                            }
+                          },
+                          behavior: HitTestBehavior.opaque,
+                          child: AbsorbPointer(
+                            child: AppTextField(
+                              controller: dobController,
+                              hintText: l10n.dateOfBirthHint,
+                              readOnly: true,
+                            ),
                           ),
                         ),
-                      ),
-              ),
-            ),
-
-            SizedBox(height: 40.h),
-
-            // Form Fields
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: Form(
-                key: formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n.fullNameLabel,
-                      style: AppTextStyles.colitez400Italic16(),
-                    ),
-                    SizedBox(height: 8.h),
-                    AppTextField(
-                      controller: nameController,
-                      validator: AppValidators.validateName,
-                      textInputAction: TextInputAction.done,
-                      maxLength: 30,
-                      onFieldSubmitted: (_) => onSave(),
-                    ),
-                    SizedBox(height: 24.h),
-                    Text(
-                      l10n.emailLabel,
-                      style: AppTextStyles.colitez400Italic16(),
-                    ),
-                    SizedBox(height: 8.h),
-                    AppTextField(hintText: email, readOnly: true),
-                    SizedBox(height: 24.h),
-                    Text(
-                      l10n.dateOfBirthLabel,
-                      style: AppTextStyles.colitez400Italic16(),
-                    ),
-                    SizedBox(height: 8.h),
-                    GestureDetector(
-                      onTap: () async {
-                        final now = DateTime.now();
-                        final initialDate = selectedDobState.value ?? now;
-                        final selectedDate = await CustomDatePickerDialog.show(
-                          context,
-                          initialDate,
-                          minDate: DateTime(1900, 1, 1),
-                          maxDate: now,
-                        );
-                        if (selectedDate != null) {
-                          selectedDobState.value = selectedDate;
-                          dobController.text = DateFormat(
-                            'MMM dd, yyyy',
-                          ).format(selectedDate).toUpperCase();
-                        }
-                      },
-                      behavior: HitTestBehavior.opaque,
-                      child: AbsorbPointer(
-                        child: AppTextField(
-                          controller: dobController,
-                          hintText: l10n.dateOfBirthHint,
-                          readOnly: true,
+                        SizedBox(height: 40.h),
+                        PrimaryButton(
+                          text: l10n.saveChanges,
+                          isLoading: isLoading,
+                          onPressed: onSave,
                         ),
-                      ),
+                      ],
                     ),
-                    SizedBox(height: 40.h),
-                    PrimaryButton(
-                      text: l10n.saveChanges,
-                      isLoading: isLoading,
-                      onPressed: onSave,
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

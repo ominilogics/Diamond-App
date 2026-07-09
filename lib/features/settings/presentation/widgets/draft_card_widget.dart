@@ -30,11 +30,24 @@ class DraftCardWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('${texts.draftPrefix}$cardId', style: AppTextStyles.colitez400Italic20()),
+          Text(
+            '${texts.draftPrefix}$cardId',
+            style: AppTextStyles.colitez400Italic20(),
+          ),
           SizedBox(height: 8.h),
-          Text('${texts.coverPrefix}$coverText', style: AppTextStyles.roboto300Light13(), maxLines: 2, overflow: TextOverflow.ellipsis),
+          Text(
+            '${texts.coverPrefix}$coverText',
+            style: AppTextStyles.roboto300Light13(),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
           SizedBox(height: 4.h),
-          Text('${texts.insidePrefix}$insideMessage', style: AppTextStyles.roboto300Light13(), maxLines: 2, overflow: TextOverflow.ellipsis),
+          Text(
+            '${texts.insidePrefix}$insideMessage',
+            style: AppTextStyles.roboto300Light13(),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
         ],
       ),
     );

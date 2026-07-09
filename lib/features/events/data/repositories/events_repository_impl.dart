@@ -1,6 +1,7 @@
 import '../../../../core/error/failures.dart';
 import '../../../../core/utils/either.dart';
 import 'package:drift/drift.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/database/app_database.dart';
 import '../../domain/entities/event_entity.dart';
 import '../../domain/repositories/events_repository.dart';
@@ -15,13 +16,17 @@ class EventsRepositoryImpl implements EventsRepository {
   Future<Either<Failure, List<EventEntity>>> getEvents() async {
     try {
       final models = await dataSource.getEvents();
-      final entities = models.map((model) => EventEntity(
-        id: model.id,
-        title: model.title,
-        date: model.date,
-        reminder: model.reminder,
-        isCustom: model.isCustom,
-      )).toList();
+      final entities = models
+          .map(
+            (model) => EventEntity(
+              id: model.id,
+              title: model.title,
+              date: model.date,
+              reminder: model.reminder,
+              isCustom: model.isCustom,
+            ),
+          )
+          .toList();
       return Either.right(entities);
     } catch (e) {
       return Either.left(DatabaseFailure('Failed to load events: $e'));
@@ -38,8 +43,25 @@ class EventsRepositoryImpl implements EventsRepository {
         reminder: Value(event.reminder),
         isCustom: Value(event.isCustom),
       );
-      
+
       await dataSource.saveEvent(companion);
+      
+      // Silently upsert to supabase in background
+      try {
+        final Map<String, dynamic> data = {
+          'title': event.title,
+          'date': event.date.toIso8601String(),
+          'reminder': event.reminder,
+          'is_custom': event.isCustom,
+        };
+        if (event.id != -1) {
+          data['id'] = event.id; // Include ID to update the exact row on Supabase
+        }
+        Supabase.instance.client.from('events').upsert(data).then((_) {});
+      } catch (e) {
+        // Ignore remote sync errors
+      }
+
       return Either.right(null);
     } catch (e) {
       return Either.left(DatabaseFailure('Failed to save event: $e'));
@@ -50,6 +72,14 @@ class EventsRepositoryImpl implements EventsRepository {
   Future<Either<Failure, void>> deleteEvent(int id) async {
     try {
       await dataSource.deleteEvent(id);
+      
+      // Silently delete from supabase in background
+      try {
+        Supabase.instance.client.from('events').delete().eq('id', id).then((_) {});
+      } catch (e) {
+        // Ignore remote deletion errors
+      }
+      
       return Either.right(null);
     } catch (e) {
       return Either.left(DatabaseFailure('Failed to delete event: $e'));

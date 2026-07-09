@@ -757,13 +757,13 @@ abstract class AppLocalizations {
   /// No description provided for @deleteAccountMessage.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to delete your account? This action cannot be undone.'**
+  /// **'Are you sure you want to delete your account? This action is permanent and cannot be undone once confirmed.'**
   String get deleteAccountMessage;
 
   /// No description provided for @logoutMessage.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to log out of your account?'**
+  /// **'Are you sure you want to log out of your account? You will need to enter your credentials again to access your saved cards and preferences.'**
   String get logoutMessage;
 
   /// No description provided for @subscriptionTitle.
@@ -931,7 +931,7 @@ abstract class AppLocalizations {
   /// No description provided for @discardChangesDesc.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to discard your edits?'**
+  /// **'Are you sure you want to discard your edits? Any unsaved changes you\'ve made to this card will be permanently lost.'**
   String get discardChangesDesc;
 
   /// No description provided for @keepEditing.
@@ -1161,6 +1161,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error: '**
   String get errorOccurred;
+
+  /// No description provided for @purchaseSuccessful.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase successful!'**
+  String get purchaseSuccessful;
+
+  /// No description provided for @restoreSuccessful.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchases restored successfully!'**
+  String get restoreSuccessful;
+
+  /// No description provided for @storeNotReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Store is not ready yet. Please try again later.'**
+  String get storeNotReady;
+
+  /// No description provided for @manageSubscriptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Subscriptions'**
+  String get manageSubscriptions;
+
+  /// No description provided for @customizedCardFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Customized Card'**
+  String get customizedCardFallback;
+
+  /// No description provided for @orderPlaced.
+  ///
+  /// In en, this message translates to:
+  /// **'Order Placed'**
+  String get orderPlaced;
+
+  /// No description provided for @pleaseEnterMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a message for the card.'**
+  String get pleaseEnterMessage;
+
+  /// No description provided for @pleaseFillRecipientFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Please fill out all recipient fields.'**
+  String get pleaseFillRecipientFields;
+
+  /// No description provided for @singleCardNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Single card product is not available right now.'**
+  String get singleCardNotAvailable;
+
+  /// No description provided for @thisFieldIsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'This field is required'**
+  String get thisFieldIsRequired;
+
+  /// No description provided for @pleaseFillMessageFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Please fill out all message fields.'**
+  String get pleaseFillMessageFields;
+
+  /// No description provided for @cardDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Card Details'**
+  String get cardDetails;
+
+  /// No description provided for @preview.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get preview;
+
+  /// No description provided for @continueBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueBtn;
+
+  /// No description provided for @defaultCardDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Loving you has been one of life\'s greatest gifts. No matter where life takes us, my heart will always find its way back to you.'**
+  String get defaultCardDescription;
 }
 
 class _AppLocalizationsDelegate

@@ -41,7 +41,7 @@ class SubscriptionPlanCard extends StatelessWidget {
               color: Colors.black.withOpacity(0.02),
               blurRadius: 10,
               offset: const Offset(0, 4),
-            )
+            ),
           ],
         ),
         child: Container(
@@ -51,8 +51,16 @@ class SubscriptionPlanCard extends StatelessWidget {
             gradient: isSelected
                 ? LinearGradient(
                     colors: [
-                      Color.lerp(Colors.white, AppColors.primaryButtonGradientStart, 0.08)!,
-                      Color.lerp(Colors.white, AppColors.primaryButtonGradientEnd, 0.08)!,
+                      Color.lerp(
+                        Colors.white,
+                        AppColors.primaryButtonGradientStart,
+                        0.08,
+                      )!,
+                      Color.lerp(
+                        Colors.white,
+                        AppColors.primaryButtonGradientEnd,
+                        0.08,
+                      )!,
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -71,7 +79,8 @@ class SubscriptionPlanCard extends StatelessWidget {
                   Text(
                     title.toUpperCase(),
                     style: AppTextStyles.roboto500Medium14().copyWith(
-                      color: Colors.black, // Title color is now consistently bold and dark
+                      color: Colors
+                          .black, // Title color is now consistently bold and dark
                       letterSpacing: 2.0,
                       fontSize: 12.sp,
                       fontWeight: FontWeight.w600,
@@ -89,7 +98,9 @@ class SubscriptionPlanCard extends StatelessWidget {
               ),
               SizedBox(height: 6.h),
               Padding(
-                padding: EdgeInsets.only(right: 32.w), // Added horizontal padding to subtext
+                padding: EdgeInsets.only(
+                  right: 32.w,
+                ), // Added horizontal padding to subtext
                 child: Text(
                   description,
                   style: AppTextStyles.roboto400Regular12().copyWith(

@@ -11,14 +11,14 @@ class CustomDatePickerDialog extends StatefulWidget {
   final DateTime? maxDate;
 
   const CustomDatePickerDialog({
-    super.key, 
+    super.key,
     required this.initialDate,
     this.minDate,
     this.maxDate,
   });
 
   static Future<DateTime?> show(
-    BuildContext context, 
+    BuildContext context,
     DateTime initialDate, {
     DateTime? minDate,
     DateTime? maxDate,
@@ -50,14 +50,24 @@ class _CustomDatePickerDialogState extends State<CustomDatePickerDialog> {
   late FixedExtentScrollController _yearController;
 
   final List<String> months = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ];
 
   @override
   void initState() {
     super.initState();
-    
+
     if (widget.minDate != null) {
       baseYear = widget.minDate!.year;
     } else {
@@ -72,7 +82,7 @@ class _CustomDatePickerDialogState extends State<CustomDatePickerDialog> {
     }
 
     DateTime initDate = widget.initialDate;
-    
+
     if (widget.minDate != null && initDate.isBefore(widget.minDate!)) {
       initDate = widget.minDate!;
     } else if (widget.maxDate != null && initDate.isAfter(widget.maxDate!)) {
@@ -84,8 +94,12 @@ class _CustomDatePickerDialogState extends State<CustomDatePickerDialog> {
     selectedYear = initDate.year;
 
     _dayController = FixedExtentScrollController(initialItem: selectedDay - 1);
-    _monthController = FixedExtentScrollController(initialItem: selectedMonth - 1);
-    _yearController = FixedExtentScrollController(initialItem: selectedYear - baseYear);
+    _monthController = FixedExtentScrollController(
+      initialItem: selectedMonth - 1,
+    );
+    _yearController = FixedExtentScrollController(
+      initialItem: selectedYear - baseYear,
+    );
   }
 
   @override
@@ -113,9 +127,21 @@ class _CustomDatePickerDialogState extends State<CustomDatePickerDialog> {
         selectedDay = target.day;
       });
       // Snap the wheels back to the target date
-      _dayController.animateToItem(selectedDay - 1, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
-      _monthController.animateToItem(selectedMonth - 1, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
-      _yearController.animateToItem(selectedYear - baseYear, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+      _dayController.animateToItem(
+        selectedDay - 1,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+      _monthController.animateToItem(
+        selectedMonth - 1,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+      _yearController.animateToItem(
+        selectedYear - baseYear,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
     }
   }
 
@@ -162,7 +188,9 @@ class _CustomDatePickerDialogState extends State<CustomDatePickerDialog> {
                           child: Text(
                             '${index + 1}',
                             style: AppTextStyles.roboto400Regular20(
-                              color: isActive ? Colors.black : const Color(0xFFA8A8A8),
+                              color: isActive
+                                  ? Colors.black
+                                  : const Color(0xFFA8A8A8),
                             ),
                           ),
                         );
@@ -177,7 +205,10 @@ class _CustomDatePickerDialogState extends State<CustomDatePickerDialog> {
                       onSelectedItemChanged: (index) {
                         setState(() {
                           selectedMonth = index + 1;
-                          int newMax = _getDaysInMonth(selectedMonth, selectedYear);
+                          int newMax = _getDaysInMonth(
+                            selectedMonth,
+                            selectedYear,
+                          );
                           if (selectedDay > newMax) {
                             selectedDay = newMax;
                             _dayController.jumpToItem(selectedDay - 1);
@@ -191,7 +222,9 @@ class _CustomDatePickerDialogState extends State<CustomDatePickerDialog> {
                           child: Text(
                             months[index],
                             style: AppTextStyles.roboto400Regular20(
-                              color: isActive ? Colors.black : const Color(0xFFA8A8A8),
+                              color: isActive
+                                  ? Colors.black
+                                  : const Color(0xFFA8A8A8),
                             ),
                           ),
                         );
@@ -206,7 +239,10 @@ class _CustomDatePickerDialogState extends State<CustomDatePickerDialog> {
                       onSelectedItemChanged: (index) {
                         setState(() {
                           selectedYear = baseYear + index;
-                          int newMax = _getDaysInMonth(selectedMonth, selectedYear);
+                          int newMax = _getDaysInMonth(
+                            selectedMonth,
+                            selectedYear,
+                          );
                           if (selectedDay > newMax) {
                             selectedDay = newMax;
                             _dayController.jumpToItem(selectedDay - 1);
@@ -220,7 +256,9 @@ class _CustomDatePickerDialogState extends State<CustomDatePickerDialog> {
                           child: Text(
                             '${baseYear + index}',
                             style: AppTextStyles.roboto400Regular20(
-                              color: isActive ? Colors.black : const Color(0xFFA8A8A8),
+                              color: isActive
+                                  ? Colors.black
+                                  : const Color(0xFFA8A8A8),
                             ),
                           ),
                         );
@@ -234,7 +272,9 @@ class _CustomDatePickerDialogState extends State<CustomDatePickerDialog> {
             PrimaryButton(
               text: 'Done',
               onPressed: () {
-                Navigator.of(context).pop(DateTime(selectedYear, selectedMonth, selectedDay));
+                Navigator.of(
+                  context,
+                ).pop(DateTime(selectedYear, selectedMonth, selectedDay));
               },
             ),
           ],

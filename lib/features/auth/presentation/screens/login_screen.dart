@@ -107,164 +107,174 @@ class LoginScreen extends HookConsumerWidget {
                   child: Form(
                     key: formKey,
                     child: Column(
-                      mainAxisAlignment: kIsWeb ? MainAxisAlignment.center : MainAxisAlignment.start,
+                      mainAxisAlignment: kIsWeb
+                          ? MainAxisAlignment.center
+                          : MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                    SizedBox(height: 36.h),
-                    Text(
-                      texts.loginTitle,
-                      style: AppTextStyles.colitez400Italic32(),
-                    ),
-                    SizedBox(height: 9.h),
-                    Text(
-                      texts.loginSubtitle,
-                      style: AppTextStyles.roboto300Light13(),
-                    ),
-                    SizedBox(height: 29.h),
-
-                    AppLabelledTextField(
-                      label: texts.emailLabel,
-                      hintText: texts.emailHint,
-                      keyboardType: TextInputType.emailAddress,
-                      controller: emailController,
-                      focusNode: emailFocus,
-                      textInputAction: TextInputAction.next,
-                      onFieldSubmitted: (_) => passwordFocus.requestFocus(),
-                      validator: AppValidators.validateEmail,
-                    ),
-                    SizedBox(height: 16.h),
-
-                    AppLabelledTextField(
-                      label: texts.passwordLabel,
-                      hintText: texts.passwordHint,
-                      isPassword: true,
-                      controller: passwordController,
-                      focusNode: passwordFocus,
-                      textInputAction: TextInputAction.done,
-                      onFieldSubmitted: (_) => onLoginPressed(),
-                      validator: AppValidators.validateLoginPassword,
-                    ),
-                    // The top padding is handled by the GestureDetector's padding
-                    if (!kIsWeb)
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: () {
-                            context.pushNamed(AppRoute.forgotPassword.name);
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                              top: 8.h,
-                              bottom: 8.h,
-                              left: 16.w,
-                            ),
-                            child: Text(
-                              texts.forgotPasswordTitle,
-                              style: AppTextStyles.roboto400Regular14(),
-                            ),
-                          ),
+                        SizedBox(height: 36.h),
+                        Text(
+                          texts.loginTitle,
+                          style: AppTextStyles.colitez400Italic32(),
                         ),
-                      )
-                    else
-                      SizedBox(height: 24.h),
+                        SizedBox(height: 9.h),
+                        Text(
+                          texts.loginSubtitle,
+                          style: AppTextStyles.roboto300Light13(),
+                        ),
+                        SizedBox(height: 29.h),
 
-                    SizedBox(height: 24.h),
+                        AppLabelledTextField(
+                          label: texts.emailLabel,
+                          hintText: texts.emailHint,
+                          keyboardType: TextInputType.emailAddress,
+                          controller: emailController,
+                          focusNode: emailFocus,
+                          textInputAction: TextInputAction.next,
+                          onFieldSubmitted: (_) => passwordFocus.requestFocus(),
+                          validator: AppValidators.validateEmail,
+                        ),
+                        SizedBox(height: 16.h),
 
-                    PrimaryButton(
-                      text: texts.logIn,
-                      onPressed: onLoginPressed,
-                      isLoading: isLoading,
-                    ),
-
-                    if (!kIsWeb) ...[
-                      SizedBox(height: 32.h),
-                      const OrDivider(),
-                      SizedBox(height: 29.h),
-
-                      SocialAuthButton(
-                        text: 'Continue with Google',
-                        iconPath: AppAssets.google,
-                        onPressed: () {
-                          ref
-                              .read(authProvider.notifier)
-                              .signInWithGoogle(
-                                (errorMessage) {
-                                  if (context.mounted) {
-                                    CustomSnackbar.showError(
-                                      context,
-                                      errorMessage,
-                                    );
-                                  }
-                                },
-                                () {
-                                  if (context.mounted) {
-                                    CustomSnackbar.showSuccess(
-                                      context,
-                                      texts.loginSuccess,
-                                    );
-                                    context.goNamed(AppRoute.main.name);
-                                  }
-
-                                  // Request Notification Permission based on Android versions in the background
-                                  Future.microtask(() async {
-                                    if (Platform.isAndroid) {
-                                      final androidInfo =
-                                          await DeviceInfoPlugin().androidInfo;
-                                      final sdkInt = androidInfo.version.sdkInt;
-
-                                      if (sdkInt < 29) {
-                                        await Permission.notification.request();
-                                      } else if (sdkInt >= 29 && sdkInt < 33) {
-                                        await Permission.notification.request();
-                                      } else {
-                                        await Permission.notification.request();
-                                      }
-                                    } else {
-                                      await Permission.notification.request();
-                                    }
-                                  });
-                                },
-                              );
-                        },
-                      ),
-
-                      const Spacer(),
-                      SizedBox(height: 32.h),
-
-                      Center(
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: () {
-                            // Navigate to Sign Up
-                            context.goNamed(AppRoute.signup.name);
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              vertical: 8.h,
-                              horizontal: 16.w,
+                        AppLabelledTextField(
+                          label: texts.passwordLabel,
+                          hintText: texts.passwordHint,
+                          isPassword: true,
+                          controller: passwordController,
+                          focusNode: passwordFocus,
+                          textInputAction: TextInputAction.done,
+                          onFieldSubmitted: (_) => onLoginPressed(),
+                          validator: AppValidators.validateLoginPassword,
+                        ),
+                        // The top padding is handled by the GestureDetector's padding
+                        if (!kIsWeb)
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () {
+                                context.goNamed(AppRoute.forgotPassword.name);
+                              },
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  top: 8.h,
+                                  bottom: 8.h,
+                                  left: 16.w,
+                                ),
+                                child: Text(
+                                  texts.forgotPasswordTitle,
+                                  style: AppTextStyles.roboto400Regular14(),
+                                ),
+                              ),
                             ),
-                            child: RichText(
-                              text: TextSpan(
-                                text: texts.noAccount,
-                                style: AppTextStyles.roboto300Light14(),
-                                children: [
-                                  TextSpan(
-                                    text: texts.signUpText,
-                                    style: AppTextStyles.roboto400Regular14(),
+                          )
+                        else
+                          SizedBox(height: 24.h),
+
+                        SizedBox(height: 24.h),
+
+                        PrimaryButton(
+                          text: texts.logIn,
+                          onPressed: onLoginPressed,
+                          isLoading: isLoading,
+                        ),
+
+                        if (!kIsWeb) ...[
+                          SizedBox(height: 32.h),
+                          const OrDivider(),
+                          SizedBox(height: 29.h),
+
+                          SocialAuthButton(
+                            text: 'Continue with Google',
+                            iconPath: AppAssets.google,
+                            onPressed: () {
+                              ref
+                                  .read(authProvider.notifier)
+                                  .signInWithGoogle(
+                                    (errorMessage) {
+                                      if (context.mounted) {
+                                        CustomSnackbar.showError(
+                                          context,
+                                          errorMessage,
+                                        );
+                                      }
+                                    },
+                                    () {
+                                      if (context.mounted) {
+                                        CustomSnackbar.showSuccess(
+                                          context,
+                                          texts.loginSuccess,
+                                        );
+                                        context.goNamed(AppRoute.main.name);
+                                      }
+
+                                      // Request Notification Permission based on Android versions in the background
+                                      Future.microtask(() async {
+                                        if (Platform.isAndroid) {
+                                          final androidInfo =
+                                              await DeviceInfoPlugin()
+                                                  .androidInfo;
+                                          final sdkInt =
+                                              androidInfo.version.sdkInt;
+
+                                          if (sdkInt < 29) {
+                                            await Permission.notification
+                                                .request();
+                                          } else if (sdkInt >= 29 &&
+                                              sdkInt < 33) {
+                                            await Permission.notification
+                                                .request();
+                                          } else {
+                                            await Permission.notification
+                                                .request();
+                                          }
+                                        } else {
+                                          await Permission.notification
+                                              .request();
+                                        }
+                                      });
+                                    },
+                                  );
+                            },
+                          ),
+
+                          const Spacer(),
+                          SizedBox(height: 32.h),
+
+                          Center(
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () {
+                                // Navigate to Sign Up
+                                context.goNamed(AppRoute.signup.name);
+                              },
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 8.h,
+                                  horizontal: 16.w,
+                                ),
+                                child: RichText(
+                                  text: TextSpan(
+                                    text: texts.noAccount,
+                                    style: AppTextStyles.roboto300Light14(),
+                                    children: [
+                                      TextSpan(
+                                        text: texts.signUpText,
+                                        style:
+                                            AppTextStyles.roboto400Regular14(),
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ),
-                      SizedBox(height: 15.h), // Bottom padding
-                    ]
-                  ],
+                          SizedBox(height: 15.h), // Bottom padding
+                        ],
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-              ),
               ),
             ),
           ),

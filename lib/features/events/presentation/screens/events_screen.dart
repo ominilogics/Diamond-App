@@ -65,16 +65,31 @@ class EventsScreen extends HookConsumerWidget {
 
     Widget content = CustomScrollView(
       slivers: [
-        SliverToBoxAdapter(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SizedBox(height: 12.h),
-              showBackButton
-                  ? AppBar2(title: texts.myEvents)
-                  : AppBar1(title: texts.myEvents),
-            ],
-          ),
+        SliverLayoutBuilder(
+          builder: (context, constraints) {
+            final isScrolled = constraints.scrollOffset > 0;
+            return SliverAppBar(
+              floating: true,
+              snap: true,
+              backgroundColor: isScrolled
+                  ? AppColors.gradientStart
+                  : Colors.transparent,
+              surfaceTintColor: Colors.transparent,
+              elevation: 0,
+              scrolledUnderElevation: 3.0,
+              automaticallyImplyLeading: false,
+              toolbarHeight: 60.h,
+              titleSpacing: 0,
+              title: Column(
+                children: [
+                  SizedBox(height: 12.h),
+                  showBackButton
+                      ? AppBar2(title: texts.myEvents)
+                      : AppBar1(title: texts.myEvents),
+                ],
+              ),
+            );
+          },
         ),
         if (hasAnyEvents)
           SliverToBoxAdapter(
@@ -88,7 +103,8 @@ class EventsScreen extends HookConsumerWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     padding: EdgeInsets.symmetric(horizontal: 24.w),
                     itemCount: customEvents.length,
-                    separatorBuilder: (context, index) => SizedBox(height: 16.h),
+                    separatorBuilder: (context, index) =>
+                        SizedBox(height: 16.h),
                     itemBuilder: (context, index) {
                       final event = customEvents[index];
                       return MyEventCard(
@@ -97,6 +113,15 @@ class EventsScreen extends HookConsumerWidget {
                         ).format(event.date).toUpperCase(),
                         title: event.title,
                         reminder: event.reminder,
+                        onEdit: () {
+                          AddEventBottomSheet.show(
+                            context,
+                            eventToEdit: event,
+                          );
+                        },
+                        onRemove: () {
+                          ref.read(eventsProvider.notifier).deleteEvent(event.id);
+                        },
                       );
                     },
                   ),
@@ -116,7 +141,8 @@ class EventsScreen extends HookConsumerWidget {
                     physics: const NeverScrollableScrollPhysics(),
                     padding: EdgeInsets.symmetric(horizontal: 24.w),
                     itemCount: systemEvents.length,
-                    separatorBuilder: (context, index) => SizedBox(height: 16.h),
+                    separatorBuilder: (context, index) =>
+                        SizedBox(height: 16.h),
                     itemBuilder: (context, index) {
                       final event = systemEvents[index];
                       return UpcomingOccasionCard(

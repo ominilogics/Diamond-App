@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/utils/either.dart';
@@ -43,7 +44,12 @@ class AuthRepositoryImpl implements AuthRepository {
     String? dateOfBirth,
   }) async {
     try {
-      await remoteDataSource.signUp(email, password, fullName, dateOfBirth: dateOfBirth);
+      await remoteDataSource.signUp(
+        email,
+        password,
+        fullName,
+        dateOfBirth: dateOfBirth,
+      );
       return Either.right(null);
     } on TimeoutException {
       return Either.left(
@@ -117,7 +123,9 @@ class AuthRepositoryImpl implements AuthRepository {
       return Either.left(AuthFailure(_parseErrorMessage(e.message)));
     } on PostgrestException catch (e) {
       return Either.left(AuthFailure(_parseErrorMessage(e.message)));
-    } catch (e) {
+    } catch (e, stack) {
+      debugPrint('[Google Sign-In Error]: $e');
+      debugPrint('[Google Sign-In StackTrace]: $stack');
       return Either.left(
         AuthFailure('An unexpected error occurred during Google Sign-In.'),
       );
@@ -125,7 +133,10 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, void>> updateProfile(String fullName, {String? dateOfBirth}) async {
+  Future<Either<Failure, void>> updateProfile(
+    String fullName, {
+    String? dateOfBirth,
+  }) async {
     try {
       await remoteDataSource.updateProfile(fullName, dateOfBirth: dateOfBirth);
       return Either.right(null);

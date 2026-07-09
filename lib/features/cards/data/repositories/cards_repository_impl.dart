@@ -20,16 +20,20 @@ class CardsRepositoryImpl implements CardsRepository {
     return (localDb.select(localDb.remoteCategoriesTable)
           ..orderBy([(t) => drift.OrderingTerm(expression: t.sortOrder)]))
         .watch()
-        .map((rows) => rows
-            .map((row) => CategoryEntity(
+        .map(
+          (rows) => rows
+              .map(
+                (row) => CategoryEntity(
                   id: row.id,
                   name: row.name,
                   iconUrl: row.iconUrl,
                   sortOrder: row.sortOrder,
                   isActive: row.isActive,
-                ))
-            .where((cat) => cat.isActive)
-            .toList());
+                ),
+              )
+              .where((cat) => cat.isActive)
+              .toList(),
+        );
   }
 
   @override
@@ -42,8 +46,10 @@ class CardsRepositoryImpl implements CardsRepository {
       query.where((t) => t.isFeatured.equals(isFeatured));
     }
 
-    return query.watch().map((rows) => rows
-        .map((row) => CardEntity(
+    return query.watch().map(
+      (rows) => rows
+          .map(
+            (row) => CardEntity(
               id: row.id,
               categoryId: row.categoryId,
               title: row.title,
@@ -54,16 +60,20 @@ class CardsRepositoryImpl implements CardsRepository {
               isFeatured: row.isFeatured,
               colorValue: row.colorValue,
               isActive: row.isActive,
-            ))
-        .where((card) => card.isActive)
-        .toList());
+            ),
+          )
+          .where((card) => card.isActive)
+          .toList(),
+    );
   }
 
   @override
   Future<Either<Failure, void>> syncData() async {
     try {
       // Fetch Categories
-      final categoriesResponse = await supabaseClient.from('categories').select();
+      final categoriesResponse = await supabaseClient
+          .from('categories')
+          .select();
 
       // Fetch Cards
       final cardsResponse = await supabaseClient.from('cards').select();
@@ -71,7 +81,9 @@ class CardsRepositoryImpl implements CardsRepository {
       // Upsert into Drift
       await localDb.transaction(() async {
         for (var cat in categoriesResponse) {
-          await localDb.into(localDb.remoteCategoriesTable).insertOnConflictUpdate(
+          await localDb
+              .into(localDb.remoteCategoriesTable)
+              .insertOnConflictUpdate(
                 RemoteCategoryTableData(
                   id: cat['id'],
                   name: cat['name'],
@@ -84,7 +96,9 @@ class CardsRepositoryImpl implements CardsRepository {
         }
 
         for (var card in cardsResponse) {
-          await localDb.into(localDb.remoteCardsTable).insertOnConflictUpdate(
+          await localDb
+              .into(localDb.remoteCardsTable)
+              .insertOnConflictUpdate(
                 RemoteCardTableData(
                   id: card['id'],
                   categoryId: card['category_id'],
@@ -104,11 +118,15 @@ class CardsRepositoryImpl implements CardsRepository {
 
       return Either.right(null);
     } on SocketException {
-      return Either.left(ServerFailure('No internet connection. Using offline cache.'));
+      return Either.left(
+        ServerFailure('No internet connection. Using offline cache.'),
+      );
     } on PostgrestException catch (e) {
       return Either.left(ServerFailure(e.message));
     } catch (e) {
-      return Either.left(ServerFailure('An unexpected error occurred while syncing data.'));
+      return Either.left(
+        ServerFailure('An unexpected error occurred while syncing data.'),
+      );
     }
   }
 }

@@ -14,14 +14,18 @@ class LocalFavoritesDataSourceImpl implements LocalFavoritesDataSource {
 
   @override
   Future<List<FavoriteTableData>> getFavorites() async {
-    return await (db.select(db.favoritesTable)
-          ..orderBy([(t) => OrderingTerm(expression: t.favoritedAt, mode: OrderingMode.desc)]))
+    return await (db.select(db.favoritesTable)..orderBy([
+          (t) =>
+              OrderingTerm(expression: t.favoritedAt, mode: OrderingMode.desc),
+        ]))
         .get();
   }
 
   @override
   Future<void> toggleFavorite(FavoritesTableCompanion favorite) async {
-    final existing = await (db.select(db.favoritesTable)..where((t) => t.cardId.equals(favorite.cardId.value))).getSingleOrNull();
+    final existing = await (db.select(
+      db.favoritesTable,
+    )..where((t) => t.cardId.equals(favorite.cardId.value))).getSingleOrNull();
     if (existing != null) {
       await db.favoritesTable.deleteWhere((t) => t.id.equals(existing.id));
     } else {
@@ -31,7 +35,9 @@ class LocalFavoritesDataSourceImpl implements LocalFavoritesDataSource {
 
   @override
   Future<bool> isFavorite(String cardId) async {
-    final existing = await (db.select(db.favoritesTable)..where((t) => t.cardId.equals(cardId))).getSingleOrNull();
+    final existing = await (db.select(
+      db.favoritesTable,
+    )..where((t) => t.cardId.equals(cardId))).getSingleOrNull();
     return existing != null;
   }
 }

@@ -59,6 +59,8 @@ class UpcomingOccasionCard extends StatelessWidget {
                 Text(
                   title,
                   style: AppTextStyles.colitez400Italic20(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),

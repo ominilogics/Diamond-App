@@ -47,23 +47,30 @@ class AdminRepository {
   }
 
   Future<void> updateCategory(String id, String name, bool isActive) async {
-    await _supabase.from('categories').update({
-      'name': name,
-      'is_active': isActive,
-    }).eq('id', id);
+    await _supabase
+        .from('categories')
+        .update({'name': name, 'is_active': isActive})
+        .eq('id', id);
   }
 
   Future<void> deleteCategory(String id) async {
-    await _supabase.from('categories').update({'is_active': false}).eq('id', id);
+    await _supabase
+        .from('categories')
+        .update({'is_active': false})
+        .eq('id', id);
   }
 
   Future<List<AdminCategory>> fetchCategories() async {
     final response = await _supabase.from('categories').select().order('name');
-    return response.map((row) => AdminCategory(
-      id: row['id'],
-      name: row['name'],
-      isActive: row['is_active'],
-    )).toList();
+    return response
+        .map(
+          (row) => AdminCategory(
+            id: row['id'],
+            name: row['name'],
+            isActive: row['is_active'],
+          ),
+        )
+        .toList();
   }
 
   // ---------------------------------------------------------------------------
@@ -79,9 +86,12 @@ class AdminRepository {
     required String fileExtension, // e.g., 'jpg', 'png'
   }) async {
     final cardId = const Uuid().v4();
-    final fileName = '${DateTime.now().millisecondsSinceEpoch}_card_template.$fileExtension';
+    final fileName =
+        '${DateTime.now().millisecondsSinceEpoch}_card_template.$fileExtension';
 
-    await _supabase.storage.from('card_assets').uploadBinary(
+    await _supabase.storage
+        .from('card_assets')
+        .uploadBinary(
           fileName,
           imageBytes,
           fileOptions: FileOptions(
@@ -90,7 +100,9 @@ class AdminRepository {
           ),
         );
 
-    final imageUrl = _supabase.storage.from('card_assets').getPublicUrl(fileName);
+    final imageUrl = _supabase.storage
+        .from('card_assets')
+        .getPublicUrl(fileName);
 
     // 2. Insert Card record
     await _supabase.from('cards').insert({
@@ -111,10 +123,10 @@ class AdminRepository {
     required String title,
     required bool isActive,
   }) async {
-    await _supabase.from('cards').update({
-      'title': title,
-      'is_active': isActive,
-    }).eq('id', cardId);
+    await _supabase
+        .from('cards')
+        .update({'title': title, 'is_active': isActive})
+        .eq('id', cardId);
   }
 
   Future<void> deleteCard(String cardId) async {
@@ -123,14 +135,18 @@ class AdminRepository {
 
   Future<List<AdminCard>> fetchCards() async {
     final response = await _supabase.from('cards').select().order('title');
-    return response.map((row) => AdminCard(
-      id: row['id'],
-      categoryId: row['category_id'],
-      title: row['title'],
-      coverImageUrl: row['cover_image_url'],
-      defaultFrontMessage: row['default_front_message'] ?? '',
-      defaultInsideMessage: row['default_inside_message'] ?? '',
-      isActive: row['is_active'],
-    )).toList();
+    return response
+        .map(
+          (row) => AdminCard(
+            id: row['id'],
+            categoryId: row['category_id'],
+            title: row['title'],
+            coverImageUrl: row['cover_image_url'],
+            defaultFrontMessage: row['default_front_message'] ?? '',
+            defaultInsideMessage: row['default_inside_message'] ?? '',
+            isActive: row['is_active'],
+          ),
+        )
+        .toList();
   }
 }

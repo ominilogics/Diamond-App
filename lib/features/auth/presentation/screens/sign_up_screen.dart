@@ -54,7 +54,9 @@ class SignUpScreen extends HookConsumerWidget {
               emailController.text.trim(),
               passwordController.text.trim(),
               nameController.text.trim(),
-              dobController.text.trim().isEmpty ? null : dobController.text.trim(),
+              dobController.text.trim().isEmpty
+                  ? null
+                  : dobController.text.trim(),
               (errorMessage) {
                 debugPrint('Sign Up failed: $errorMessage');
                 if (context.mounted) {
@@ -135,9 +137,9 @@ class SignUpScreen extends HookConsumerWidget {
                         );
                         if (selectedDate != null) {
                           selectedDobState.value = selectedDate;
-                          dobController.text = DateFormat('MMM dd, yyyy')
-                              .format(selectedDate)
-                              .toUpperCase();
+                          dobController.text = DateFormat(
+                            'MMM dd, yyyy',
+                          ).format(selectedDate).toUpperCase();
                         }
                       },
                       behavior: HitTestBehavior.opaque,

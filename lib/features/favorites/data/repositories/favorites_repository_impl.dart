@@ -15,14 +15,18 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
   Future<Either<Failure, List<FavoriteEntity>>> getFavorites() async {
     try {
       final models = await localDataSource.getFavorites();
-      final entities = models.map((m) => FavoriteEntity(
-        id: m.id,
-        cardId: m.cardId,
-        title: m.title,
-        colorValue: m.colorValue,
-        supabaseUserId: m.supabaseUserId,
-        favoritedAt: m.favoritedAt,
-      )).toList();
+      final entities = models
+          .map(
+            (m) => FavoriteEntity(
+              id: m.id,
+              cardId: m.cardId,
+              title: m.title,
+              colorValue: m.colorValue,
+              supabaseUserId: m.supabaseUserId,
+              favoritedAt: m.favoritedAt,
+            ),
+          )
+          .toList();
       return Either.right(entities);
     } catch (e) {
       return Either.left(DatabaseFailure('Failed to fetch favorites: $e'));
@@ -39,7 +43,7 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
         supabaseUserId: Value(entity.supabaseUserId),
         favoritedAt: Value(entity.favoritedAt),
       );
-      
+
       await localDataSource.toggleFavorite(companion);
       return Either.right(null);
     } catch (e) {
@@ -53,7 +57,9 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
       final result = await localDataSource.isFavorite(cardId);
       return Either.right(result);
     } catch (e) {
-      return Either.left(DatabaseFailure('Failed to check favorite status: $e'));
+      return Either.left(
+        DatabaseFailure('Failed to check favorite status: $e'),
+      );
     }
   }
 }

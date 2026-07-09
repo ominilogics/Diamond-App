@@ -18,7 +18,7 @@ class AppBar2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      padding: EdgeInsets.symmetric(horizontal: 10.w),
       child: Row(
         children: [
           Material(
@@ -35,7 +35,7 @@ class AppBar2 extends StatelessWidget {
               splashColor: AppColors.primaryButtonGradientStart.withOpacity(0.2),
               highlightColor: AppColors.primaryButtonGradientStart.withOpacity(0.1),
               child: Padding(
-                padding: EdgeInsets.all(8.w),
+                padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 13.h),
               child: SvgPicture.asset(
                 AppAssets.backArrow,
                 width: 20.w,
@@ -58,8 +58,8 @@ class AppBar2 extends StatelessWidget {
             ),
           ),
           SizedBox(
-            width: 36.w,
-          ), // To balance the back arrow (20w + 16w padding)
+            width: 48.w,
+          ), // To balance the back arrow (20w + 28w padding)
         ],
       ),
     );

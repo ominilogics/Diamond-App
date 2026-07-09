@@ -23,19 +23,31 @@ final allCardsStreamProvider = StreamProvider<List<CardEntity>>((ref) {
   return repository.watchCards();
 });
 
-final featuredCardsStreamProvider = Provider<AsyncValue<List<CardEntity>>>((ref) {
+final featuredCardsStreamProvider = Provider<AsyncValue<List<CardEntity>>>((
+  ref,
+) {
   final asyncCards = ref.watch(allCardsStreamProvider);
-  return asyncCards.whenData((cards) => cards.where((c) => c.isFeatured).toList());
+  return asyncCards.whenData(
+    (cards) => cards.where((c) => c.isFeatured).toList(),
+  );
 });
 
-final categoryCardsStreamProvider = Provider.family<AsyncValue<List<CardEntity>>, String>((ref, categoryId) {
-  final asyncCards = ref.watch(allCardsStreamProvider);
-  return asyncCards.whenData((cards) => cards.where((c) => c.categoryId == categoryId).toList());
-});
+final categoryCardsStreamProvider =
+    Provider.family<AsyncValue<List<CardEntity>>, String>((ref, categoryId) {
+      final asyncCards = ref.watch(allCardsStreamProvider);
+      return asyncCards.whenData(
+        (cards) => cards.where((c) => c.categoryId == categoryId).toList(),
+      );
+    });
 
-final cardDetailProvider = Provider.family<AsyncValue<CardEntity?>, String>((ref, cardId) {
+final cardDetailProvider = Provider.family<AsyncValue<CardEntity?>, String>((
+  ref,
+  cardId,
+) {
   final asyncCards = ref.watch(allCardsStreamProvider);
-  return asyncCards.whenData((cards) => cards.where((c) => c.id == cardId).firstOrNull);
+  return asyncCards.whenData(
+    (cards) => cards.where((c) => c.id == cardId).firstOrNull,
+  );
 });
 
 final syncCardsProvider = FutureProvider<void>((ref) async {
@@ -45,9 +57,11 @@ final syncCardsProvider = FutureProvider<void>((ref) async {
 
 final searchQueryProvider = StateProvider.autoDispose<String>((ref) => '');
 
-final searchResultsProvider = Provider.autoDispose<AsyncValue<List<CardEntity>>>((ref) {
+final searchResultsProvider = Provider.autoDispose<AsyncValue<List<CardEntity>>>((
+  ref,
+) {
   final query = ref.watch(searchQueryProvider).trim().toLowerCase();
-  
+
   final asyncCards = ref.watch(allCardsStreamProvider);
 
   if (query.isEmpty) {
@@ -57,16 +71,18 @@ final searchResultsProvider = Provider.autoDispose<AsyncValue<List<CardEntity>>>
   return asyncCards.whenData((cards) {
     // Basic Tokenization for multi-word search
     final tokens = query.split(RegExp(r'\s+'));
-    
+
     // Efficient O(N) multi-field linear scan filter
     final results = cards.where((card) {
       final title = card.title.toLowerCase();
       final front = card.defaultFrontMessage?.toLowerCase() ?? '';
       final inside = card.defaultInsideMessage?.toLowerCase() ?? '';
-      
+
       // Fast AND logic: every token must be found in at least one of the fields
       for (final token in tokens) {
-        if (!title.contains(token) && !front.contains(token) && !inside.contains(token)) {
+        if (!title.contains(token) &&
+            !front.contains(token) &&
+            !inside.contains(token)) {
           return false;
         }
       }
@@ -85,21 +101,31 @@ final searchResultsProvider = Provider.autoDispose<AsyncValue<List<CardEntity>>>
       final titleB = b.title.toLowerCase();
       final frontB = b.defaultFrontMessage?.toLowerCase() ?? '';
       final insideB = b.defaultInsideMessage?.toLowerCase() ?? '';
-      
+
       // Score A
-      if (titleA == query) scoreA += 100; // Exact title match
-      else if (titleA.startsWith(query)) scoreA += 50; // Title prefix match
-      else if (titleA.contains(query)) scoreA += 25; // Title partial match
-      else if (frontA.contains(query)) scoreA += 10; // Front message match
-      else if (insideA.contains(query)) scoreA += 5; // Inside message match
+      if (titleA == query)
+        scoreA += 100; // Exact title match
+      else if (titleA.startsWith(query))
+        scoreA += 50; // Title prefix match
+      else if (titleA.contains(query))
+        scoreA += 25; // Title partial match
+      else if (frontA.contains(query))
+        scoreA += 10; // Front message match
+      else if (insideA.contains(query))
+        scoreA += 5; // Inside message match
 
       // Score B
-      if (titleB == query) scoreB += 100;
-      else if (titleB.startsWith(query)) scoreB += 50;
-      else if (titleB.contains(query)) scoreB += 25;
-      else if (frontB.contains(query)) scoreB += 10;
-      else if (insideB.contains(query)) scoreB += 5;
-      
+      if (titleB == query)
+        scoreB += 100;
+      else if (titleB.startsWith(query))
+        scoreB += 50;
+      else if (titleB.contains(query))
+        scoreB += 25;
+      else if (frontB.contains(query))
+        scoreB += 10;
+      else if (insideB.contains(query))
+        scoreB += 5;
+
       return scoreB.compareTo(scoreA); // Highest score at the top
     });
 

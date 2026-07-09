@@ -6,7 +6,9 @@ final adminRepositoryProvider = Provider<AdminRepository>((ref) {
   return AdminRepository(Supabase.instance.client);
 });
 
-final adminCategoriesProvider = FutureProvider<List<AdminCategory>>((ref) async {
+final adminCategoriesProvider = FutureProvider<List<AdminCategory>>((
+  ref,
+) async {
   return ref.watch(adminRepositoryProvider).fetchCategories();
 });
 

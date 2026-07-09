@@ -1,3 +1,4 @@
+import 'package:daimond/core/utils/app_helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -11,6 +12,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../core/widgets/shimmers/category_shimmer.dart';
 import '../../../../core/utils/category_localization.dart';
+import '../../../../core/utils/app_helpers.dart';
 import '../../../cards/presentation/providers/cards_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -38,6 +40,7 @@ class CategoriesSection extends ConsumerWidget {
               Text(texts.categories, style: AppTextStyles.colitez400Italic24()),
               GestureDetector(
                 onTap: () {
+                  AppHelpers.dismissKeyboard();
                   context.pushNamed(
                     AppRoute.cards.name,
                     extra: texts.categories,
@@ -58,35 +61,40 @@ class CategoriesSection extends ConsumerWidget {
           ),
         ),
         SizedBox(height: 16.h),
-        SizedBox(
-          height: 102.h,
-          child: categoriesAsync.when(
-            loading: () => Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: Row(
-                children: List.generate(4, (index) => const Expanded(
-                  child: Center(child: CategoryShimmer()),
-                )),
+        categoriesAsync.when(
+          loading: () => Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24.w),
+            child: Row(
+              children: List.generate(
+                4,
+                (index) =>
+                    const Expanded(child: Center(child: CategoryShimmer())),
               ),
             ),
-            error: (error, stack) => const Center(child: Text('Error loading categories')),
-            data: (categories) {
-              if (categories.isEmpty) {
-                return Center(child: Text('No categories available', style: AppTextStyles.roboto300Light13()));
-              }
-              final displayCategories = categories.take(4).toList();
-              
-              return Padding(
-                padding: EdgeInsets.symmetric(horizontal: 24.w),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: displayCategories.map((cat) => Expanded(
-                    child: _CategoryItem(cat: cat)
-                  )).toList(),
+          ),
+          error: (error, stack) =>
+              const Center(child: Text('Error loading categories')),
+          data: (categories) {
+            if (categories.isEmpty) {
+              return Center(
+                child: Text(
+                  'No categories available',
+                  style: AppTextStyles.roboto300Light13(),
                 ),
               );
-            },
-          ),
+            }
+            final displayCategories = categories.take(4).toList();
+
+            return Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: displayCategories
+                    .map((cat) => Expanded(child: _CategoryItem(cat: cat)))
+                    .toList(),
+              ),
+            );
+          },
         ),
       ],
     );
@@ -106,12 +114,10 @@ class _CategoryItem extends ConsumerWidget {
 
     return GestureDetector(
       onTap: () {
+        AppHelpers.dismissKeyboard();
         context.pushNamed(
           AppRoute.cards.name,
-          extra: {
-            'title': texts.categories,
-            'categoryId': cat.id,
-          },
+          extra: {'title': texts.categories, 'categoryId': cat.id},
         );
       },
       behavior: HitTestBehavior.opaque,
@@ -124,10 +130,7 @@ class _CategoryItem extends ConsumerWidget {
             decoration: BoxDecoration(
               color: const Color(0xFFFFFFFF),
               shape: BoxShape.circle,
-              border: Border.all(
-                color: const Color(0xFF000000),
-                width: 0.5.w,
-              ),
+              border: Border.all(color: const Color(0xFF000000), width: 0.5.w),
             ),
             child: ClipOval(
               child: Align(
@@ -136,7 +139,9 @@ class _CategoryItem extends ConsumerWidget {
                   padding: EdgeInsets.only(top: 16.h),
                   child: hasImage
                       ? ClipRRect(
-                          borderRadius: BorderRadius.circular(4.r), // Adds subtle rounding to the tiny card
+                          borderRadius: BorderRadius.circular(
+                            4.r,
+                          ), // Adds subtle rounding to the tiny card
                           child: Stack(
                             alignment: Alignment.center,
                             children: [
@@ -148,13 +153,15 @@ class _CategoryItem extends ConsumerWidget {
                                 fadeInDuration: Duration.zero,
                                 fadeOutDuration: Duration.zero,
                               ),
-                              if (firstCard.defaultFrontMessage != null && firstCard.defaultFrontMessage!.isNotEmpty)
+                              if (firstCard.defaultFrontMessage != null &&
+                                  firstCard.defaultFrontMessage!.isNotEmpty)
                                 Positioned(
                                   top: 47.h, // ~70% of 67.h height
                                   left: 5.w,
                                   right: 5.w,
                                   child: Text(
-                                    firstCard.defaultFrontMessage!.toUpperCase(),
+                                    firstCard.defaultFrontMessage!
+                                        .toUpperCase(),
                                     textAlign: TextAlign.center,
                                     style: AppTextStyles.bizudMincho(
                                       fontSize: 4.sp,
@@ -184,7 +191,7 @@ class _CategoryItem extends ConsumerWidget {
           SizedBox(height: 10.h),
           Text(
             cat.name.localized(texts),
-            style: AppTextStyles.roboto400Regular14(),
+            style: AppTextStyles.roboto400Regular14(height: 1.2),
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

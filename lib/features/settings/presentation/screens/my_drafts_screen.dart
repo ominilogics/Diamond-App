@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -21,55 +22,87 @@ class MyDraftsScreen extends ConsumerWidget {
     final db = ref.watch(appDatabaseProvider);
     final draftsStream = db.select(db.draftsTable).watch();
     final texts = AppLocalizations.of(context)!;
-    
+
     final allCardsState = ref.watch(allCardsStreamProvider);
     final allCards = allCardsState.valueOrNull ?? [];
 
     return GradientScaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            SizedBox(height: 12.h),
-            AppBar2(title: texts.myDrafts),
-            SizedBox(height: 24.h),
-            Expanded(
-              child: StreamBuilder(
-                stream: draftsStream,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  
-                  final drafts = snapshot.data ?? [];
-                  if (drafts.isEmpty) {
-                    return Center(
+        child: CustomScrollView(
+          slivers: [
+            SliverLayoutBuilder(
+              builder: (context, constraints) {
+                final isScrolled = constraints.scrollOffset > 0;
+                return SliverAppBar(
+                  floating: true,
+                  snap: true,
+                  backgroundColor: isScrolled
+                      ? const Color(0xFFE7FFEC)
+                      : Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                  elevation: 0,
+                  scrolledUnderElevation: 3.0,
+                  automaticallyImplyLeading: false,
+                  toolbarHeight: 60.h,
+                  titleSpacing: 0,
+                  title: Column(
+                    children: [
+                      SizedBox(height: 12.h),
+                      AppBar2(title: texts.myDrafts),
+                    ],
+                  ),
+                );
+              },
+            ),
+            SliverToBoxAdapter(child: SizedBox(height: 24.h)),
+            StreamBuilder(
+              stream: draftsStream,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const SliverFillRemaining(
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+
+                final drafts = snapshot.data ?? [];
+                if (drafts.isEmpty) {
+                  return SliverFillRemaining(
+                    child: Center(
                       child: Text(
                         texts.noDraftsSavedYet,
                         style: AppTextStyles.roboto300Light13(),
                       ),
-                    );
-                  }
+                    ),
+                  );
+                }
 
-                  return GridView.builder(
-                    padding: EdgeInsets.symmetric(horizontal: 24.w),
-                    itemCount: drafts.length,
+                return SliverPadding(
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+                  sliver: SliverGrid(
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       crossAxisSpacing: 14.w,
                       mainAxisSpacing: 14.h,
                       childAspectRatio: 171.w / 204.h,
                     ),
-                    itemBuilder: (context, index) {
+                    delegate: SliverChildBuilderDelegate((context, index) {
                       final draft = drafts[index];
-                      final card = allCards.firstWhereOrNull((c) => c.id == draft.cardId);
+                      final card = allCards.firstWhereOrNull(
+                        (c) => c.id == draft.cardId,
+                      );
 
                       return FeaturedCard(
                         cardId: draft.cardId,
                         title: draft.draftName ?? 'Draft',
-                        cardColor: const Color(0xFFFFA7A7), // Default card color
+                        cardColor: const Color(
+                          0xFFFFA7A7,
+                        ), // Default card color
                         coverImageUrl: card?.coverImageUrl,
                         frontMessage: card?.defaultFrontMessage,
                         insideMessage: card?.defaultInsideMessage,
+                        onDelete: () async {
+                          await db.draftsTable.deleteWhere((t) => t.id.equals(draft.id));
+                        },
                         onTap: () {
                           context.pushNamed(
                             AppRoute.editCard.name,
@@ -78,14 +111,15 @@ class MyDraftsScreen extends ConsumerWidget {
                               'coverImageUrl': card?.coverImageUrl,
                               'frontMessage': draft.coverText,
                               'initialMessage': draft.insideMessage,
+                              'draftId': draft.id,
                             },
                           );
                         },
                       );
-                    },
-                  );
-                },
-              ),
+                    }, childCount: drafts.length),
+                  ),
+                );
+              },
             ),
           ],
         ),

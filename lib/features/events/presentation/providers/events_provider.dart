@@ -43,6 +43,8 @@ class EventsNotifier extends AsyncNotifier<List<EventEntity>> {
   }
 }
 
-final eventsProvider = AsyncNotifierProvider<EventsNotifier, List<EventEntity>>(() {
-  return EventsNotifier();
-});
+final eventsProvider = AsyncNotifierProvider<EventsNotifier, List<EventEntity>>(
+  () {
+    return EventsNotifier();
+  },
+);

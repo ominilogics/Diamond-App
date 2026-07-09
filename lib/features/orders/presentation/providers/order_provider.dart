@@ -10,9 +10,10 @@ final orderRepositoryProvider = Provider((ref) {
   return OrderRepositoryImpl(localDataSource);
 });
 
-final orderProvider = StateNotifierProvider<OrderNotifier, AsyncValue<List<OrderEntity>>>((ref) {
-  return OrderNotifier(ref.watch(orderRepositoryProvider));
-});
+final orderProvider =
+    StateNotifierProvider<OrderNotifier, AsyncValue<List<OrderEntity>>>((ref) {
+      return OrderNotifier(ref.watch(orderRepositoryProvider));
+    });
 
 class OrderNotifier extends StateNotifier<AsyncValue<List<OrderEntity>>> {
   final OrderRepositoryImpl _repository;

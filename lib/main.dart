@@ -8,6 +8,8 @@ import 'core/database/app_database.dart';
 import 'core/providers/database_provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:daimond/features/payments/data/repositories/revenue_cat_repository_impl.dart';
+import 'package:daimond/features/payments/presentation/providers/payment_providers.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,6 +21,14 @@ void main() async {
   );
 
   final appDatabase = AppDatabase();
+
+  // Initialize RevenueCat and sync user if already logged in
+  final paymentRepository = RevenueCatRepositoryImpl();
+  await paymentRepository.initialize();
+  final user = Supabase.instance.client.auth.currentUser;
+  if (user != null) {
+    paymentRepository.loginUser(user.id);
+  }
 
   // Configure system UI overlays for Android edge-to-edge support
   SystemChrome.setSystemUIOverlayStyle(
@@ -36,10 +46,11 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]).then((_) {
-    runApp(ProviderScope(
-      overrides: [
-        appDatabaseProvider.overrideWithValue(appDatabase),
-      ],
+      runApp(ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(appDatabase),
+          paymentRepositoryProvider.overrideWithValue(paymentRepository),
+        ],
       child: const MyApp(),
     ));
   });

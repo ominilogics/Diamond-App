@@ -8,24 +8,30 @@ class LocalOrderDataSource {
 
   Future<List<OrderEntity>> getOrders() async {
     final result = await db.select(db.ordersTable).get();
-    return result.map((row) => OrderEntity(
-      id: row.id,
-      cardId: row.cardId,
-      title: row.title,
-      message: row.message,
-      addedAt: row.addedAt,
-    )).toList();
+    return result
+        .map(
+          (row) => OrderEntity(
+            id: row.id,
+            cardId: row.cardId,
+            title: row.title,
+            message: row.message,
+            addedAt: row.addedAt,
+          ),
+        )
+        .toList();
   }
 
   Future<void> addOrder(OrderEntity order) async {
-    await db.into(db.ordersTable).insert(
-      OrdersTableCompanion.insert(
-        cardId: order.cardId,
-        title: order.title,
-        message: order.message,
-        addedAt: order.addedAt,
-      ),
-    );
+    await db
+        .into(db.ordersTable)
+        .insert(
+          OrdersTableCompanion.insert(
+            cardId: order.cardId,
+            title: order.title,
+            message: order.message,
+            addedAt: order.addedAt,
+          ),
+        );
   }
 
   Future<void> removeOrder(int id) async {

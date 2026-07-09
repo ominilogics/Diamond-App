@@ -44,16 +44,13 @@ class PrivacyPolicyScreen extends StatelessWidget {
         final parts = section.split('\n');
         final header = parts.first;
         final body = parts.skip(1).join('\n');
-        
+
         return Padding(
           padding: EdgeInsets.only(bottom: 24.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                header,
-                style: AppTextStyles.colitez400Italic20(),
-              ),
+              Text(header, style: AppTextStyles.colitez400Italic20()),
               if (body.isNotEmpty) ...[
                 SizedBox(height: 8.h),
                 _buildBodyText(body),
@@ -76,22 +73,42 @@ class PrivacyPolicyScreen extends StatelessWidget {
 
     return GradientScaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            SizedBox(height: 12.h),
-            AppBar2(title: texts.privacyPolicy),
-            SizedBox(height: 24.h),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+        child: CustomScrollView(
+          slivers: [
+            SliverLayoutBuilder(
+              builder: (context, constraints) {
+                final isScrolled = constraints.scrollOffset > 0;
+                return SliverAppBar(
+                  floating: true,
+                  snap: true,
+                  backgroundColor: isScrolled
+                      ? const Color(0xFFE7FFEC)
+                      : Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                  elevation: 0,
+                  scrolledUnderElevation: 3.0,
+                  automaticallyImplyLeading: false,
+                  toolbarHeight: 60.h,
+                  titleSpacing: 0,
+                  title: Column(
                     children: [
-                      ..._buildFormattedContent(texts.privacyPolicyContent),
-                      SizedBox(height: 16.h),
+                      SizedBox(height: 12.h),
+                      AppBar2(title: texts.privacyPolicy),
                     ],
                   ),
+                );
+              },
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 24.h),
+                    ..._buildFormattedContent(texts.privacyPolicyContent),
+                    SizedBox(height: 16.h),
+                  ],
                 ),
               ),
             ),

@@ -37,11 +37,15 @@ class FavoritesNotifier extends AsyncNotifier<List<FavoriteEntity>> {
   }
 }
 
-final favoritesProvider = AsyncNotifierProvider<FavoritesNotifier, List<FavoriteEntity>>(() {
-  return FavoritesNotifier();
-});
+final favoritesProvider =
+    AsyncNotifierProvider<FavoritesNotifier, List<FavoriteEntity>>(() {
+      return FavoritesNotifier();
+    });
 
-final isFavoriteProvider = FutureProvider.family<bool, String>((ref, cardId) async {
+final isFavoriteProvider = FutureProvider.family<bool, String>((
+  ref,
+  cardId,
+) async {
   final favorites = await ref.watch(favoritesProvider.future);
   return favorites.any((f) => f.cardId == cardId);
 });

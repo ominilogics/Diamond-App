@@ -353,11 +353,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteAccountMessage =>
-      'Are you sure you want to delete your account? This action cannot be undone.';
+      'Are you sure you want to delete your account? This action is permanent and cannot be undone once confirmed.';
 
   @override
   String get logoutMessage =>
-      'Are you sure you want to log out of your account?';
+      'Are you sure you want to log out of your account? You will need to enter your credentials again to access your saved cards and preferences.';
 
   @override
   String get subscriptionTitle => 'Choose your plan';
@@ -446,7 +446,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get discardChangesDesc =>
-      'Are you sure you want to discard your edits?';
+      'Are you sure you want to discard your edits? Any unsaved changes you\'ve made to this card will be permanently lost.';
 
   @override
   String get keepEditing => 'Keep Editing';
@@ -561,4 +561,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorOccurred => 'Error: ';
+
+  @override
+  String get purchaseSuccessful => 'Purchase successful!';
+
+  @override
+  String get restoreSuccessful => 'Purchases restored successfully!';
+
+  @override
+  String get storeNotReady => 'Store is not ready yet. Please try again later.';
+
+  @override
+  String get manageSubscriptions => 'Manage Subscriptions';
+
+  @override
+  String get customizedCardFallback => 'Customized Card';
+
+  @override
+  String get orderPlaced => 'Order Placed';
+
+  @override
+  String get pleaseEnterMessage => 'Please enter a message for the card.';
+
+  @override
+  String get pleaseFillRecipientFields =>
+      'Please fill out all recipient fields.';
+
+  @override
+  String get singleCardNotAvailable =>
+      'Single card product is not available right now.';
+
+  @override
+  String get thisFieldIsRequired => 'This field is required';
+
+  @override
+  String get pleaseFillMessageFields => 'Please fill out all message fields.';
+
+  @override
+  String get cardDetails => 'Card Details';
+
+  @override
+  String get preview => 'Preview';
+
+  @override
+  String get continueBtn => 'Continue';
+
+  @override
+  String get defaultCardDescription =>
+      'Loving you has been one of life\'s greatest gifts. No matter where life takes us, my heart will always find its way back to you.';
 }

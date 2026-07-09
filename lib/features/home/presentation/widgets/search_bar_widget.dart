@@ -6,6 +6,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 
 import '../../../../core/utils/app_assets.dart';
 import '../../../../core/widgets/app_text_field.dart';
+import '../../../../core/utils/app_helpers.dart';
 
 class SearchBarWidget extends HookWidget {
   final TextEditingController? controller;
@@ -37,12 +38,14 @@ class SearchBarWidget extends HookWidget {
         ),
         suffixIcon: hasText
             ? GestureDetector(
+                behavior: HitTestBehavior.opaque,
                 onTap: () {
                   internalController.clear();
                   onChanged?.call('');
+                  AppHelpers.dismissKeyboard();
                 },
                 child: Padding(
-                  padding: EdgeInsets.only(right: 16.w, left: 8.w),
+                  padding: EdgeInsets.only(right: 16.w, left: 16.w),
                   child: UnconstrainedBox(
                     child: SvgPicture.asset(
                       AppAssets.cancel,

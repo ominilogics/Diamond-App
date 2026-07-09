@@ -7,7 +7,7 @@ import '../theme/app_text_styles.dart';
 
 class PrimaryButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final bool isLoading;
 
   const PrimaryButton({
@@ -19,33 +19,38 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: kIsWeb ? 44 : 44.h,
-      decoration: BoxDecoration(
-        gradient: AppColors.primaryButtonGradient,
-        borderRadius: BorderRadius.circular(20.r),
-      ),
-      child: Material(
-        color: Colors.transparent, // Ensures the gradient shows through
-        child: InkWell(
+    final isDisabled = onPressed == null || isLoading;
+    
+    return Opacity(
+      opacity: onPressed == null && !isLoading ? 0.5 : 1.0,
+      child: Container(
+        width: double.infinity,
+        height: kIsWeb ? 44 : 44.h,
+        decoration: BoxDecoration(
+          gradient: AppColors.primaryButtonGradient,
           borderRadius: BorderRadius.circular(20.r),
-          onTap: isLoading ? null : onPressed,
-          child: Center(
-            child: isLoading
-                ? SizedBox(
-                    width: kIsWeb ? 24 : 24.w,
-                    height: kIsWeb ? 24 : 24.w,
-                    child: const CircularProgressIndicator(
-                      color: Colors.black, // Matching the default text color
-                      strokeWidth: 2.0,
+        ),
+        child: Material(
+          color: Colors.transparent, // Ensures the gradient shows through
+          child: InkWell(
+            borderRadius: BorderRadius.circular(20.r),
+            onTap: isDisabled ? null : onPressed,
+            child: Center(
+              child: isLoading
+                  ? SizedBox(
+                      width: kIsWeb ? 24 : 24.w,
+                      height: kIsWeb ? 24 : 24.w,
+                      child: const CircularProgressIndicator(
+                        color: Colors.black, // Matching the default text color
+                        strokeWidth: 2.0,
+                      ),
+                    )
+                  : Text(
+                      text,
+                      style: AppTextStyles.colitez400Italic22(),
+                      textAlign: TextAlign.center,
                     ),
-                  )
-                : Text(
-                    text,
-                    style: AppTextStyles.colitez400Italic22(),
-                    textAlign: TextAlign.center,
-                  ),
+            ),
           ),
         ),
       ),

@@ -37,8 +37,8 @@ class AppRouter {
     redirect: (context, state) {
       final session = Supabase.instance.client.auth.currentSession;
       final isAuthRoute = state.matchedLocation == AppRoute.login.path || 
-                          state.matchedLocation == AppRoute.signup.path || 
-                          state.matchedLocation == AppRoute.forgotPassword.path;
+                          state.matchedLocation == '${AppRoute.login.path}/${AppRoute.signup.path}' || 
+                          state.matchedLocation == '${AppRoute.login.path}/${AppRoute.forgotPassword.path}';
 
       if (session == null) {
         if (!isAuthRoute) return AppRoute.login.path;
@@ -73,16 +73,18 @@ class AppRouter {
         name: AppRoute.login.name,
         path: AppRoute.login.path,
         builder: (context, state) => const LoginScreen(),
-      ),
-      GoRoute(
-        name: AppRoute.signup.name,
-        path: AppRoute.signup.path,
-        builder: (context, state) => const SignUpScreen(),
-      ),
-      GoRoute(
-        name: AppRoute.forgotPassword.name,
-        path: AppRoute.forgotPassword.path,
-        builder: (context, state) => const ForgotPasswordScreen(),
+        routes: [
+          GoRoute(
+            name: AppRoute.signup.name,
+            path: AppRoute.signup.path,
+            builder: (context, state) => const SignUpScreen(),
+          ),
+          GoRoute(
+            name: AppRoute.forgotPassword.name,
+            path: AppRoute.forgotPassword.path,
+            builder: (context, state) => const ForgotPasswordScreen(),
+          ),
+        ],
       ),
       GoRoute(
         name: AppRoute.main.name,
@@ -167,6 +169,7 @@ class AppRouter {
             coverImageUrl: extra['coverImageUrl'] as String?,
             frontMessage: extra['frontMessage'] as String?,
             initialMessage: extra['initialMessage'] as String?,
+            draftId: extra['draftId'] as int?,
           );
         },
       ),

@@ -21,7 +21,8 @@ class AdminDashboardScreen extends ConsumerStatefulWidget {
   const AdminDashboardScreen({super.key});
 
   @override
-  ConsumerState<AdminDashboardScreen> createState() => _AdminDashboardScreenState();
+  ConsumerState<AdminDashboardScreen> createState() =>
+      _AdminDashboardScreenState();
 }
 
 class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
@@ -41,7 +42,10 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 36,
+                  ),
                   child: Row(
                     children: [
                       Container(
@@ -50,7 +54,11 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                           color: _primaryAccent.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Icon(Icons.diamond_outlined, color: _primaryAccent, size: 28),
+                        child: const Icon(
+                          Icons.diamond_outlined,
+                          color: _primaryAccent,
+                          size: 28,
+                        ),
                       ),
                       const SizedBox(width: 12),
                       const Text(
@@ -80,13 +88,17 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 32),
                   decoration: const BoxDecoration(
                     color: _cardBg,
-                    border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
+                    border: Border(
+                      bottom: BorderSide(color: Color(0xFFE2E8F0)),
+                    ),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        _selectedIndex == 0 ? 'Categories Management' : 'Cards Management',
+                        _selectedIndex == 0
+                            ? 'Categories Management'
+                            : 'Cards Management',
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w600,
@@ -102,10 +114,13 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                           const SizedBox(width: 12),
                           const Text(
                             'Admin',
-                            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                            ),
                           ),
                         ],
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -147,7 +162,11 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
         ),
         child: Row(
           children: [
-            Icon(icon, color: isSelected ? _sidebarTextActive : _sidebarText, size: 22),
+            Icon(
+              icon,
+              color: isSelected ? _sidebarTextActive : _sidebarText,
+              size: 22,
+            ),
             const SizedBox(width: 16),
             Text(
               title,
@@ -201,10 +220,19 @@ class _CategoriesAdminView extends ConsumerWidget {
             Row(
               children: [
                 IconButton(
-                  icon: categoriesAsync.isLoading || categoriesAsync.isRefreshing
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: _primaryAccent, strokeWidth: 2.5))
+                  icon:
+                      categoriesAsync.isLoading || categoriesAsync.isRefreshing
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: _primaryAccent,
+                            strokeWidth: 2.5,
+                          ),
+                        )
                       : const Icon(Icons.refresh, color: _primaryAccent),
-                  onPressed: categoriesAsync.isLoading || categoriesAsync.isRefreshing
+                  onPressed:
+                      categoriesAsync.isLoading || categoriesAsync.isRefreshing
                       ? null
                       : () => ref.invalidate(adminCategoriesProvider),
                   tooltip: 'Refresh Data',
@@ -213,12 +241,20 @@ class _CategoriesAdminView extends ConsumerWidget {
                 ElevatedButton.icon(
                   onPressed: () => _showCategoryDialog(context, ref),
                   icon: const Icon(Icons.add, size: 20),
-                  label: const Text('Add Category', style: TextStyle(fontWeight: FontWeight.bold)),
+                  label: const Text(
+                    'Add Category',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _primaryAccent,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 18,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                     elevation: 0,
                   ),
                 ),
@@ -237,12 +273,19 @@ class _CategoriesAdminView extends ConsumerWidget {
                   color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
-                )
+                ),
               ],
             ),
             child: categoriesAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator(color: _primaryAccent)),
-              error: (err, stack) => Center(child: Text('Error: \$err', style: const TextStyle(color: _danger))),
+              loading: () => const Center(
+                child: CircularProgressIndicator(color: _primaryAccent),
+              ),
+              error: (err, stack) => Center(
+                child: Text(
+                  'Error: \$err',
+                  style: const TextStyle(color: _danger),
+                ),
+              ),
               data: (categories) {
                 if (categories.isEmpty) {
                   return const Center(
@@ -251,7 +294,13 @@ class _CategoriesAdminView extends ConsumerWidget {
                       children: [
                         Icon(Icons.inbox, size: 64, color: Color(0xFFCBD5E1)),
                         SizedBox(height: 16),
-                        Text('No categories found', style: TextStyle(color: Color(0xFF64748B), fontSize: 18)),
+                        Text(
+                          'No categories found',
+                          style: TextStyle(
+                            color: Color(0xFF64748B),
+                            fontSize: 18,
+                          ),
+                        ),
                       ],
                     ),
                   );
@@ -263,11 +312,16 @@ class _CategoriesAdminView extends ConsumerWidget {
                       data: Theme.of(context).copyWith(
                         dividerColor: const Color(0xFFF1F5F9),
                         dataTableTheme: const DataTableThemeData(
-                          headingRowColor: WidgetStatePropertyAll(Color(0xFFF8FAFC)),
+                          headingRowColor: WidgetStatePropertyAll(
+                            Color(0xFFF8FAFC),
+                          ),
                         ),
                       ),
                       child: DataTable(
-                        headingTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF475569)),
+                        headingTextStyle: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF475569),
+                        ),
                         dataRowMinHeight: 60,
                         dataRowMaxHeight: 60,
                         columns: const [
@@ -277,43 +331,78 @@ class _CategoriesAdminView extends ConsumerWidget {
                           DataColumn(label: Text('ACTIONS')),
                         ],
                         rows: categories.map((cat) {
-                          return DataRow(cells: [
-                            DataCell(Text(cat.id.substring(0, 8).toUpperCase(), style: const TextStyle(color: Color(0xFF64748B)))),
-                            DataCell(Text(cat.name, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16))),
-                            DataCell(
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: cat.isActive ? _success.withValues(alpha: 0.1) : _danger.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Text(
-                                  cat.isActive ? 'Active' : 'Inactive',
-                                  style: TextStyle(
-                                    color: cat.isActive ? _success : _danger,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 12,
+                          return DataRow(
+                            cells: [
+                              DataCell(
+                                Text(
+                                  cat.id.substring(0, 8).toUpperCase(),
+                                  style: const TextStyle(
+                                    color: Color(0xFF64748B),
                                   ),
                                 ),
                               ),
-                            ),
-                            DataCell(
-                              Row(
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.edit_outlined, color: _primaryAccent),
-                                    tooltip: 'Edit Category',
-                                    onPressed: () => _showCategoryDialog(context, ref, existingId: cat.id, initialName: cat.name, initialIsActive: cat.isActive),
+                              DataCell(
+                                Text(
+                                  cat.name,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16,
                                   ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete_outline, color: _danger),
-                                    tooltip: 'Disable Category',
-                                    onPressed: () => _deleteCategory(context, ref, cat.id),
-                                  ),
-                                ],
+                                ),
                               ),
-                            ),
-                          ]);
+                              DataCell(
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: cat.isActive
+                                        ? _success.withValues(alpha: 0.1)
+                                        : _danger.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    cat.isActive ? 'Active' : 'Inactive',
+                                    style: TextStyle(
+                                      color: cat.isActive ? _success : _danger,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              DataCell(
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.edit_outlined,
+                                        color: _primaryAccent,
+                                      ),
+                                      tooltip: 'Edit Category',
+                                      onPressed: () => _showCategoryDialog(
+                                        context,
+                                        ref,
+                                        existingId: cat.id,
+                                        initialName: cat.name,
+                                        initialIsActive: cat.isActive,
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.delete_outline,
+                                        color: _danger,
+                                      ),
+                                      tooltip: 'Disable Category',
+                                      onPressed: () =>
+                                          _deleteCategory(context, ref, cat.id),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          );
                         }).toList(),
                       ),
                     ),
@@ -327,7 +416,13 @@ class _CategoriesAdminView extends ConsumerWidget {
     );
   }
 
-  void _showCategoryDialog(BuildContext context, WidgetRef ref, {String? existingId, String? initialName, bool initialIsActive = true}) {
+  void _showCategoryDialog(
+    BuildContext context,
+    WidgetRef ref, {
+    String? existingId,
+    String? initialName,
+    bool initialIsActive = true,
+  }) {
     final controller = TextEditingController(text: initialName);
     bool isActive = initialIsActive;
     bool isSaving = false;
@@ -339,8 +434,13 @@ class _CategoriesAdminView extends ConsumerWidget {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: Text(existingId == null ? 'Create New Category' : 'Edit Category', style: const TextStyle(fontWeight: FontWeight.bold)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: Text(
+                existingId == null ? 'Create New Category' : 'Edit Category',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
               content: SizedBox(
                 width: 400,
                 child: Column(
@@ -350,55 +450,91 @@ class _CategoriesAdminView extends ConsumerWidget {
                       controller: controller,
                       decoration: InputDecoration(
                         labelText: 'Category Name',
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                     ),
                     if (existingId != null) ...[
                       const SizedBox(height: 24),
                       SwitchListTile(
-                        title: const Text('Active Status', style: TextStyle(fontWeight: FontWeight.w500)),
+                        title: const Text(
+                          'Active Status',
+                          style: TextStyle(fontWeight: FontWeight.w500),
+                        ),
                         value: isActive,
                         activeColor: _success,
                         onChanged: (val) => setState(() => isActive = val),
                       ),
-                    ]
+                    ],
                   ],
                 ),
               ),
-              actionsPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              actionsPadding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 16,
+              ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel', style: TextStyle(color: Color(0xFF64748B))),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: Color(0xFF64748B)),
+                  ),
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: _primaryAccent, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
-                  onPressed: isSaving ? null : () async {
-                    if (controller.text.trim().isNotEmpty) {
-                      setState(() => isSaving = true);
-                      try {
-                        if (existingId == null) {
-                          await ref.read(adminRepositoryProvider).addCategory(controller.text.trim());
-                        } else {
-                          await ref.read(adminRepositoryProvider).updateCategory(existingId, controller.text.trim(), isActive);
-                        }
-                        ref.invalidate(adminCategoriesProvider);
-                        if (context.mounted) Navigator.pop(context);
-                      } catch (e) {
-                        setState(() => isSaving = false);
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e')));
-                        }
-                      }
-                    }
-                  },
-                  child: isSaving 
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _primaryAccent,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onPressed: isSaving
+                      ? null
+                      : () async {
+                          if (controller.text.trim().isNotEmpty) {
+                            setState(() => isSaving = true);
+                            try {
+                              if (existingId == null) {
+                                await ref
+                                    .read(adminRepositoryProvider)
+                                    .addCategory(controller.text.trim());
+                              } else {
+                                await ref
+                                    .read(adminRepositoryProvider)
+                                    .updateCategory(
+                                      existingId,
+                                      controller.text.trim(),
+                                      isActive,
+                                    );
+                              }
+                              ref.invalidate(adminCategoriesProvider);
+                              if (context.mounted) Navigator.pop(context);
+                            } catch (e) {
+                              setState(() => isSaving = false);
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Failed: $e')),
+                                );
+                              }
+                            }
+                          }
+                        },
+                  child: isSaving
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
                       : const Text('Save Details'),
                 ),
               ],
             );
-          }
+          },
         );
       },
     );
@@ -413,29 +549,51 @@ class _CategoriesAdminView extends ConsumerWidget {
         builder: (context, setState) {
           return AlertDialog(
             title: const Text('Confirm Disabling'),
-            content: const Text('Are you sure you want to disable this category? This acts as a soft-delete.'),
+            content: const Text(
+              'Are you sure you want to disable this category? This acts as a soft-delete.',
+            ),
             actions: [
-              TextButton(onPressed: isDeleting ? null : () => Navigator.pop(context), child: const Text('Cancel')),
+              TextButton(
+                onPressed: isDeleting ? null : () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: _danger, foregroundColor: Colors.white),
-                onPressed: isDeleting ? null : () async {
-                  setState(() => isDeleting = true);
-                  try {
-                    await ref.read(adminRepositoryProvider).deleteCategory(id);
-                    ref.invalidate(adminCategoriesProvider);
-                    if (context.mounted) Navigator.pop(context);
-                  } catch (e) {
-                    setState(() => isDeleting = false);
-                    if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e')));
-                  }
-                },
-                child: isDeleting 
-                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _danger,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: isDeleting
+                    ? null
+                    : () async {
+                        setState(() => isDeleting = true);
+                        try {
+                          await ref
+                              .read(adminRepositoryProvider)
+                              .deleteCategory(id);
+                          ref.invalidate(adminCategoriesProvider);
+                          if (context.mounted) Navigator.pop(context);
+                        } catch (e) {
+                          setState(() => isDeleting = false);
+                          if (context.mounted)
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Failed: $e')),
+                            );
+                        }
+                      },
+                child: isDeleting
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
                     : const Text('Disable Category'),
               ),
             ],
           );
-        }
+        },
       ),
     );
   }
@@ -478,7 +636,14 @@ class _CardsAdminView extends ConsumerWidget {
               children: [
                 IconButton(
                   icon: cardsAsync.isLoading || cardsAsync.isRefreshing
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: _primaryAccent, strokeWidth: 2.5))
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: _primaryAccent,
+                            strokeWidth: 2.5,
+                          ),
+                        )
                       : const Icon(Icons.refresh, color: _primaryAccent),
                   onPressed: cardsAsync.isLoading || cardsAsync.isRefreshing
                       ? null
@@ -489,12 +654,20 @@ class _CardsAdminView extends ConsumerWidget {
                 ElevatedButton.icon(
                   onPressed: () => _showCardDialog(context, ref),
                   icon: const Icon(Icons.add, size: 20),
-                  label: const Text('Add Card', style: TextStyle(fontWeight: FontWeight.bold)),
+                  label: const Text(
+                    'Add Card',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _primaryAccent,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 18,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                     elevation: 0,
                   ),
                 ),
@@ -513,21 +686,38 @@ class _CardsAdminView extends ConsumerWidget {
                   color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
-                )
+                ),
               ],
             ),
             child: cardsAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator(color: _primaryAccent)),
-              error: (err, stack) => Center(child: Text('Error: \$err', style: const TextStyle(color: _danger))),
+              loading: () => const Center(
+                child: CircularProgressIndicator(color: _primaryAccent),
+              ),
+              error: (err, stack) => Center(
+                child: Text(
+                  'Error: \$err',
+                  style: const TextStyle(color: _danger),
+                ),
+              ),
               data: (cards) {
                 if (cards.isEmpty) {
                   return const Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.style_outlined, size: 64, color: Color(0xFFCBD5E1)),
+                        Icon(
+                          Icons.style_outlined,
+                          size: 64,
+                          color: Color(0xFFCBD5E1),
+                        ),
                         SizedBox(height: 16),
-                        Text('No cards found', style: TextStyle(color: Color(0xFF64748B), fontSize: 18)),
+                        Text(
+                          'No cards found',
+                          style: TextStyle(
+                            color: Color(0xFF64748B),
+                            fontSize: 18,
+                          ),
+                        ),
                       ],
                     ),
                   );
@@ -539,11 +729,16 @@ class _CardsAdminView extends ConsumerWidget {
                       data: Theme.of(context).copyWith(
                         dividerColor: const Color(0xFFF1F5F9),
                         dataTableTheme: const DataTableThemeData(
-                          headingRowColor: WidgetStatePropertyAll(Color(0xFFF8FAFC)),
+                          headingRowColor: WidgetStatePropertyAll(
+                            Color(0xFFF8FAFC),
+                          ),
                         ),
                       ),
                       child: DataTable(
-                        headingTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF475569)),
+                        headingTextStyle: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF475569),
+                        ),
                         dataRowMinHeight: 70,
                         dataRowMaxHeight: 70,
                         columns: const [
@@ -553,70 +748,110 @@ class _CardsAdminView extends ConsumerWidget {
                           DataColumn(label: Text('ACTIONS')),
                         ],
                         rows: cards.map((card) {
-                          return DataRow(cells: [
-                            DataCell(Text(card.id.substring(0, 8).toUpperCase(), style: const TextStyle(color: Color(0xFF64748B)))),
-                            DataCell(Text(card.title, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16))),
-                            DataCell(
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: card.isActive ? _success.withValues(alpha: 0.1) : _danger.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Text(
-                                  card.isActive ? 'Active' : 'Inactive',
-                                  style: TextStyle(
-                                    color: card.isActive ? _success : _danger,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 12,
+                          return DataRow(
+                            cells: [
+                              DataCell(
+                                Text(
+                                  card.id.substring(0, 8).toUpperCase(),
+                                  style: const TextStyle(
+                                    color: Color(0xFF64748B),
                                   ),
                                 ),
                               ),
-                            ),
-                            DataCell(
-                              Row(
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.visibility_outlined, color: Colors.blueGrey),
-                                    tooltip: 'Preview Card',
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => AdminCardPreviewScreen(
-                                            title: card.title,
-                                            frontMessage: card.defaultFrontMessage,
-                                            insideMessage: card.defaultInsideMessage,
-                                            imageProvider: NetworkImage(card.coverImageUrl),
-                                            heroTag: 'preview_\${card.id}',
-                                          ),
-                                        ),
-                                      );
-                                    },
+                              DataCell(
+                                Text(
+                                  card.title,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16,
                                   ),
-                                  IconButton(
-                                    icon: const Icon(Icons.edit_outlined, color: _primaryAccent),
-                                    tooltip: 'Edit Card',
-                                    onPressed: () => _showCardDialog(
-                                      context,
-                                      ref,
-                                      existingId: card.id,
-                                      initialTitle: card.title,
-                                      initialIsActive: card.isActive,
-                                      initialFrontMessage: card.defaultFrontMessage,
-                                      initialInsideMessage: card.defaultInsideMessage,
-                                      existingImageUrl: card.coverImageUrl,
+                                ),
+                              ),
+                              DataCell(
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: card.isActive
+                                        ? _success.withValues(alpha: 0.1)
+                                        : _danger.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    card.isActive ? 'Active' : 'Inactive',
+                                    style: TextStyle(
+                                      color: card.isActive ? _success : _danger,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 12,
                                     ),
                                   ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete_outline, color: _danger),
-                                    tooltip: 'Disable Card',
-                                    onPressed: () => _deleteCard(context, ref, card.id),
-                                  ),
-                                ],
+                                ),
                               ),
-                            ),
-                          ]);
+                              DataCell(
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.visibility_outlined,
+                                        color: Colors.blueGrey,
+                                      ),
+                                      tooltip: 'Preview Card',
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                AdminCardPreviewScreen(
+                                                  title: card.title,
+                                                  frontMessage:
+                                                      card.defaultFrontMessage,
+                                                  insideMessage:
+                                                      card.defaultInsideMessage,
+                                                  imageProvider: NetworkImage(
+                                                    card.coverImageUrl,
+                                                  ),
+                                                  heroTag:
+                                                      'preview_\${card.id}',
+                                                ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.edit_outlined,
+                                        color: _primaryAccent,
+                                      ),
+                                      tooltip: 'Edit Card',
+                                      onPressed: () => _showCardDialog(
+                                        context,
+                                        ref,
+                                        existingId: card.id,
+                                        initialTitle: card.title,
+                                        initialIsActive: card.isActive,
+                                        initialFrontMessage:
+                                            card.defaultFrontMessage,
+                                        initialInsideMessage:
+                                            card.defaultInsideMessage,
+                                        existingImageUrl: card.coverImageUrl,
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.delete_outline,
+                                        color: _danger,
+                                      ),
+                                      tooltip: 'Disable Card',
+                                      onPressed: () =>
+                                          _deleteCard(context, ref, card.id),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          );
                         }).toList(),
                       ),
                     ),
@@ -645,7 +880,7 @@ class _CardsAdminView extends ConsumerWidget {
     final insideMsgCtrl = TextEditingController(text: initialInsideMessage);
     bool isActive = initialIsActive;
     bool isSaving = false;
-    
+
     final categoriesAsync = ref.watch(adminCategoriesProvider);
     String? selectedCategoryId;
     PlatformFile? selectedImage;
@@ -657,8 +892,13 @@ class _CardsAdminView extends ConsumerWidget {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: Text(existingId == null ? 'Create New Card' : 'Edit Card Metadata', style: const TextStyle(fontWeight: FontWeight.bold)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              title: Text(
+                existingId == null ? 'Create New Card' : 'Edit Card Metadata',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
               content: SingleChildScrollView(
                 child: SizedBox(
                   width: 500,
@@ -671,15 +911,26 @@ class _CardsAdminView extends ConsumerWidget {
                             return DropdownButtonFormField<String>(
                               decoration: InputDecoration(
                                 labelText: 'Select Category',
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
                               ),
                               value: selectedCategoryId,
-                              items: categories.map((cat) => DropdownMenuItem(value: cat.id, child: Text(cat.name))).toList(),
-                              onChanged: (val) => setState(() => selectedCategoryId = val),
+                              items: categories
+                                  .map(
+                                    (cat) => DropdownMenuItem(
+                                      value: cat.id,
+                                      child: Text(cat.name),
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: (val) =>
+                                  setState(() => selectedCategoryId = val),
                             );
                           },
                           loading: () => const CircularProgressIndicator(),
-                          error: (_, __) => const Text('Error loading categories'),
+                          error: (_, __) =>
+                              const Text('Error loading categories'),
                         ),
                         const SizedBox(height: 20),
                       ],
@@ -687,7 +938,9 @@ class _CardsAdminView extends ConsumerWidget {
                         controller: titleCtrl,
                         decoration: InputDecoration(
                           labelText: 'Card Title',
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                       ),
                       if (existingId == null) ...[
@@ -696,7 +949,9 @@ class _CardsAdminView extends ConsumerWidget {
                           controller: frontMsgCtrl,
                           decoration: InputDecoration(
                             labelText: 'Default Front Message',
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
                           maxLines: 2,
                         ),
@@ -705,7 +960,9 @@ class _CardsAdminView extends ConsumerWidget {
                           controller: insideMsgCtrl,
                           decoration: InputDecoration(
                             labelText: 'Default Inside Message',
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
                           maxLines: 4,
                         ),
@@ -713,16 +970,25 @@ class _CardsAdminView extends ConsumerWidget {
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            border: Border.all(color: const Color(0xFFCBD5E1), style: BorderStyle.solid),
+                            border: Border.all(
+                              color: const Color(0xFFCBD5E1),
+                              style: BorderStyle.solid,
+                            ),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
                             children: [
                               ElevatedButton.icon(
                                 onPressed: () async {
-                                  final result = await FilePicker.platform.pickFiles(type: FileType.image, withData: true);
+                                  final result = await FilePicker.platform
+                                      .pickFiles(
+                                        type: FileType.image,
+                                        withData: true,
+                                      );
                                   if (result != null) {
-                                    setState(() => selectedImage = result.files.first);
+                                    setState(
+                                      () => selectedImage = result.files.first,
+                                    );
                                   }
                                 },
                                 icon: const Icon(Icons.upload_file),
@@ -731,8 +997,11 @@ class _CardsAdminView extends ConsumerWidget {
                               const SizedBox(width: 16),
                               Expanded(
                                 child: Text(
-                                  selectedImage?.name ?? 'No image selected for upload',
-                                  style: const TextStyle(color: Color(0xFF64748B)),
+                                  selectedImage?.name ??
+                                      'No image selected for upload',
+                                  style: const TextStyle(
+                                    color: Color(0xFF64748B),
+                                  ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
@@ -743,17 +1012,23 @@ class _CardsAdminView extends ConsumerWidget {
                       if (existingId != null) ...[
                         const SizedBox(height: 24),
                         SwitchListTile(
-                          title: const Text('Active Status', style: TextStyle(fontWeight: FontWeight.w500)),
+                          title: const Text(
+                            'Active Status',
+                            style: TextStyle(fontWeight: FontWeight.w500),
+                          ),
                           value: isActive,
                           activeColor: _success,
                           onChanged: (val) => setState(() => isActive = val),
                         ),
-                      ]
+                      ],
                     ],
                   ),
                 ),
               ),
-              actionsPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              actionsPadding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 16,
+              ),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -763,7 +1038,7 @@ class _CardsAdminView extends ConsumerWidget {
                     } else if (existingImageUrl != null) {
                       provider = NetworkImage(existingImageUrl);
                     }
-                    
+
                     if (provider != null) {
                       Navigator.push(
                         context,
@@ -779,66 +1054,117 @@ class _CardsAdminView extends ConsumerWidget {
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Please select a cover image to preview.')),
+                        const SnackBar(
+                          content: Text(
+                            'Please select a cover image to preview.',
+                          ),
+                        ),
                       );
                     }
                   },
-                  child: const Text('Preview', style: TextStyle(color: _primaryAccent, fontWeight: FontWeight.bold)),
+                  child: const Text(
+                    'Preview',
+                    style: TextStyle(
+                      color: _primaryAccent,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel', style: TextStyle(color: Color(0xFF64748B))),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: Color(0xFF64748B)),
+                  ),
                 ),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: _primaryAccent, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
-                  onPressed: isSaving ? null : () async {
-                    try {
-                      if (existingId == null) {
-                        if (titleCtrl.text.trim().isNotEmpty && selectedCategoryId != null && selectedImage?.bytes != null) {
-                          setState(() => isSaving = true);
-                          await ref.read(adminRepositoryProvider).addCard(
-                            categoryId: selectedCategoryId!,
-                            title: titleCtrl.text.trim(),
-                            defaultFrontMessage: frontMsgCtrl.text.trim(),
-                            defaultInsideMessage: insideMsgCtrl.text.trim(),
-                            imageBytes: selectedImage!.bytes!,
-                            fileExtension: selectedImage!.extension ?? 'jpg',
-                          );
-                          ref.invalidate(adminCardsProvider);
-                          if (context.mounted) Navigator.pop(context);
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Please fill all required fields (Category, Title, and Cover Image).')),
-                          );
-                        }
-                      } else {
-                        if (titleCtrl.text.trim().isNotEmpty) {
-                          setState(() => isSaving = true);
-                          await ref.read(adminRepositoryProvider).updateCard(cardId: existingId, title: titleCtrl.text.trim(), isActive: isActive);
-                          ref.invalidate(adminCardsProvider);
-                          if (context.mounted) Navigator.pop(context);
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Card title cannot be empty.')),
-                          );
-                        }
-                      }
-                    } catch (e) {
-                      setState(() => isSaving = false);
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Failed to save data: $e')),
-                        );
-                      }
-                    }
-                  },
-                  child: isSaving 
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _primaryAccent,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onPressed: isSaving
+                      ? null
+                      : () async {
+                          try {
+                            if (existingId == null) {
+                              if (titleCtrl.text.trim().isNotEmpty &&
+                                  selectedCategoryId != null &&
+                                  selectedImage?.bytes != null) {
+                                setState(() => isSaving = true);
+                                await ref
+                                    .read(adminRepositoryProvider)
+                                    .addCard(
+                                      categoryId: selectedCategoryId!,
+                                      title: titleCtrl.text.trim(),
+                                      defaultFrontMessage: frontMsgCtrl.text
+                                          .trim(),
+                                      defaultInsideMessage: insideMsgCtrl.text
+                                          .trim(),
+                                      imageBytes: selectedImage!.bytes!,
+                                      fileExtension:
+                                          selectedImage!.extension ?? 'jpg',
+                                    );
+                                ref.invalidate(adminCardsProvider);
+                                if (context.mounted) Navigator.pop(context);
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Please fill all required fields (Category, Title, and Cover Image).',
+                                    ),
+                                  ),
+                                );
+                              }
+                            } else {
+                              if (titleCtrl.text.trim().isNotEmpty) {
+                                setState(() => isSaving = true);
+                                await ref
+                                    .read(adminRepositoryProvider)
+                                    .updateCard(
+                                      cardId: existingId,
+                                      title: titleCtrl.text.trim(),
+                                      isActive: isActive,
+                                    );
+                                ref.invalidate(adminCardsProvider);
+                                if (context.mounted) Navigator.pop(context);
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Card title cannot be empty.',
+                                    ),
+                                  ),
+                                );
+                              }
+                            }
+                          } catch (e) {
+                            setState(() => isSaving = false);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Failed to save data: $e'),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                  child: isSaving
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
                       : const Text('Save Details'),
                 ),
               ],
             );
-          }
+          },
         );
       },
     );
@@ -853,33 +1179,54 @@ class _CardsAdminView extends ConsumerWidget {
         builder: (context, setState) {
           return AlertDialog(
             title: const Text('Confirm Disabling'),
-            content: const Text('Are you sure you want to disable this card? This acts as a soft-delete.'),
+            content: const Text(
+              'Are you sure you want to disable this card? This acts as a soft-delete.',
+            ),
             actions: [
-              TextButton(onPressed: isDeleting ? null : () => Navigator.pop(context), child: const Text('Cancel')),
+              TextButton(
+                onPressed: isDeleting ? null : () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: _danger, foregroundColor: Colors.white),
-                onPressed: isDeleting ? null : () async {
-                  setState(() => isDeleting = true);
-                  try {
-                    await ref.read(adminRepositoryProvider).deleteCard(id);
-                    ref.invalidate(adminCardsProvider);
-                    if (context.mounted) Navigator.pop(context);
-                  } catch (e) {
-                    setState(() => isDeleting = false);
-                    if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e')));
-                  }
-                },
-                child: isDeleting 
-                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _danger,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: isDeleting
+                    ? null
+                    : () async {
+                        setState(() => isDeleting = true);
+                        try {
+                          await ref
+                              .read(adminRepositoryProvider)
+                              .deleteCard(id);
+                          ref.invalidate(adminCardsProvider);
+                          if (context.mounted) Navigator.pop(context);
+                        } catch (e) {
+                          setState(() => isDeleting = false);
+                          if (context.mounted)
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Failed: $e')),
+                            );
+                        }
+                      },
+                child: isDeleting
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
                     : const Text('Disable Card'),
               ),
             ],
           );
-        }
+        },
       ),
     );
   }
-
 }
 
 class AdminCardPreviewScreen extends StatelessWidget {
@@ -906,7 +1253,13 @@ class AdminCardPreviewScreen extends StatelessWidget {
         backgroundColor: const Color(0xFF0F172A),
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0,
-        title: Text('Preview: $title', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: Text(
+          'Preview: $title',
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: Row(
         children: [
@@ -920,11 +1273,16 @@ class AdminCardPreviewScreen extends StatelessWidget {
                 tag: heroTag,
                 child: Image(
                   image: imageProvider,
-                  fit: BoxFit.contain, // Ensures the entire image is visible with absolutely no clipping
+                  fit: BoxFit
+                      .contain, // Ensures the entire image is visible with absolutely no clipping
                   width: double.infinity,
                   height: double.infinity,
                   errorBuilder: (_, __, ___) => const Center(
-                    child: Icon(Icons.broken_image, size: 64, color: Colors.white54),
+                    child: Icon(
+                      Icons.broken_image,
+                      size: 64,
+                      color: Colors.white54,
+                    ),
                   ),
                 ),
               ),
@@ -940,14 +1298,32 @@ class AdminCardPreviewScreen extends StatelessWidget {
               children: [
                 const Text(
                   'Card Data',
-                  style: TextStyle(color: Colors.white54, fontSize: 14, letterSpacing: 1.5, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                    color: Colors.white54,
+                    fontSize: 14,
+                    letterSpacing: 1.5,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 24),
-                _buildDataField('Card Title', title.isEmpty ? 'Untitled' : title),
+                _buildDataField(
+                  'Card Title',
+                  title.isEmpty ? 'Untitled' : title,
+                ),
                 const SizedBox(height: 24),
-                _buildDataField('Front Message', frontMessage.isEmpty ? '(No default front message)' : frontMessage),
+                _buildDataField(
+                  'Front Message',
+                  frontMessage.isEmpty
+                      ? '(No default front message)'
+                      : frontMessage,
+                ),
                 const SizedBox(height: 24),
-                _buildDataField('Inside Message', insideMessage.isEmpty ? '(No default inside message)' : insideMessage),
+                _buildDataField(
+                  'Inside Message',
+                  insideMessage.isEmpty
+                      ? '(No default inside message)'
+                      : insideMessage,
+                ),
               ],
             ),
           ),
@@ -967,7 +1343,11 @@ class AdminCardPreviewScreen extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           value,
-          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ],
     );

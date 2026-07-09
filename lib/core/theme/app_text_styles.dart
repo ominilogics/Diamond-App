@@ -401,4 +401,24 @@ class AppTextStyles {
       leadingDistribution: leadingDistribution ?? TextLeadingDistribution.even,
     );
   }
+  static TextStyle bizudMincho400Regular12({
+    Color? color,
+    double? fontSize,
+    FontWeight? fontWeight,
+    FontStyle? fontStyle,
+    double? height,
+    double? letterSpacing,
+    TextLeadingDistribution? leadingDistribution,
+  }) {
+    return TextStyle(
+      fontFamily: 'BIZUDMincho',
+      fontWeight: fontWeight ?? FontWeight.w400,
+      fontStyle: fontStyle ?? FontStyle.normal,
+      fontSize: fontSize ?? 12.0,
+      height: height ?? 1.2,
+      letterSpacing: letterSpacing ?? 0.0,
+      color: color ?? Colors.black,
+      leadingDistribution: leadingDistribution ?? TextLeadingDistribution.even,
+    );
+  }
 }

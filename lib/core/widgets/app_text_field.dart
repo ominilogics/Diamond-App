@@ -64,9 +64,7 @@ class AppTextField extends StatelessWidget {
             ],
             Container(
               width: double.infinity,
-              constraints: BoxConstraints(
-                minHeight: 44.h,
-              ),
+              constraints: BoxConstraints(minHeight: 44.h),
               decoration: BoxDecoration(
                 color: const Color(0xFFFFFFFF),
                 borderRadius: BorderRadius.circular(20.r),
@@ -80,52 +78,55 @@ class AppTextField extends StatelessWidget {
                 data: Theme.of(context).copyWith(
                   textSelectionTheme: TextSelectionThemeData(
                     cursorColor: AppColors.primaryButtonGradientStart,
-                    selectionColor: AppColors.primaryButtonGradientStart.withOpacity(0.3),
+                    selectionColor: AppColors.primaryButtonGradientStart
+                        .withOpacity(0.3),
                     selectionHandleColor: AppColors.primaryButtonGradientStart,
                   ),
                 ),
                 child: TextField(
                   controller: controller,
-                focusNode: focusNode,
-                textInputAction: textInputAction,
-                onSubmitted: onFieldSubmitted,
-                obscureText: obscureText,
-                readOnly: readOnly,
-                maxLines: maxLines,
-                keyboardType: keyboardType,
-                inputFormatters: maxLength != null ? [LengthLimitingTextInputFormatter(maxLength)] : null,
-                cursorColor: AppColors.primaryButtonGradientStart,
-                style: AppTextStyles.roboto400Regular14(color: Colors.black),
-                onChanged: (val) {
-                  state.didChange(val);
-                  onChanged?.call(val);
-                },
-                textAlignVertical: TextAlignVertical.center,
-                decoration: InputDecoration(
-                  hintText: hintText,
-                  hintStyle: AppTextStyles.roboto300Light14(
-                    color: const Color(0xFFA8A8A8),
-                  ),
-                  border: InputBorder.none,
-                  isDense: true,
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: kIsWeb ? 16 : 16.w,
-                    vertical: kIsWeb ? 16 : 10.h,
-                  ),
-                  prefixIcon: prefixIcon,
-                  prefixIconConstraints: BoxConstraints(
-                    minWidth: kIsWeb ? 40 : 40.w,
-                    minHeight: kIsWeb ? 20 : 20.h,
-                    maxHeight: kIsWeb ? 44 : 44.h,
-                  ),
-                  suffixIcon: suffixIcon,
-                  suffixIconConstraints: BoxConstraints(
-                    minWidth: kIsWeb ? 40 : 40.w,
-                    minHeight: kIsWeb ? 20 : 20.h,
-                    maxHeight: kIsWeb ? 44 : 44.h,
+                  focusNode: focusNode,
+                  textInputAction: textInputAction,
+                  onSubmitted: onFieldSubmitted,
+                  obscureText: obscureText,
+                  readOnly: readOnly,
+                  maxLines: maxLines,
+                  keyboardType: keyboardType,
+                  inputFormatters: maxLength != null
+                      ? [LengthLimitingTextInputFormatter(maxLength)]
+                      : null,
+                  cursorColor: AppColors.primaryButtonGradientStart,
+                  style: AppTextStyles.roboto400Regular14(color: Colors.black),
+                  onChanged: (val) {
+                    state.didChange(val);
+                    onChanged?.call(val);
+                  },
+                  textAlignVertical: TextAlignVertical.center,
+                  decoration: InputDecoration(
+                    hintText: hintText,
+                    hintStyle: AppTextStyles.roboto300Light13(
+                      color: const Color(0xFFA8A8A8),
+                    ),
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: kIsWeb ? 16 : 16.w,
+                      vertical: kIsWeb ? 16 : 10.h,
+                    ),
+                    prefixIcon: prefixIcon,
+                    prefixIconConstraints: BoxConstraints(
+                      minWidth: kIsWeb ? 40 : 40.w,
+                      minHeight: kIsWeb ? 20 : 20.h,
+                      maxHeight: kIsWeb ? 44 : 44.h,
+                    ),
+                    suffixIcon: suffixIcon,
+                    suffixIconConstraints: BoxConstraints(
+                      minWidth: kIsWeb ? 40 : 40.w,
+                      minHeight: kIsWeb ? 20 : 20.h,
+                      maxHeight: kIsWeb ? 44 : 44.h,
+                    ),
                   ),
                 ),
-              ),
               ),
             ),
             if (hasError && state.errorText != null) ...[

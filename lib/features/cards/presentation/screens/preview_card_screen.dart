@@ -11,27 +11,42 @@ import '../../../../core/widgets/app_bar2.dart';
 class PreviewCardScreen extends StatelessWidget {
   final String message;
 
-  const PreviewCardScreen({
-    super.key,
-    required this.message,
-  });
+  const PreviewCardScreen({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
     return GradientScaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            SizedBox(height: 12.h),
-            const AppBar2(title: 'Preview Card'),
-            SizedBox(height: 24.h),
-            Expanded(
+        child: CustomScrollView(
+          slivers: [
+            SliverLayoutBuilder(
+              builder: (context, constraints) {
+                final isScrolled = constraints.scrollOffset > 0;
+                return SliverAppBar(
+                  floating: true,
+                  snap: true,
+                  backgroundColor: isScrolled
+                      ? const Color(0xFFE7FFEC)
+                      : Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                  elevation: 0,
+                  scrolledUnderElevation: 3.0,
+                  automaticallyImplyLeading: false,
+                  toolbarHeight: 60.h,
+                  titleSpacing: 0,
+                  title: Column(
+                    children: [
+                      SizedBox(height: 12.h),
+                      const AppBar2(title: 'Preview Card'),
+                    ],
+                  ),
+                );
+              },
+            ),
+            SliverFillRemaining(
+              hasScrollBody: false,
               child: Padding(
-                padding: EdgeInsets.only(
-                  left: 24.w,
-                  right: 24.w,
-                  bottom: 40.h,
-                ),
+                padding: EdgeInsets.only(left: 24.w, right: 24.w, bottom: 40.h),
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
@@ -42,7 +57,7 @@ class PreviewCardScreen extends StatelessWidget {
                       width: double.infinity,
                       height: double.infinity,
                     ),
-                    
+
                     // Centered Text over SVG
                     Positioned.fill(
                       child: Center(
@@ -52,7 +67,7 @@ class PreviewCardScreen extends StatelessWidget {
                             message,
                             textAlign: TextAlign.center,
                             style: AppTextStyles.colitez400Italic32(
-                              color: Colors.black, 
+                              color: Colors.black,
                             ),
                           ),
                         ),

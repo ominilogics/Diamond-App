@@ -24,14 +24,22 @@ class MainScreen extends HookConsumerWidget {
       const SettingsScreen(),
     ];
 
-    return GradientScaffold(
-      bottomNavigationBar: CustomBottomNavBar(
-        currentIndex: currentIndex,
-        onTap: (index) {
-          ref.read(bottomNavIndexProvider.notifier).state = index;
-        },
+    return PopScope(
+      canPop: currentIndex == 0,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop) {
+          ref.read(bottomNavIndexProvider.notifier).state = 0;
+        }
+      },
+      child: GradientScaffold(
+        bottomNavigationBar: CustomBottomNavBar(
+          currentIndex: currentIndex,
+          onTap: (index) {
+            ref.read(bottomNavIndexProvider.notifier).state = index;
+          },
+        ),
+        body: IndexedStack(index: currentIndex, children: pages),
       ),
-      body: IndexedStack(index: currentIndex, children: pages),
     );
   }
 }

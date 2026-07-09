@@ -22,7 +22,7 @@ class FavoritesScreen extends ConsumerWidget {
 
     final favoritesState = ref.watch(favoritesProvider);
     final favorites = favoritesState.valueOrNull ?? [];
-    
+
     final allCardsState = ref.watch(allCardsStreamProvider);
     final allCards = allCardsState.valueOrNull ?? [];
 
@@ -74,8 +74,10 @@ class FavoritesScreen extends ConsumerWidget {
               ),
               itemBuilder: (context, index) {
                 final favorite = favorites[index];
-                final card = allCards.firstWhereOrNull((c) => c.id == favorite.cardId);
-                
+                final card = allCards.firstWhereOrNull(
+                  (c) => c.id == favorite.cardId,
+                );
+
                 return FeaturedCard(
                   cardId: favorite.cardId,
                   title: favorite.title,

@@ -16,14 +16,18 @@ class NotificationSettingsScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final texts = AppLocalizations.of(context)!;
-    
+
     final pushNotifications = useState(true);
     final islamicEvents = useState(false);
     final newCardAlerts = useState(true);
     final eventReminders = useState(true);
     final specialOffers = useState(false);
 
-    Widget buildToggleRow(String title, ValueNotifier<bool> state, {bool isEnabled = true}) {
+    Widget buildToggleRow(
+      String title,
+      ValueNotifier<bool> state, {
+      bool isEnabled = true,
+    }) {
       return IgnorePointer(
         ignoring: !isEnabled,
         child: Opacity(
@@ -59,42 +63,88 @@ class NotificationSettingsScreen extends HookConsumerWidget {
 
     return GradientScaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            SizedBox(height: 12.h),
-            AppBar2(title: texts.notificationSettings),
-            SizedBox(height: 24.h),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w),
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFFFFF),
-                      borderRadius: BorderRadius.circular(20.r),
-                      border: Border.all(
-                        color: const Color(0xFF000000),
-                        width: 0.5.w,
-                      ),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          buildToggleRow(texts.pushNotifications, pushNotifications),
-                          buildDivider(),
-                          buildToggleRow(texts.islamicEvents, islamicEvents, isEnabled: pushNotifications.value),
-                          buildDivider(),
-                          buildToggleRow(texts.newCardAlerts, newCardAlerts, isEnabled: pushNotifications.value),
-                          buildDivider(),
-                          buildToggleRow(texts.eventReminders, eventReminders, isEnabled: pushNotifications.value),
-                          buildDivider(),
-                          buildToggleRow(texts.specialOffers, specialOffers, isEnabled: pushNotifications.value),
-                        ],
-                      ),
-                    ),
+        child: CustomScrollView(
+          slivers: [
+            SliverLayoutBuilder(
+              builder: (context, constraints) {
+                final isScrolled = constraints.scrollOffset > 0;
+                return SliverAppBar(
+                  floating: true,
+                  snap: true,
+                  backgroundColor: isScrolled
+                      ? const Color(0xFFE7FFEC)
+                      : Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                  elevation: 0,
+                  scrolledUnderElevation: 3.0,
+                  automaticallyImplyLeading: false,
+                  toolbarHeight: 60.h,
+                  titleSpacing: 0,
+                  title: Column(
+                    children: [
+                      SizedBox(height: 12.h),
+                      AppBar2(title: texts.notificationSettings),
+                    ],
                   ),
+                );
+              },
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                child: Column(
+                  children: [
+                    SizedBox(height: 24.h),
+                    DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFFFFF),
+                        borderRadius: BorderRadius.circular(20.r),
+                        border: Border.all(
+                          color: const Color(0xFF000000),
+                          width: 0.5.w,
+                        ),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 24.w,
+                          vertical: 16.h,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            buildToggleRow(
+                              texts.pushNotifications,
+                              pushNotifications,
+                            ),
+                            buildDivider(),
+                            buildToggleRow(
+                              texts.islamicEvents,
+                              islamicEvents,
+                              isEnabled: pushNotifications.value,
+                            ),
+                            buildDivider(),
+                            buildToggleRow(
+                              texts.newCardAlerts,
+                              newCardAlerts,
+                              isEnabled: pushNotifications.value,
+                            ),
+                            buildDivider(),
+                            buildToggleRow(
+                              texts.eventReminders,
+                              eventReminders,
+                              isEnabled: pushNotifications.value,
+                            ),
+                            buildDivider(),
+                            buildToggleRow(
+                              texts.specialOffers,
+                              specialOffers,
+                              isEnabled: pushNotifications.value,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -109,10 +159,7 @@ class _GradientSwitch extends StatelessWidget {
   final bool value;
   final ValueChanged<bool> onChanged;
 
-  const _GradientSwitch({
-    required this.value,
-    required this.onChanged,
-  });
+  const _GradientSwitch({required this.value, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {

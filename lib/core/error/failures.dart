@@ -14,3 +14,8 @@ class AuthFailure extends Failure {
 class ServerFailure extends Failure {
   ServerFailure(super.message);
 }
+
+class PaymentFailure extends Failure {
+  final bool isCancelled;
+  PaymentFailure(super.message, {this.isCancelled = false});
+}

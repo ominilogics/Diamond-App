@@ -3,6 +3,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../data/datasources/remote_auth_datasource.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../domain/repositories/auth_repository.dart';
+import '../../../../features/payments/domain/repositories/payment_repository.dart';
+import '../../../../features/payments/presentation/providers/payment_providers.dart';
 
 final supabaseClientProvider = Provider<SupabaseClient>((ref) {
   return Supabase.instance.client;
@@ -16,8 +18,9 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 
 class AuthNotifier extends StateNotifier<bool> {
   final AuthRepository repository;
+  final PaymentRepository paymentRepository;
 
-  AuthNotifier(this.repository) : super(false);
+  AuthNotifier(this.repository, this.paymentRepository) : super(false);
 
   Future<void> signIn(
     String email,
@@ -28,7 +31,13 @@ class AuthNotifier extends StateNotifier<bool> {
     state = true;
     final result = await repository.signIn(email, password);
     state = false;
-    result.fold((failure) => onError(failure.message), (_) => onSuccess());
+    result.fold((failure) => onError(failure.message), (_) {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user != null) {
+        paymentRepository.loginUser(user.id);
+      }
+      onSuccess();
+    });
   }
 
   Future<void> signUp(
@@ -40,9 +49,20 @@ class AuthNotifier extends StateNotifier<bool> {
     Function() onSuccess,
   ) async {
     state = true;
-    final result = await repository.signUp(email, password, fullName, dateOfBirth: dateOfBirth);
+    final result = await repository.signUp(
+      email,
+      password,
+      fullName,
+      dateOfBirth: dateOfBirth,
+    );
     state = false;
-    result.fold((failure) => onError(failure.message), (_) => onSuccess());
+    result.fold((failure) => onError(failure.message), (_) {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user != null) {
+        paymentRepository.loginUser(user.id);
+      }
+      onSuccess();
+    });
   }
 
   Future<void> resetPassword(
@@ -58,6 +78,7 @@ class AuthNotifier extends StateNotifier<bool> {
 
   Future<void> signOut() async {
     state = true;
+    await paymentRepository.logoutUser();
     await repository.signOut();
     state = false;
   }
@@ -69,7 +90,13 @@ class AuthNotifier extends StateNotifier<bool> {
     state = true;
     final result = await repository.signInWithGoogle();
     state = false;
-    result.fold((failure) => onError(failure.message), (_) => onSuccess());
+    result.fold((failure) => onError(failure.message), (_) {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user != null) {
+        paymentRepository.loginUser(user.id);
+      }
+      onSuccess();
+    });
   }
 
   Future<void> updateProfile(
@@ -79,7 +106,10 @@ class AuthNotifier extends StateNotifier<bool> {
     Function() onSuccess,
   ) async {
     state = true;
-    final result = await repository.updateProfile(fullName, dateOfBirth: dateOfBirth);
+    final result = await repository.updateProfile(
+      fullName,
+      dateOfBirth: dateOfBirth,
+    );
     state = false;
     result.fold((failure) => onError(failure.message), (_) => onSuccess());
   }
@@ -87,5 +117,6 @@ class AuthNotifier extends StateNotifier<bool> {
 
 final authProvider = StateNotifierProvider<AuthNotifier, bool>((ref) {
   final repository = ref.watch(authRepositoryProvider);
-  return AuthNotifier(repository);
+  final paymentRepo = ref.watch(paymentRepositoryProvider);
+  return AuthNotifier(repository, paymentRepo);
 });

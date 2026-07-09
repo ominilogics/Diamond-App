@@ -36,31 +36,58 @@ class NotificationsScreen extends HookConsumerWidget {
 
     return GradientScaffold(
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 12.h),
-            AppBar2(title: texts.notificationsTitle),
-            SizedBox(height: 24.h),
-
-            Expanded(
-              child: groupedAsync.when(
-                loading: () => const Center(child: CircularProgressIndicator(color: Colors.black)),
-                error: (err, stack) => Center(child: Text('${texts.errorOccurred}$err')),
-                data: (grouped) {
-                  if (grouped.isEmpty) {
-                    return Center(
+        child: CustomScrollView(
+          slivers: [
+            SliverLayoutBuilder(
+              builder: (context, constraints) {
+                final isScrolled = constraints.scrollOffset > 0;
+                return SliverAppBar(
+                  floating: true,
+                  snap: true,
+                  backgroundColor: isScrolled
+                      ? const Color(0xFFE7FFEC)
+                      : Colors.transparent,
+                  surfaceTintColor: Colors.transparent,
+                  elevation: 0,
+                  scrolledUnderElevation: 3.0,
+                  automaticallyImplyLeading: false,
+                  toolbarHeight: 60.h,
+                  titleSpacing: 0,
+                  title: Column(
+                    children: [
+                      SizedBox(height: 12.h),
+                      AppBar2(title: texts.notificationsTitle),
+                    ],
+                  ),
+                );
+              },
+            ),
+            SliverToBoxAdapter(child: SizedBox(height: 24.h)),
+            groupedAsync.when(
+              loading: () => const SliverFillRemaining(
+                child: Center(
+                  child: CircularProgressIndicator(color: Colors.black),
+                ),
+              ),
+              error: (err, stack) => SliverFillRemaining(
+                child: Center(child: Text('${texts.errorOccurred}$err')),
+              ),
+              data: (grouped) {
+                if (grouped.isEmpty) {
+                  return SliverFillRemaining(
+                    child: Center(
                       child: Text(
                         texts.noNotificationsYet,
                         style: AppTextStyles.roboto300Light13(),
                       ),
-                    );
-                  }
+                    ),
+                  );
+                }
 
-                  return ListView.builder(
-                    padding: EdgeInsets.symmetric(horizontal: 24.w),
-                    itemCount: grouped.length,
-                    itemBuilder: (context, index) {
+                return SliverPadding(
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate((context, index) {
                       final rawTitle = grouped.keys.elementAt(index);
                       final items = grouped[rawTitle]!;
 
@@ -81,21 +108,23 @@ class NotificationsScreen extends HookConsumerWidget {
                             ),
                             SizedBox(height: 16.h),
                           ],
-                          ...items.map((item) => Padding(
-                                padding: EdgeInsets.only(bottom: 16.h),
-                                child: NotificationCard(
-                                  title: item.title,
-                                  description: item.description,
-                                  time: _getTimeAgo(item.createdAt),
-                                ),
-                              )),
+                          ...items.map(
+                            (item) => Padding(
+                              padding: EdgeInsets.only(bottom: 16.h),
+                              child: NotificationCard(
+                                title: item.title,
+                                description: item.description,
+                                time: _getTimeAgo(item.createdAt),
+                              ),
+                            ),
+                          ),
                           SizedBox(height: 8.h),
                         ],
                       );
-                    },
-                  );
-                },
-              ),
+                    }, childCount: grouped.length),
+                  ),
+                );
+              },
             ),
           ],
         ),

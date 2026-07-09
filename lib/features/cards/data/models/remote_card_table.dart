@@ -11,7 +11,8 @@ class RemoteCardsTable extends Table {
   TextColumn get defaultInsideMessage => text().nullable()();
   RealColumn get price => real().withDefault(const Constant(5.99))();
   BoolColumn get isFeatured => boolean().withDefault(const Constant(false))();
-  IntColumn get colorValue => integer().nullable()(); // SQLite integer is 64-bit, perfectly fits ARGB unsigned 32-bit
+  IntColumn get colorValue => integer()
+      .nullable()(); // SQLite integer is 64-bit, perfectly fits ARGB unsigned 32-bit
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
   DateTimeColumn get createdAt => dateTime()();
 

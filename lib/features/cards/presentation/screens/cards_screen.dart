@@ -22,9 +22,9 @@ class CardsScreen extends HookConsumerWidget {
   final String? initialCategoryId;
 
   const CardsScreen({
-    super.key, 
-    this.title, 
-    this.showBackButton = false, 
+    super.key,
+    this.title,
+    this.showBackButton = false,
     this.initialCategoryId,
   });
 
@@ -34,113 +34,167 @@ class CardsScreen extends HookConsumerWidget {
     final screenTitle = title?.replaceAll('\n', ' ') ?? texts.navCards;
 
     final selectedCategoryId = useState<String?>(initialCategoryId);
-    
+    final selectedItemKey = useMemoized(() => GlobalKey());
+
     // Create the controller here so it survives SliverAppBar scrolling
-    final searchController = useTextEditingController(text: ref.read(searchQueryProvider));
+    final searchController = useTextEditingController(
+      text: ref.read(searchQueryProvider),
+    );
 
     final searchQuery = ref.watch(searchQueryProvider);
     final searchResultsAsync = ref.watch(searchResultsProvider);
     final isSearching = searchQuery.trim().isNotEmpty;
 
     final categoriesAsync = ref.watch(categoriesStreamProvider);
-    
-    final cardsAsync = selectedCategoryId.value == null 
-        ? ref.watch(allCardsStreamProvider) 
+
+    useEffect(() {
+      if (categoriesAsync.value != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (selectedItemKey.currentContext != null) {
+            Scrollable.ensureVisible(
+              selectedItemKey.currentContext!,
+              alignment: 0.5,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            );
+          }
+        });
+      }
+      return null;
+    }, [categoriesAsync.value, selectedCategoryId.value]);
+
+    final cardsAsync = selectedCategoryId.value == null
+        ? ref.watch(allCardsStreamProvider)
         : ref.watch(categoryCardsStreamProvider(selectedCategoryId.value!));
 
     final displayAsync = isSearching ? searchResultsAsync : cardsAsync;
 
     Widget content = CustomScrollView(
       slivers: [
-        SliverAppBar(
-          floating: true,
-          snap: true,
-          backgroundColor: AppColors.gradientStart, // Solid background so cards don't bleed through
-          surfaceTintColor: Colors.transparent,
-          elevation: 0,
-          automaticallyImplyLeading: false,
-          toolbarHeight: 60.h,
-          title: Column(
-            children: [
-              SizedBox(height: 12.h),
-              showBackButton
-                  ? AppBar2(title: screenTitle)
-                  : AppBar1(title: screenTitle),
-            ],
-          ),
-          bottom: PreferredSize(
-            preferredSize: Size.fromHeight(126.h), // Approximate height of search + chips + padding
-            child: Column(
-              children: [
-                SizedBox(height: 24.h),
-                SearchBarWidget(
-                  controller: searchController,
-                  onChanged: (val) => ref.read(searchQueryProvider.notifier).state = val,
-                ),
-                SizedBox(height: 24.h),
-                SizedBox(
-                  height: 30.h,
-                  child: categoriesAsync.when(
-                    loading: () => ListView.separated(
-                      padding: EdgeInsets.symmetric(horizontal: 24.w),
-                      scrollDirection: Axis.horizontal,
-                      itemCount: 4,
-                      separatorBuilder: (context, index) => SizedBox(width: 8.w),
-                      itemBuilder: (context, index) => SizedBox(width: 76.w, child: const CategoryShimmer()),
+        SliverLayoutBuilder(
+          builder: (context, constraints) {
+            final isScrolled = constraints.scrollOffset > 0;
+            return SliverAppBar(
+              floating: true,
+              snap: true,
+              backgroundColor: isScrolled
+                  ? AppColors.gradientStart
+                  : Colors
+                        .transparent, // Solid background so cards don't bleed through
+              surfaceTintColor: Colors.transparent,
+              elevation: 0,
+              scrolledUnderElevation: 3.0,
+              automaticallyImplyLeading: false,
+              toolbarHeight: 60.h,
+              titleSpacing: 0,
+              title: Column(
+                children: [
+                  SizedBox(height: 12.h),
+                  showBackButton
+                      ? AppBar2(title: screenTitle)
+                      : AppBar1(title: screenTitle),
+                ],
+              ),
+              bottom: PreferredSize(
+                preferredSize: Size.fromHeight(
+                  78.h,
+                ), // Approximate height of chips + padding
+                child: Column(
+                  children: [
+                    SizedBox(height: 24.h),
+                    /*
+                    SearchBarWidget(
+                      controller: searchController,
+                      onChanged: (val) =>
+                          ref.read(searchQueryProvider.notifier).state = val,
                     ),
-                    error: (error, stack) => const Center(child: Text('Error loading categories')),
-                    data: (categories) {
-                      final allCategories = [null, ...categories];
-                      return ListView.separated(
-                        padding: EdgeInsets.symmetric(horizontal: 24.w),
-                        scrollDirection: Axis.horizontal,
-                        itemCount: allCategories.length,
-                        separatorBuilder: (context, index) => SizedBox(width: 8.w),
-                        itemBuilder: (context, index) {
-                          final cat = allCategories[index];
-                          final isSelected = selectedCategoryId.value == (cat?.id);
-                          final name = cat == null ? texts.all : cat.name.localized(texts);
+                    SizedBox(height: 24.h),
+                    */
+                    SizedBox(
+                      height: 30.h,
+                      child: categoriesAsync.when(
+                        loading: () => ListView.separated(
+                          key: const PageStorageKey('categories_loading_list'),
+                          padding: EdgeInsets.symmetric(horizontal: 24.w),
+                          scrollDirection: Axis.horizontal,
+                          itemCount: 4,
+                          separatorBuilder: (context, index) =>
+                              SizedBox(width: 8.w),
+                          itemBuilder: (context, index) => SizedBox(
+                            width: 76.w,
+                            child: const CategoryShimmer(),
+                          ),
+                        ),
+                        error: (error, stack) => const Center(
+                          child: Text('Error loading categories'),
+                        ),
+                        data: (categories) {
+                          final allCategories = [null, ...categories];
+                          return ListView.separated(
+                            key: const PageStorageKey('categories_list'),
+                            padding: EdgeInsets.symmetric(horizontal: 24.w),
+                            scrollDirection: Axis.horizontal,
+                            itemCount: allCategories.length,
+                            separatorBuilder: (context, index) =>
+                                SizedBox(width: 8.w),
+                            itemBuilder: (context, index) {
+                              final cat = allCategories[index];
+                              final isSelected =
+                                  selectedCategoryId.value == (cat?.id);
+                              final itemKey = isSelected ? selectedItemKey : null;
+                              final name = cat == null
+                                  ? texts.all
+                                  : cat.name.localized(texts);
 
-                          return GestureDetector(
-                            onTap: () {
-                              selectedCategoryId.value = cat?.id;
-                            },
-                            behavior: HitTestBehavior.opaque,
-                            child: Container(
-                              constraints: BoxConstraints(minWidth: 76.w),
-                              padding: EdgeInsets.symmetric(horizontal: 16.w),
-                              height: 30.h,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: isSelected ? null : Colors.transparent,
-                                gradient: isSelected
-                                    ? AppColors.primaryButtonGradient
-                                    : null,
-                                borderRadius: BorderRadius.circular(20.r),
-                                border: isSelected
-                                    ? null
-                                    : Border.all(
-                                        color: const Color(0xFF000000),
-                                        width: 0.5.w,
-                                      ),
-                              ),
-                              child: Text(
-                                name,
-                                style: AppTextStyles.roboto400Regular14(
-                                  color: isSelected ? Colors.white : Colors.black,
+                              return GestureDetector(
+                                key: itemKey,
+                                onTap: () {
+                                  selectedCategoryId.value = cat?.id;
+                                },
+                                behavior: HitTestBehavior.opaque,
+                                child: Container(
+                                  constraints: BoxConstraints(minWidth: 76.w),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 16.w,
+                                  ),
+                                  height: 30.h,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? null
+                                        : Colors.transparent,
+                                    gradient: isSelected
+                                        ? AppColors.primaryButtonGradient
+                                        : null,
+                                    borderRadius: BorderRadius.circular(20.r),
+                                    border: isSelected
+                                        ? null
+                                        : Border.all(
+                                            color: const Color(0xFF000000),
+                                            width: 0.5.w,
+                                          ),
+                                  ),
+                                  child: Text(
+                                    name,
+                                    style: AppTextStyles.roboto400Regular14(
+                                      color: isSelected
+                                          ? Colors.white
+                                          : Colors.black,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
+                              );
+                            },
                           );
                         },
-                      );
-                    },
-                  ),
+                      ),
+                    ),
+                    SizedBox(height: 24.h),
+                  ],
                 ),
-                SizedBox(height: 24.h),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         ),
         SliverPadding(
           padding: EdgeInsets.symmetric(horizontal: 24.w),
@@ -167,8 +221,10 @@ class CardsScreen extends HookConsumerWidget {
                     child: Padding(
                       padding: EdgeInsets.only(top: 40.h),
                       child: Text(
-                        isSearching ? 'No cards found for "$searchQuery"' : 'No cards available in this category', 
-                        style: AppTextStyles.roboto300Light13()
+                        isSearching
+                            ? 'No cards found for "$searchQuery"'
+                            : 'No cards available in this category',
+                        style: AppTextStyles.roboto300Light13(),
                       ),
                     ),
                   ),
@@ -181,27 +237,24 @@ class CardsScreen extends HookConsumerWidget {
                   mainAxisSpacing: 14.h,
                   childAspectRatio: 171.w / 204.h,
                 ),
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final card = cards[index];
-                    return FeaturedCard(
-                      cardId: card.id,
-                      title: card.title,
-                      coverImageUrl: card.coverImageUrl,
-                      frontMessage: card.defaultFrontMessage,
-                      insideMessage: card.defaultInsideMessage,
-                      cardColor: card.colorValue != null ? Color(card.colorValue!) : AppColors.card1,
-                    );
-                  },
-                  childCount: cards.length,
-                ),
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final card = cards[index];
+                  return FeaturedCard(
+                    cardId: card.id,
+                    title: card.title,
+                    coverImageUrl: card.coverImageUrl,
+                    frontMessage: card.defaultFrontMessage,
+                    insideMessage: card.defaultInsideMessage,
+                    cardColor: card.colorValue != null
+                        ? Color(card.colorValue!)
+                        : AppColors.card1,
+                  );
+                }, childCount: cards.length),
               );
             },
           ),
         ),
-        SliverToBoxAdapter(
-          child: SizedBox(height: 40.h),
-        ),
+        SliverToBoxAdapter(child: SizedBox(height: 40.h)),
       ],
     );
 

@@ -16,9 +16,11 @@ import '../providers/events_provider.dart';
 import 'custom_date_picker_dialog.dart';
 
 class AddEventBottomSheet extends HookConsumerWidget {
-  const AddEventBottomSheet({super.key});
+  final EventEntity? eventToEdit;
+  
+  const AddEventBottomSheet({super.key, this.eventToEdit});
 
-  static void show(BuildContext context) {
+  static void show(BuildContext context, {EventEntity? eventToEdit}) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -30,7 +32,7 @@ class AddEventBottomSheet extends HookConsumerWidget {
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
-        child: const AddEventBottomSheet(),
+        child: AddEventBottomSheet(eventToEdit: eventToEdit),
       ),
     );
   }
@@ -39,11 +41,16 @@ class AddEventBottomSheet extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final texts = AppLocalizations.of(context)!;
 
-    final titleController = useTextEditingController();
-    final dateController = useTextEditingController();
-    final reminderController = useTextEditingController();
-    final selectedDateState = useState<DateTime?>(null);
+    final titleController = useTextEditingController(text: eventToEdit?.title ?? '');
+    final dateController = useTextEditingController(
+      text: eventToEdit != null
+          ? DateFormat('MMM dd, yyyy').format(eventToEdit!.date).toUpperCase()
+          : '',
+    );
+    final reminderController = useTextEditingController(text: eventToEdit?.reminder ?? '');
+    final selectedDateState = useState<DateTime?>(eventToEdit?.date);
     final formKey = useMemoized(() => GlobalKey<FormState>());
+    final hasAttemptedSubmit = useState(false);
 
     return SafeArea(
       child: Form(
@@ -64,7 +71,7 @@ class AddEventBottomSheet extends HookConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            texts.addReminderTitle,
+                            eventToEdit != null ? 'Edit Reminder' : texts.addReminderTitle,
                             style: AppTextStyles.colitez400Italic24(),
                           ),
                           SizedBox(height: 4.h),
@@ -116,54 +123,61 @@ class AddEventBottomSheet extends HookConsumerWidget {
                       ),
                       child: PopupMenuButton<String>(
                         initialValue: reminderController.text,
-                      onSelected: (val) => reminderController.text = val,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      color: Colors.white,
-                      offset: Offset(MediaQuery.of(context).size.width, 44.h),
-                      itemBuilder: (context) {
-                        final itemStyle = AppTextStyles.roboto400Regular13(
-                          color: Colors.black,
-                        );
-                        return [
-                          PopupMenuItem(
-                            value: "3 Days Before",
-                            height: 32.h,
-                            child: Text("3 Days Before", style: itemStyle),
-                          ),
-                          PopupMenuItem(
-                            value: "A Week Before",
-                            height: 32.h,
-                            child: Text("A Week Before", style: itemStyle),
-                          ),
-                          PopupMenuItem(
-                            value: "One Day Before",
-                            height: 32.h,
-                            child: Text("One Day Before", style: itemStyle),
-                          ),
-                        ];
-                      },
-                      child: AbsorbPointer(
-                        child: AppTextField(
-                          labelText: texts.eventReminderLabel,
-                          hintText: texts.eventReminderHint,
-                          controller: reminderController,
-                          readOnly: true,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please select a reminder';
-                            }
-                            return null;
-                          },
-                          suffixIcon: Icon(
-                            Icons.arrow_drop_down,
+                        onSelected: (val) {
+                          debugPrint('Reminder selected: $val');
+                          reminderController.text = val;
+                          if (hasAttemptedSubmit.value) {
+                            debugPrint('Re-validating form after Reminder selection...');
+                            formKey.currentState?.validate();
+                          }
+                        },
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        color: Colors.white,
+                        offset: Offset(MediaQuery.of(context).size.width, 44.h),
+                        itemBuilder: (context) {
+                          final itemStyle = AppTextStyles.roboto400Regular13(
                             color: Colors.black,
-                            size: 24.w,
+                          );
+                          return [
+                            PopupMenuItem(
+                              value: "3 Days Before",
+                              height: 32.h,
+                              child: Text("3 Days Before", style: itemStyle),
+                            ),
+                            PopupMenuItem(
+                              value: "A Week Before",
+                              height: 32.h,
+                              child: Text("A Week Before", style: itemStyle),
+                            ),
+                            PopupMenuItem(
+                              value: "One Day Before",
+                              height: 32.h,
+                              child: Text("One Day Before", style: itemStyle),
+                            ),
+                          ];
+                        },
+                        child: AbsorbPointer(
+                          child: AppTextField(
+                            labelText: texts.eventReminderLabel,
+                            hintText: texts.eventReminderHint,
+                            controller: reminderController,
+                            readOnly: true,
+                            validator: (_) {
+                              if (reminderController.text.isEmpty) {
+                                return 'Please select a reminder';
+                              }
+                              return null;
+                            },
+                            suffixIcon: Icon(
+                              Icons.arrow_drop_down,
+                              color: Colors.black,
+                              size: 24.w,
+                            ),
                           ),
                         ),
                       ),
-                    ),
                     ),
                     SizedBox(height: 24.h),
 
@@ -181,6 +195,11 @@ class AddEventBottomSheet extends HookConsumerWidget {
                           dateController.text = DateFormat(
                             'MMM dd, yyyy',
                           ).format(selectedDate).toUpperCase();
+                          debugPrint('Date selected: ${dateController.text}');
+                          if (hasAttemptedSubmit.value) {
+                            debugPrint('Re-validating form after Date selection...');
+                            formKey.currentState?.validate();
+                          }
                         }
                       },
                       behavior: HitTestBehavior.opaque,
@@ -190,9 +209,8 @@ class AddEventBottomSheet extends HookConsumerWidget {
                           labelText: texts.eventDateLabel,
                           hintText: texts.eventDateHint,
                           readOnly: true,
-                          validator: (value) {
-                            if (value == null ||
-                                value.isEmpty ||
+                          validator: (_) {
+                            if (dateController.text.isEmpty ||
                                 selectedDateState.value == null) {
                               return 'Please select a date';
                             }
@@ -214,13 +232,16 @@ class AddEventBottomSheet extends HookConsumerWidget {
                     PrimaryButton(
                       text: texts.saveReminder,
                       onPressed: () async {
+                        debugPrint('Save Reminder clicked. Attempting form validation.');
+                        hasAttemptedSubmit.value = true;
                         if (formKey.currentState?.validate() ?? false) {
+                          debugPrint('Form validation passed. Saving event...');
                           try {
                             await ref
                                 .read(eventsProvider.notifier)
                                 .addEvent(
                                   EventEntity(
-                                    id: -1,
+                                    id: eventToEdit?.id ?? -1,
                                     title: titleController.text,
                                     date: selectedDateState.value!,
                                     reminder: reminderController.text,
@@ -238,6 +259,8 @@ class AddEventBottomSheet extends HookConsumerWidget {
                               );
                             }
                           }
+                        } else {
+                          debugPrint('Form validation failed. Showing inline errors.');
                         }
                       },
                     ),

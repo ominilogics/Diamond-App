@@ -10,10 +10,9 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
 
   @override
   Stream<List<NotificationEntity>> watchNotifications() {
-    return (_db.select(_db.notificationsTable)
-          ..orderBy([
-            (t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc)
-          ]))
+    return (_db.select(_db.notificationsTable)..orderBy([
+          (t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc),
+        ]))
         .watch()
         .map((rows) => rows.map((row) => _mapToEntity(row)).toList());
   }
@@ -21,9 +20,9 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
   @override
   Future<void> syncNotifications() async {
     // In a real app, you would fetch from Supabase here.
-    // For now, we will just insert some initial notifications if the table is empty 
+    // For now, we will just insert some initial notifications if the table is empty
     // to simulate the "sync" from the server.
-    
+
     final count = await _db.select(_db.notificationsTable).get();
     if (count.isEmpty) {
       final now = DateTime.now();
@@ -58,7 +57,7 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
   Future<void> markAsRead(int id) async {
     await (_db.update(_db.notificationsTable)..where((t) => t.id.equals(id)))
         .write(const NotificationsTableCompanion(isRead: Value(true)));
-    
+
     // Here you would also update Supabase in the background
   }
 

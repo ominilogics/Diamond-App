@@ -7,6 +7,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:daimond/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:daimond/features/payments/presentation/providers/payment_controller.dart';
+import 'package:daimond/features/payments/presentation/providers/payment_providers.dart';
 
 import '../../../../core/routing/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -26,16 +28,26 @@ class SettingsScreen extends ConsumerWidget {
     final user = Supabase.instance.client.auth.currentUser;
     final bool isLoggedIn = user != null;
 
-    return Column(
-      children: [
-        SizedBox(height: 12.h),
-        AppBar1(title: texts.navSettings),
-        SizedBox(height: 24.h),
-        Expanded(
-          child: isLoggedIn
-              ? _buildLoggedInContent(context, texts, ref)
-              : _buildLoggedOutContent(context, texts),
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Column(
+            children: [
+              SizedBox(height: 12.h),
+              AppBar1(title: texts.navSettings),
+              SizedBox(height: 24.h),
+            ],
+          ),
         ),
+        if (isLoggedIn)
+          SliverToBoxAdapter(
+            child: _buildLoggedInContent(context, texts, ref),
+          )
+        else
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: _buildLoggedOutContent(context, texts),
+          ),
       ],
     );
   }
@@ -82,12 +94,12 @@ class SettingsScreen extends ConsumerWidget {
             user?.userMetadata?['name'] as String? ??
             texts.profileName;
         final initial = rawName.isNotEmpty ? rawName[0].toUpperCase() : 'U';
-        final avatarUrl = user?.userMetadata?['avatar_url'] as String? ??
-                          user?.userMetadata?['picture'] as String?;
+        final avatarUrl =
+            user?.userMetadata?['avatar_url'] as String? ??
+            user?.userMetadata?['picture'] as String?;
 
-        return SingleChildScrollView(
-          child: Column(
-            children: [
+        return Column(
+          children: [
               // Header Profile Container
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24.w),
@@ -126,15 +138,19 @@ class SettingsScreen extends ConsumerWidget {
                                     width: 57.w,
                                     height: 57.w,
                                     fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) => Center(
-                                      child: Text(
-                                        initial,
-                                        style: AppTextStyles.roboto400Regular20(
-                                          color: const Color(0xFF000000),
-                                          fontSize: 24.sp,
+                                    errorBuilder:
+                                        (context, error, stackTrace) => Center(
+                                          child: Text(
+                                            initial,
+                                            style:
+                                                AppTextStyles.roboto400Regular20(
+                                                  color: const Color(
+                                                    0xFF000000,
+                                                  ),
+                                                  fontSize: 24.sp,
+                                                ),
+                                          ),
                                         ),
-                                      ),
-                                    ),
                                   ),
                                 )
                               : Center(
@@ -213,6 +229,13 @@ class SettingsScreen extends ConsumerWidget {
                         texts.subscriptions,
                         onTap: () =>
                             context.pushNamed(AppRoute.subscription.name),
+                      ),
+                      _buildDivider(),
+                      _buildPreferenceItem(
+                        texts.manageSubscriptions,
+                        onTap: () {
+                          ref.read(paymentControllerProvider.notifier).manageSubscriptions(context);
+                        },
                       ),
                       _buildDivider(),
                       _buildPreferenceItem(
@@ -304,7 +327,6 @@ class SettingsScreen extends ConsumerWidget {
               ),
               SizedBox(height: 40.h),
             ],
-          ),
         );
       },
     );

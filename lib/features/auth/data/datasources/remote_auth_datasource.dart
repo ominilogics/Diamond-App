@@ -3,7 +3,12 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 abstract class RemoteAuthDataSource {
   Future<void> signIn(String email, String password);
-  Future<void> signUp(String email, String password, String fullName, {String? dateOfBirth});
+  Future<void> signUp(
+    String email,
+    String password,
+    String fullName, {
+    String? dateOfBirth,
+  });
   Future<void> resetPassword(String email);
   Future<void> signOut();
   Future<void> signInWithGoogle();
@@ -24,7 +29,12 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
   }
 
   @override
-  Future<void> signUp(String email, String password, String fullName, {String? dateOfBirth}) async {
+  Future<void> signUp(
+    String email,
+    String password,
+    String fullName, {
+    String? dateOfBirth,
+  }) async {
     final data = {'custom_name': fullName, 'full_name': fullName};
     if (dateOfBirth != null) {
       data['date_of_birth'] = dateOfBirth;

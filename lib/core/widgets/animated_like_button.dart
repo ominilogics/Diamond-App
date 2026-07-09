@@ -6,12 +6,14 @@ class AnimatedLikeButton extends StatefulWidget {
   final bool isLiked;
   final VoidCallback onTap;
   final double size;
+  final EdgeInsetsGeometry? padding;
 
   const AnimatedLikeButton({
     super.key,
     required this.isLiked,
     required this.onTap,
     this.size = 24.0,
+    this.padding,
   });
 
   @override
@@ -76,12 +78,15 @@ class _AnimatedLikeButtonState extends State<AnimatedLikeButton>
       behavior: HitTestBehavior.opaque, // Ensures the entire box is clickable
       // ScaleTransition is heavily optimized. It runs directly on the GPU
       // and skips the Flutter layout/paint phases during animation ticks.
-      child: ScaleTransition(
-        scale: _scaleAnimation,
-        child: SvgPicture.asset(
-          widget.isLiked ? AppAssets.favouriteFilled : AppAssets.favourite,
-          width: widget.size,
-          height: widget.size,
+      child: Padding(
+        padding: widget.padding ?? EdgeInsets.zero,
+        child: ScaleTransition(
+          scale: _scaleAnimation,
+          child: SvgPicture.asset(
+            widget.isLiked ? AppAssets.favouriteFilled : AppAssets.favourite,
+            width: widget.size,
+            height: widget.size,
+          ),
         ),
       ),
     );

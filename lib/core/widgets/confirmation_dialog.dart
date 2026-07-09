@@ -28,10 +28,9 @@ class ConfirmationDialog extends StatelessWidget {
       backgroundColor: Colors.transparent,
       elevation: 0,
       insetPadding: EdgeInsets.symmetric(horizontal: 24.w),
-      child: Center(
-        child: Container(
-          width: 263.w,
-          padding: EdgeInsets.symmetric(vertical: 20.h),
+      child: Container(
+          width: 310.w,
+          padding: EdgeInsets.symmetric(vertical: 32.h, horizontal: 8.w),
           decoration: BoxDecoration(
             color: const Color(0xFFFFFFFF),
             borderRadius: BorderRadius.circular(20.r),
@@ -51,7 +50,7 @@ class ConfirmationDialog extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
               ),
-              SizedBox(height: 14.h),
+              SizedBox(height: 24.h),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 40.w),
                 child: Text(
@@ -60,9 +59,9 @@ class ConfirmationDialog extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
               ),
-              SizedBox(height: 24.h),
+              SizedBox(height: 32.h),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                padding: EdgeInsets.symmetric(horizontal: 30.w),
                 child: Row(
                   children: [
                     Expanded(
@@ -123,7 +122,6 @@ class ConfirmationDialog extends StatelessWidget {
             ],
           ),
         ),
-      ),
     );
   }
 }
