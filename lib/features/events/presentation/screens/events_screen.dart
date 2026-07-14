@@ -78,7 +78,7 @@ class EventsScreen extends HookConsumerWidget {
               elevation: 0,
               scrolledUnderElevation: 3.0,
               automaticallyImplyLeading: false,
-              toolbarHeight: 60.h,
+              toolbarHeight: 53.h,
               titleSpacing: 0,
               title: Column(
                 children: [
@@ -127,7 +127,7 @@ class EventsScreen extends HookConsumerWidget {
                   ),
                 ],
                 if (hasSystemEvents) ...[
-                  SizedBox(height: 40.h),
+                  SizedBox(height: hasCustomEvents ? 40.h : 24.h),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 24.w),
                     child: Text(

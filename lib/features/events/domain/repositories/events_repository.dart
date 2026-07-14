@@ -6,4 +6,5 @@ abstract class EventsRepository {
   Future<Either<Failure, List<EventEntity>>> getEvents();
   Future<Either<Failure, void>> saveEvent(EventEntity event);
   Future<Either<Failure, void>> deleteEvent(int id);
+  Future<Either<Failure, void>> syncEvents();
 }

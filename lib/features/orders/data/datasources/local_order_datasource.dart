@@ -7,11 +7,13 @@ class LocalOrderDataSource {
   LocalOrderDataSource(this.db);
 
   Future<List<OrderEntity>> getOrders() async {
-    final result = await db.select(db.ordersTable).get();
+    final result = await (db.select(db.ordersTable)..orderBy([(t) => OrderingTerm(expression: t.addedAt, mode: OrderingMode.desc)])).get();
     return result
         .map(
           (row) => OrderEntity(
             id: row.id,
+            remoteId: row.remoteId,
+            supabaseUserId: row.supabaseUserId,
             cardId: row.cardId,
             title: row.title,
             message: row.message,
@@ -26,6 +28,8 @@ class LocalOrderDataSource {
         .into(db.ordersTable)
         .insert(
           OrdersTableCompanion.insert(
+            remoteId: Value(order.remoteId),
+            supabaseUserId: Value(order.supabaseUserId),
             cardId: order.cardId,
             title: order.title,
             message: order.message,
@@ -36,5 +40,25 @@ class LocalOrderDataSource {
 
   Future<void> removeOrder(int id) async {
     await (db.delete(db.ordersTable)..where((tbl) => tbl.id.equals(id))).go();
+  }
+
+  Future<void> syncWithRemote(List<OrderEntity> remoteOrders) async {
+    await db.transaction(() async {
+      for (var order in remoteOrders) {
+        if (order.remoteId == null) continue;
+        final existing = await (db.select(db.ordersTable)..where((t) => t.remoteId.equals(order.remoteId!))).getSingleOrNull();
+        if (existing == null) {
+          await addOrder(order);
+        } else {
+          await (db.update(db.ordersTable)..where((t) => t.id.equals(existing.id))).write(
+            OrdersTableCompanion(
+              title: Value(order.title),
+              message: Value(order.message),
+              addedAt: Value(order.addedAt),
+            ),
+          );
+        }
+      }
+    });
   }
 }

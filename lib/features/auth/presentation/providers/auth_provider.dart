@@ -5,6 +5,7 @@ import '../../data/repositories/auth_repository_impl.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../../../features/payments/domain/repositories/payment_repository.dart';
 import '../../../../features/payments/presentation/providers/payment_providers.dart';
+import '../../../../features/payments/presentation/providers/payment_providers.dart';
 
 final supabaseClientProvider = Provider<SupabaseClient>((ref) {
   return Supabase.instance.client;
@@ -14,6 +15,10 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
   final client = ref.watch(supabaseClientProvider);
   final dataSource = RemoteAuthDataSourceImpl(client);
   return AuthRepositoryImpl(dataSource);
+});
+
+final authStateProvider = StreamProvider<AuthState>((ref) {
+  return Supabase.instance.client.auth.onAuthStateChange;
 });
 
 class AuthNotifier extends StateNotifier<bool> {

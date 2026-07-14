@@ -151,7 +151,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get favoritesTitle => 'Favorites';
 
   @override
-  String get noCardsHere => 'No Cards Here';
+  String get noCardsHere => 'No favorites yet.';
 
   @override
   String get navSettings => 'Settings';
@@ -234,13 +234,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get termsAndConditions => 'Terms and Conditions';
 
   @override
+  String get legalAndPrivacy => 'Legal & Privacy';
+
+  @override
   String get logout => 'Logout';
 
   @override
-  String get profileInitial => 'S';
+  String get profileInitial => 'A';
 
   @override
-  String get profileName => 'Samama Hussain';
+  String get profileName => 'Anonymous';
 
   @override
   String get profileEmail => 'samamahussain23@gmail.com';
@@ -268,7 +271,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get saveChanges => 'Save Changes';
 
   @override
-  String get loginPrompt => 'Please login to access features!';
+  String get loginPrompt => 'Log in to unlock your settings.';
 
   @override
   String get loginAction => 'Login';
@@ -283,7 +286,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get upcomingOccasions => 'Upcoming Occasions';
 
   @override
-  String get noEventsHere => 'No Events Here';
+  String get noEventsHere => 'No upcoming events';
 
   @override
   String get addBtn => '+ ADD';

@@ -40,6 +40,7 @@ class SubscriptionScreen extends HookConsumerWidget {
 
     final hasStandard = standardProductId != null && activeSubscriptions.contains(standardProductId);
     final hasPro = proProductId != null && activeSubscriptions.contains(proProductId);
+    final isSubscribed = hasStandard || hasPro;
 
     useEffect(() {
       if (hasPro) {
@@ -168,6 +169,23 @@ class SubscriptionScreen extends HookConsumerWidget {
                       },
                     ),
                   ),
+                  if (isSubscribed)
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 16.h),
+                      child: GestureDetector(
+                        onTap: () {
+                          ref.read(paymentControllerProvider.notifier).manageSubscriptions(context);
+                        },
+                        child: Text(
+                          texts.manageSubscriptions,
+                          style: AppTextStyles.roboto500Medium14().copyWith(
+                            color: const Color(0xFF3B82F6), // Premium accent color for action
+                            decoration: TextDecoration.underline,
+                            decorationColor: const Color(0xFF3B82F6),
+                          ),
+                        ),
+                      ),
+                    ),
                   Padding(
                     padding: EdgeInsets.only(bottom: 16.h),
                     child: Text(

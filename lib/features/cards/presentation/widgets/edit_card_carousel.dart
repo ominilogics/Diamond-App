@@ -28,20 +28,20 @@ class EditCardCarousel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          width: double.infinity,
-          height: 453.h,
-          decoration: BoxDecoration(
-            color: const Color(0xFFFFFFFF),
-            borderRadius: BorderRadius.circular(20.r),
-            border: Border.all(
-              color: const Color(0xFF000000),
-              width: 0.5.w,
-            ),
-          ),
-          child: PageView(
+    return Container(
+      width: double.infinity,
+      height: 453.h,
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFFFFF),
+        borderRadius: BorderRadius.circular(20.r),
+        border: Border.all(
+          color: const Color(0xFF000000),
+          width: 0.5.w,
+        ),
+      ),
+      child: Stack(
+        children: [
+          PageView(
             controller: pageController,
             onPageChanged: onPageChanged,
             children: [
@@ -157,30 +157,33 @@ class EditCardCarousel extends StatelessWidget {
               ),
             ],
           ),
-        ),
-        SizedBox(height: 16.h),
-        // Carousel Indicator
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(3, (index) {
-            final isActive = currentPage == index;
-            return AnimatedOpacity(
-              duration: const Duration(milliseconds: 300),
-              opacity: isActive ? 1.0 : 0.3,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                margin: EdgeInsets.symmetric(horizontal: 4.w),
-                width: isActive ? 24.w : 8.w,
-                height: 8.h,
-                decoration: BoxDecoration(
-                  gradient: AppColors.primaryButtonGradient,
-                  borderRadius: BorderRadius.circular(4.r),
-                ),
-              ),
-            );
-          }),
-        ),
-      ],
+          Positioned(
+            bottom: 16.h,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(3, (index) {
+                final isActive = currentPage == index;
+                return AnimatedOpacity(
+                  duration: const Duration(milliseconds: 300),
+                  opacity: isActive ? 1.0 : 0.3,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    margin: EdgeInsets.symmetric(horizontal: 4.w),
+                    width: isActive ? 24.w : 8.w,
+                    height: 8.h,
+                    decoration: BoxDecoration(
+                      gradient: AppColors.primaryButtonGradient,
+                      borderRadius: BorderRadius.circular(4.r),
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

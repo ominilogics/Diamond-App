@@ -47,7 +47,7 @@ class PrimaryButton extends StatelessWidget {
                     )
                   : Text(
                       text,
-                      style: AppTextStyles.colitez400Italic22(),
+                      style: AppTextStyles.colitez400Italic21(),
                       textAlign: TextAlign.center,
                     ),
             ),

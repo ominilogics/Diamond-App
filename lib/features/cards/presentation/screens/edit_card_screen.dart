@@ -197,6 +197,7 @@ class EditCardScreen extends HookConsumerWidget {
                               maxWidth: 197.w, // 255.w - 29.w - 29.w
                               maxHeight: 81.h, // 358.h - 253.h - 24.h
                               isUpperCase: true,
+                              textScaler: MediaQuery.textScalerOf(context),
                             ),
                           ],
                         ),
@@ -219,6 +220,7 @@ class EditCardScreen extends HookConsumerWidget {
                               maxWidth: 215.w, // 255.w - 20.w - 20.w
                               maxHeight: 318.h, // 358.h - 20.h - 20.h
                               isUpperCase: true,
+                              textScaler: MediaQuery.textScalerOf(context),
                             ),
                           ],
                         ),
@@ -509,11 +511,13 @@ class PhysicalBoundsTextInputFormatter extends TextInputFormatter {
   final double maxWidth;
   final double maxHeight;
   final bool isUpperCase;
+  final TextScaler textScaler;
 
   PhysicalBoundsTextInputFormatter({
     required this.style,
     required this.maxWidth,
     required this.maxHeight,
+    required this.textScaler,
     this.isUpperCase = false,
   });
 
@@ -532,6 +536,7 @@ class PhysicalBoundsTextInputFormatter extends TextInputFormatter {
       text: span,
       textAlign: TextAlign.center,
       textDirection: TextDirection.ltr,
+      textScaler: textScaler,
     );
     tp.layout(maxWidth: maxWidth);
 

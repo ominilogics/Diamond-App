@@ -8,6 +8,10 @@ class AppAssets {
 
   static const String gatta = '$_picturesPath/gatta.svg';
   static const String backSide = '$_picturesPath/back_side.jpg';
+  static const String onboarding1 = '$_picturesPath/onboarding_1.png';
+  static const String onboarding2 = '$_picturesPath/onboarding_2.png';
+  static const String onboarding3 = '$_picturesPath/onboarding_3.png';
+  static const String onboarding4 = '$_picturesPath/onboarding_4.png';
 
   // ---------------------------------------------------------------------------
   // Icons

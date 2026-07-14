@@ -39,15 +39,32 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
     if (dateOfBirth != null) {
       data['date_of_birth'] = dateOfBirth;
     }
-    final response = await supabaseClient.auth.signUp(
-      email: email,
-      password: password,
-      data: data,
-    );
 
-    // Auto-confirm might auto-login the user, we want them to explicitly log in.
-    if (response.session != null) {
-      await supabaseClient.auth.signOut();
+    final currentUser = supabaseClient.auth.currentUser;
+    if (currentUser != null && (currentUser.isAnonymous ?? false)) {
+      // Option B: Cloud Guest - Upgrade anonymous session to permanent email session
+      final response = await supabaseClient.auth.updateUser(
+        UserAttributes(
+          email: email,
+          password: password,
+          data: data,
+        ),
+      );
+      if (response.user == null) {
+        throw const AuthException('Failed to convert anonymous account.');
+      }
+    } else {
+      // Standard new user sign up
+      final response = await supabaseClient.auth.signUp(
+        email: email,
+        password: password,
+        data: data,
+      );
+
+      // Auto-confirm might auto-login the user, we want them to explicitly log in.
+      if (response.session != null) {
+        await supabaseClient.auth.signOut();
+      }
     }
   }
 
@@ -89,11 +106,24 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
       throw const AuthException('No ID Token found.');
     }
 
-    await supabaseClient.auth.signInWithIdToken(
-      provider: OAuthProvider.google,
-      idToken: idToken,
-      accessToken: accessToken,
-    );
+    final currentUser = supabaseClient.auth.currentUser;
+    if (currentUser != null && (currentUser.isAnonymous ?? false)) {
+      // Option B: Cloud Guest - Link Google to anonymous session
+      // In Supabase Auth v2+, calling signInWithIdToken while signed in anonymously 
+      // automatically links the identity if Manual Linking is enabled in the Dashboard.
+      await supabaseClient.auth.signInWithIdToken(
+        provider: OAuthProvider.google,
+        idToken: idToken,
+        accessToken: accessToken,
+      );
+    } else {
+      // Standard Google sign in
+      await supabaseClient.auth.signInWithIdToken(
+        provider: OAuthProvider.google,
+        idToken: idToken,
+        accessToken: accessToken,
+      );
+    }
   }
 
   @override

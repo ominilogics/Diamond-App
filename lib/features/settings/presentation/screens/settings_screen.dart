@@ -25,8 +25,9 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final texts = AppLocalizations.of(context)!;
-    final user = Supabase.instance.client.auth.currentUser;
-    final bool isLoggedIn = user != null;
+    final authState = ref.watch(authStateProvider);
+    final user = authState.value?.session?.user ?? Supabase.instance.client.auth.currentUser;
+    final bool isLoggedIn = user != null && !(user.isAnonymous ?? false);
 
     return CustomScrollView(
       slivers: [
@@ -70,9 +71,6 @@ class SettingsScreen extends ConsumerWidget {
               context.pushNamed(AppRoute.login.name);
             },
           ),
-          SizedBox(
-            height: 80.h,
-          ), // Shift up slightly to visually balance above bottom nav
         ],
       ),
     );
@@ -232,13 +230,6 @@ class SettingsScreen extends ConsumerWidget {
                       ),
                       _buildDivider(),
                       _buildPreferenceItem(
-                        texts.manageSubscriptions,
-                        onTap: () {
-                          ref.read(paymentControllerProvider.notifier).manageSubscriptions(context);
-                        },
-                      ),
-                      _buildDivider(),
-                      _buildPreferenceItem(
                         texts.orderHistory,
                         onTap: () =>
                             context.pushNamed(AppRoute.orderHistory.name),
@@ -264,15 +255,51 @@ class SettingsScreen extends ConsumerWidget {
                       ),
                       _buildDivider(),
                       _buildPreferenceItem(
-                        texts.privacyPolicy,
-                        onTap: () =>
-                            context.pushNamed(AppRoute.privacyPolicy.name),
-                      ),
-                      _buildDivider(),
-                      _buildPreferenceItem(
-                        texts.termsAndConditions,
-                        onTap: () =>
-                            context.pushNamed(AppRoute.termsAndConditions.name),
+                        texts.legalAndPrivacy,
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            backgroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+                            ),
+                            builder: (context) => SafeArea(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  SizedBox(height: 16.h),
+                                  Container(
+                                    width: 40.w,
+                                    height: 4.h,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[300],
+                                      borderRadius: BorderRadius.circular(2.r),
+                                    ),
+                                  ),
+                                  SizedBox(height: 16.h),
+                                  ListTile(
+                                    title: Text(texts.privacyPolicy, style: AppTextStyles.roboto400Regular16()),
+                                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      context.pushNamed(AppRoute.privacyPolicy.name);
+                                    },
+                                  ),
+                                  _buildDivider(),
+                                  ListTile(
+                                    title: Text(texts.termsAndConditions, style: AppTextStyles.roboto400Regular16()),
+                                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      context.pushNamed(AppRoute.termsAndConditions.name);
+                                    },
+                                  ),
+                                  SizedBox(height: 16.h),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
                       ),
                       _buildDivider(),
                       _buildPreferenceItem(

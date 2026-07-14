@@ -1,4 +1,5 @@
 enum AppRoute {
+  onboarding('/onboarding'),
   login('/login'),
   signup('signup'),
   forgotPassword('forgot-password'),

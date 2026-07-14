@@ -101,6 +101,9 @@ class AppTextField extends StatelessWidget {
                     state.didChange(val);
                     onChanged?.call(val);
                   },
+                  onTapOutside: (event) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
                   textAlignVertical: TextAlignVertical.center,
                   decoration: InputDecoration(
                     hintText: hintText,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:daimond/l10n/app_localizations.dart';
 import 'package:collection/collection.dart';
 
@@ -76,10 +77,14 @@ class CategoriesSection extends ConsumerWidget {
               const Center(child: Text('Error loading categories')),
           data: (categories) {
             if (categories.isEmpty) {
-              return Center(
-                child: Text(
-                  'No categories available',
-                  style: AppTextStyles.roboto300Light13(),
+              return Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                child: Row(
+                  children: List.generate(
+                    4,
+                    (index) =>
+                        const Expanded(child: Center(child: CategoryShimmer())),
+                  ),
                 ),
               );
             }
@@ -137,8 +142,21 @@ class _CategoryItem extends ConsumerWidget {
                 alignment: Alignment.topCenter,
                 child: Padding(
                   padding: EdgeInsets.only(top: 16.h),
-                  child: hasImage
-                      ? ClipRRect(
+                  child: firstCardAsync.isLoading
+                      ? Shimmer.fromColors(
+                          baseColor: Colors.grey[300]!,
+                          highlightColor: Colors.grey[100]!,
+                          child: Container(
+                            width: 44.w,
+                            height: 67.h,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(4.r),
+                            ),
+                          ),
+                        )
+                      : hasImage
+                          ? ClipRRect(
                           borderRadius: BorderRadius.circular(
                             4.r,
                           ), // Adds subtle rounding to the tiny card
@@ -152,6 +170,25 @@ class _CategoryItem extends ConsumerWidget {
                                 fit: BoxFit.cover,
                                 fadeInDuration: Duration.zero,
                                 fadeOutDuration: Duration.zero,
+                                placeholder: (context, url) => Shimmer.fromColors(
+                                  baseColor: Colors.grey[300]!,
+                                  highlightColor: Colors.grey[100]!,
+                                  child: Container(
+                                    width: 44.w,
+                                    height: 67.h,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) => SvgPicture.asset(
+                                  AppAssets.gatta,
+                                  width: 44.w,
+                                  height: 67.h,
+                                  fit: BoxFit.fill,
+                                  colorFilter: const ColorFilter.mode(
+                                    AppColors.card1,
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
                               ),
                               if (firstCard.defaultFrontMessage != null &&
                                   firstCard.defaultFrontMessage!.isNotEmpty)

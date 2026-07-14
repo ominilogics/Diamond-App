@@ -163,7 +163,7 @@ class LoginScreen extends HookConsumerWidget {
                                 ),
                                 child: Text(
                                   texts.forgotPasswordTitle,
-                                  style: AppTextStyles.roboto400Regular14(),
+                                  style: AppTextStyles.roboto300Light13(),
                                 ),
                               ),
                             ),

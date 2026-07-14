@@ -373,7 +373,7 @@ abstract class AppLocalizations {
   /// No description provided for @noCardsHere.
   ///
   /// In en, this message translates to:
-  /// **'No Cards Here'**
+  /// **'No favorites yet.'**
   String get noCardsHere;
 
   /// No description provided for @navSettings.
@@ -526,6 +526,12 @@ abstract class AppLocalizations {
   /// **'Terms and Conditions'**
   String get termsAndConditions;
 
+  /// No description provided for @legalAndPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Legal & Privacy'**
+  String get legalAndPrivacy;
+
   /// No description provided for @logout.
   ///
   /// In en, this message translates to:
@@ -535,13 +541,13 @@ abstract class AppLocalizations {
   /// No description provided for @profileInitial.
   ///
   /// In en, this message translates to:
-  /// **'S'**
+  /// **'A'**
   String get profileInitial;
 
   /// No description provided for @profileName.
   ///
   /// In en, this message translates to:
-  /// **'Samama Hussain'**
+  /// **'Anonymous'**
   String get profileName;
 
   /// No description provided for @profileEmail.
@@ -595,7 +601,7 @@ abstract class AppLocalizations {
   /// No description provided for @loginPrompt.
   ///
   /// In en, this message translates to:
-  /// **'Please login to access features!'**
+  /// **'Log in to unlock your settings.'**
   String get loginPrompt;
 
   /// No description provided for @loginAction.
@@ -625,7 +631,7 @@ abstract class AppLocalizations {
   /// No description provided for @noEventsHere.
   ///
   /// In en, this message translates to:
-  /// **'No Events Here'**
+  /// **'No upcoming events'**
   String get noEventsHere;
 
   /// No description provided for @addBtn.

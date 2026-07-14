@@ -1,20 +1,39 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/providers/database_provider.dart';
 import '../../data/datasources/local_events_datasource.dart';
+import '../../data/datasources/remote_events_datasource.dart';
 import '../../data/repositories/events_repository_impl.dart';
 import '../../domain/entities/event_entity.dart';
 import '../../domain/repositories/events_repository.dart';
+import '../../../../core/services/notification_service.dart';
 
 final eventsRepositoryProvider = Provider<EventsRepository>((ref) {
   final db = ref.watch(appDatabaseProvider);
   final dataSource = LocalEventsDataSource(db);
-  return EventsRepositoryImpl(dataSource);
+  final remoteDataSource = RemoteEventsDataSourceImpl(Supabase.instance.client);
+  final notificationService = ref.watch(notificationServiceProvider);
+  return EventsRepositoryImpl(dataSource, remoteDataSource, notificationService);
 });
 
 class EventsNotifier extends AsyncNotifier<List<EventEntity>> {
   @override
   Future<List<EventEntity>> build() async {
-    final repository = ref.watch(eventsRepositoryProvider);
+    _syncAndRefresh();
+    return _fetchEvents();
+  }
+
+  Future<void> _syncAndRefresh() async {
+    final repository = ref.read(eventsRepositoryProvider);
+    final result = await repository.syncEvents();
+    if (!result.isLeft) {
+      final updatedLocal = await _fetchEvents();
+      state = AsyncValue.data(updatedLocal);
+    }
+  }
+
+  Future<List<EventEntity>> _fetchEvents() async {
+    final repository = ref.read(eventsRepositoryProvider);
     final result = await repository.getEvents();
     return result.fold(
       (failure) => throw Exception(failure.message),
@@ -27,9 +46,12 @@ class EventsNotifier extends AsyncNotifier<List<EventEntity>> {
     final result = await repository.saveEvent(event);
     result.fold(
       (failure) => throw Exception(failure.message),
-      (_) => ref.invalidateSelf(),
+      (_) async {
+        // Fetch strictly from local database to reflect the save instantly without racing the server
+        final updatedLocal = await _fetchEvents();
+        state = AsyncValue.data(updatedLocal);
+      },
     );
-    await future;
   }
 
   Future<void> deleteEvent(int id) async {
@@ -37,9 +59,12 @@ class EventsNotifier extends AsyncNotifier<List<EventEntity>> {
     final result = await repository.deleteEvent(id);
     result.fold(
       (failure) => throw Exception(failure.message),
-      (_) => ref.invalidateSelf(),
+      (_) {
+        // Optimistically remove from state without triggering a full server sync
+        final currentEvents = state.value ?? [];
+        state = AsyncValue.data(currentEvents.where((e) => e.id != id).toList());
+      },
     );
-    await future;
   }
 }
 

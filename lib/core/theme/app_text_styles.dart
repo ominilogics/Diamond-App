@@ -108,6 +108,27 @@ class AppTextStyles {
     );
   }
 
+  static TextStyle colitez400Italic21({
+    Color? color,
+    double? fontSize,
+    FontWeight? fontWeight,
+    FontStyle? fontStyle,
+    double? height,
+    double? letterSpacing,
+    TextLeadingDistribution? leadingDistribution,
+  }) {
+    return TextStyle(
+      fontFamily: 'ColitezSerif',
+      fontWeight: fontWeight ?? FontWeight.w400,
+      fontStyle: fontStyle ?? FontStyle.italic,
+      fontSize: fontSize ?? 21.0,
+      height: height ?? 1.0,
+      letterSpacing: letterSpacing ?? 0.0,
+      color: color ?? const Color(0xFF000000),
+      leadingDistribution: leadingDistribution ?? TextLeadingDistribution.even,
+    );
+  }
+
   static TextStyle roboto400Regular13({
     Color? color,
     double? fontSize,

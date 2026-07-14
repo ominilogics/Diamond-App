@@ -5,6 +5,7 @@ abstract class LocalFavoritesDataSource {
   Future<List<FavoriteTableData>> getFavorites();
   Future<void> toggleFavorite(FavoritesTableCompanion favorite);
   Future<bool> isFavorite(String cardId);
+  Future<void> syncWithRemote(List<FavoritesTableCompanion> remoteFavorites);
 }
 
 class LocalFavoritesDataSourceImpl implements LocalFavoritesDataSource {
@@ -39,5 +40,17 @@ class LocalFavoritesDataSourceImpl implements LocalFavoritesDataSource {
       db.favoritesTable,
     )..where((t) => t.cardId.equals(cardId))).getSingleOrNull();
     return existing != null;
+  }
+
+  @override
+  Future<void> syncWithRemote(List<FavoritesTableCompanion> remoteFavorites) async {
+    await db.transaction(() async {
+      for (final remoteFav in remoteFavorites) {
+        await db.into(db.favoritesTable).insert(
+          remoteFav,
+          mode: InsertMode.insertOrReplace,
+        );
+      }
+    });
   }
 }

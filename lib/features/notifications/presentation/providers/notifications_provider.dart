@@ -5,11 +5,15 @@ import '../../domain/entities/notification_entity.dart';
 import '../../domain/repositories/notifications_repository.dart';
 import '../../data/repositories/notifications_repository_impl.dart';
 
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../data/datasources/remote_notifications_datasource.dart';
+
 final notificationsRepositoryProvider = Provider<NotificationsRepository>((
   ref,
 ) {
   final db = ref.watch(appDatabaseProvider);
-  return NotificationsRepositoryImpl(db);
+  final remote = RemoteNotificationsDataSourceImpl(Supabase.instance.client);
+  return NotificationsRepositoryImpl(db, remote);
 });
 
 final notificationsStreamProvider = StreamProvider<List<NotificationEntity>>((
@@ -56,4 +60,12 @@ final groupedNotificationsProvider =
 final syncNotificationsProvider = FutureProvider<void>((ref) async {
   final repository = ref.watch(notificationsRepositoryProvider);
   await repository.syncNotifications();
+});
+
+final unreadNotificationsCountProvider = Provider<int>((ref) {
+  final notificationsAsync = ref.watch(notificationsStreamProvider);
+  return notificationsAsync.maybeWhen(
+    data: (notifications) => notifications.where((n) => !n.isRead).length,
+    orElse: () => 0,
+  );
 });

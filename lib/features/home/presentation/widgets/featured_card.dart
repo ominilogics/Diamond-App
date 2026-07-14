@@ -11,7 +11,6 @@ import '../../../../core/routing/app_routes.dart';
 import '../../../../features/favorites/domain/entities/favorite_entity.dart';
 import '../../../../features/favorites/presentation/providers/favorites_provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../../../../core/widgets/shimmers/card_shimmer.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../../core/utils/app_helpers.dart';
 
@@ -50,7 +49,7 @@ class FeaturedCard extends ConsumerWidget {
                 extra: {
                   'cardId': cardId,
                   'title': title,
-                  'cardColorValue': cardColor.value,
+                  'cardColorValue': cardColor.toARGB32(),
                   'coverImageUrl': coverImageUrl,
                   'frontMessage': frontMessage,
                   'initialMessage': insideMessage,
@@ -74,10 +73,7 @@ class FeaturedCard extends ConsumerWidget {
                     if (coverImageUrl != null && coverImageUrl!.isNotEmpty)
                       ClipRRect(
                         borderRadius: BorderRadius.circular(4.r),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            CachedNetworkImage(
+                        child: CachedNetworkImage(
                               imageUrl: coverImageUrl!,
                               width: 84.5.w,
                               height: 118.3.h,
@@ -103,11 +99,34 @@ class FeaturedCard extends ConsumerWidget {
                                 debugPrint(
                                   'Shimmer ended / Image loaded for card: $title',
                                 );
-                                return Image(
-                                  image: imageProvider,
-                                  width: 84.5.w,
-                                  height: 118.3.h,
-                                  fit: BoxFit.cover,
+                                return Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Image(
+                                      image: imageProvider,
+                                      width: 84.5.w,
+                                      height: 118.3.h,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    if (frontMessage != null && frontMessage!.isNotEmpty)
+                                      Positioned(
+                                        top: 83.h, // ~70% of 118.3.h height
+                                        left: 10.w,
+                                        right: 10.w,
+                                        child: Text(
+                                          frontMessage!.toUpperCase(),
+                                          textAlign: TextAlign.center,
+                                          maxLines: 3,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: AppTextStyles.bizudMincho(
+                                            fontSize: 6.sp,
+                                            color: Colors.white,
+                                            height: 1.2,
+                                            letterSpacing: -0.2,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
                                 );
                               },
                               errorWidget: (context, url, error) => SizedBox(
@@ -116,37 +135,39 @@ class FeaturedCard extends ConsumerWidget {
                                 child: const Icon(Icons.error),
                               ),
                             ),
-                            if (frontMessage != null &&
-                                frontMessage!.isNotEmpty)
-                              Positioned(
-                                top: 83.h, // ~70% of 118.3.h height
-                                left: 10.w,
-                                right: 10.w,
-                                child: Text(
-                                  frontMessage!.toUpperCase(),
-                                  textAlign: TextAlign.center,
-                                  maxLines: 3,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: AppTextStyles.bizudMincho(
-                                    fontSize: 6.sp,
-                                    color: Colors.white,
-                                    height: 1.2,
-                                    letterSpacing: -0.2,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
                       )
                     else
-                      SvgPicture.asset(
-                        AppAssets.gatta,
-                        width: 84.5.w,
-                        height: 118.3.h,
-                        colorFilter: ColorFilter.mode(
-                          cardColor,
-                          BlendMode.srcIn,
-                        ),
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          SvgPicture.asset(
+                            AppAssets.gatta,
+                            width: 84.5.w,
+                            height: 118.3.h,
+                            colorFilter: ColorFilter.mode(
+                              cardColor,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                          if (frontMessage != null && frontMessage!.isNotEmpty)
+                            Positioned(
+                              top: 83.h,
+                              left: 10.w,
+                              right: 10.w,
+                              child: Text(
+                                frontMessage!.toUpperCase(),
+                                textAlign: TextAlign.center,
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTextStyles.bizudMincho(
+                                  fontSize: 6.sp,
+                                  color: Colors.white,
+                                  height: 1.2,
+                                  letterSpacing: -0.2,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     SizedBox(height: 18.h),
                     Text(title, style: AppTextStyles.roboto400Regular14()),
@@ -184,7 +205,7 @@ class FeaturedCard extends ConsumerWidget {
                                     FavoriteEntity(
                                       cardId: cardId,
                                       title: title,
-                                      colorValue: cardColor.value,
+                                      colorValue: cardColor.toARGB32(),
                                       supabaseUserId: 'dummy_user_uid',
                                       favoritedAt: DateTime.now(),
                                     ),

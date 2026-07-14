@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:daimond/l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_text_styles.dart';
@@ -115,6 +116,31 @@ class NotificationsScreen extends HookConsumerWidget {
                                 title: item.title,
                                 description: item.description,
                                 time: _getTimeAgo(item.createdAt),
+                                onTap: () {
+                                  // Mark as read in background
+                                  if (item.id != null && !item.isRead) {
+                                    ref.read(notificationsRepositoryProvider).markAsRead(item.id!);
+                                  }
+                                  
+                                  // Simple NLP routing
+                                  String targetRoute = '';
+                                  final search = '${item.title.toLowerCase()} ${item.description.toLowerCase()}';
+                                  if (search.contains('event')) {
+                                    targetRoute = '/events';
+                                  } else if (search.contains('order') || search.contains('purchas') || search.contains('payment')) {
+                                    targetRoute = '/order-history';
+                                  } else if (search.contains('subscription') || search.contains('plan')) {
+                                    targetRoute = '/subscription';
+                                  } else {
+                                    // Default fallback
+                                    targetRoute = '/events'; 
+                                  }
+
+                                  final currentPath = GoRouter.of(context).routerDelegate.currentConfiguration.uri.path;
+                                  if (currentPath != targetRoute) {
+                                    context.push(targetRoute);
+                                  }
+                                },
                               ),
                             ),
                           ),

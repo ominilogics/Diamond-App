@@ -432,6 +432,28 @@ class $OrdersTableTable extends OrdersTable
       'PRIMARY KEY AUTOINCREMENT',
     ),
   );
+  static const VerificationMeta _remoteIdMeta = const VerificationMeta(
+    'remoteId',
+  );
+  @override
+  late final GeneratedColumn<String> remoteId = GeneratedColumn<String>(
+    'remote_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _supabaseUserIdMeta = const VerificationMeta(
+    'supabaseUserId',
+  );
+  @override
+  late final GeneratedColumn<String> supabaseUserId = GeneratedColumn<String>(
+    'supabase_user_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _cardIdMeta = const VerificationMeta('cardId');
   @override
   late final GeneratedColumn<String> cardId = GeneratedColumn<String>(
@@ -473,7 +495,15 @@ class $OrdersTableTable extends OrdersTable
     requiredDuringInsert: true,
   );
   @override
-  List<GeneratedColumn> get $columns => [id, cardId, title, message, addedAt];
+  List<GeneratedColumn> get $columns => [
+    id,
+    remoteId,
+    supabaseUserId,
+    cardId,
+    title,
+    message,
+    addedAt,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -488,6 +518,21 @@ class $OrdersTableTable extends OrdersTable
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('remote_id')) {
+      context.handle(
+        _remoteIdMeta,
+        remoteId.isAcceptableOrUnknown(data['remote_id']!, _remoteIdMeta),
+      );
+    }
+    if (data.containsKey('supabase_user_id')) {
+      context.handle(
+        _supabaseUserIdMeta,
+        supabaseUserId.isAcceptableOrUnknown(
+          data['supabase_user_id']!,
+          _supabaseUserIdMeta,
+        ),
+      );
     }
     if (data.containsKey('card_id')) {
       context.handle(
@@ -534,6 +579,14 @@ class $OrdersTableTable extends OrdersTable
         DriftSqlType.int,
         data['${effectivePrefix}id'],
       )!,
+      remoteId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}remote_id'],
+      ),
+      supabaseUserId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}supabase_user_id'],
+      ),
       cardId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}card_id'],
@@ -561,12 +614,16 @@ class $OrdersTableTable extends OrdersTable
 
 class OrderTableData extends DataClass implements Insertable<OrderTableData> {
   final int id;
+  final String? remoteId;
+  final String? supabaseUserId;
   final String cardId;
   final String title;
   final String message;
   final DateTime addedAt;
   const OrderTableData({
     required this.id,
+    this.remoteId,
+    this.supabaseUserId,
     required this.cardId,
     required this.title,
     required this.message,
@@ -576,6 +633,12 @@ class OrderTableData extends DataClass implements Insertable<OrderTableData> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
+    if (!nullToAbsent || remoteId != null) {
+      map['remote_id'] = Variable<String>(remoteId);
+    }
+    if (!nullToAbsent || supabaseUserId != null) {
+      map['supabase_user_id'] = Variable<String>(supabaseUserId);
+    }
     map['card_id'] = Variable<String>(cardId);
     map['title'] = Variable<String>(title);
     map['message'] = Variable<String>(message);
@@ -586,6 +649,12 @@ class OrderTableData extends DataClass implements Insertable<OrderTableData> {
   OrdersTableCompanion toCompanion(bool nullToAbsent) {
     return OrdersTableCompanion(
       id: Value(id),
+      remoteId: remoteId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remoteId),
+      supabaseUserId: supabaseUserId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(supabaseUserId),
       cardId: Value(cardId),
       title: Value(title),
       message: Value(message),
@@ -600,6 +669,8 @@ class OrderTableData extends DataClass implements Insertable<OrderTableData> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return OrderTableData(
       id: serializer.fromJson<int>(json['id']),
+      remoteId: serializer.fromJson<String?>(json['remoteId']),
+      supabaseUserId: serializer.fromJson<String?>(json['supabaseUserId']),
       cardId: serializer.fromJson<String>(json['cardId']),
       title: serializer.fromJson<String>(json['title']),
       message: serializer.fromJson<String>(json['message']),
@@ -611,6 +682,8 @@ class OrderTableData extends DataClass implements Insertable<OrderTableData> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
+      'remoteId': serializer.toJson<String?>(remoteId),
+      'supabaseUserId': serializer.toJson<String?>(supabaseUserId),
       'cardId': serializer.toJson<String>(cardId),
       'title': serializer.toJson<String>(title),
       'message': serializer.toJson<String>(message),
@@ -620,12 +693,18 @@ class OrderTableData extends DataClass implements Insertable<OrderTableData> {
 
   OrderTableData copyWith({
     int? id,
+    Value<String?> remoteId = const Value.absent(),
+    Value<String?> supabaseUserId = const Value.absent(),
     String? cardId,
     String? title,
     String? message,
     DateTime? addedAt,
   }) => OrderTableData(
     id: id ?? this.id,
+    remoteId: remoteId.present ? remoteId.value : this.remoteId,
+    supabaseUserId: supabaseUserId.present
+        ? supabaseUserId.value
+        : this.supabaseUserId,
     cardId: cardId ?? this.cardId,
     title: title ?? this.title,
     message: message ?? this.message,
@@ -634,6 +713,10 @@ class OrderTableData extends DataClass implements Insertable<OrderTableData> {
   OrderTableData copyWithCompanion(OrdersTableCompanion data) {
     return OrderTableData(
       id: data.id.present ? data.id.value : this.id,
+      remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
+      supabaseUserId: data.supabaseUserId.present
+          ? data.supabaseUserId.value
+          : this.supabaseUserId,
       cardId: data.cardId.present ? data.cardId.value : this.cardId,
       title: data.title.present ? data.title.value : this.title,
       message: data.message.present ? data.message.value : this.message,
@@ -645,6 +728,8 @@ class OrderTableData extends DataClass implements Insertable<OrderTableData> {
   String toString() {
     return (StringBuffer('OrderTableData(')
           ..write('id: $id, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('supabaseUserId: $supabaseUserId, ')
           ..write('cardId: $cardId, ')
           ..write('title: $title, ')
           ..write('message: $message, ')
@@ -654,12 +739,22 @@ class OrderTableData extends DataClass implements Insertable<OrderTableData> {
   }
 
   @override
-  int get hashCode => Object.hash(id, cardId, title, message, addedAt);
+  int get hashCode => Object.hash(
+    id,
+    remoteId,
+    supabaseUserId,
+    cardId,
+    title,
+    message,
+    addedAt,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is OrderTableData &&
           other.id == this.id &&
+          other.remoteId == this.remoteId &&
+          other.supabaseUserId == this.supabaseUserId &&
           other.cardId == this.cardId &&
           other.title == this.title &&
           other.message == this.message &&
@@ -668,12 +763,16 @@ class OrderTableData extends DataClass implements Insertable<OrderTableData> {
 
 class OrdersTableCompanion extends UpdateCompanion<OrderTableData> {
   final Value<int> id;
+  final Value<String?> remoteId;
+  final Value<String?> supabaseUserId;
   final Value<String> cardId;
   final Value<String> title;
   final Value<String> message;
   final Value<DateTime> addedAt;
   const OrdersTableCompanion({
     this.id = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.supabaseUserId = const Value.absent(),
     this.cardId = const Value.absent(),
     this.title = const Value.absent(),
     this.message = const Value.absent(),
@@ -681,6 +780,8 @@ class OrdersTableCompanion extends UpdateCompanion<OrderTableData> {
   });
   OrdersTableCompanion.insert({
     this.id = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.supabaseUserId = const Value.absent(),
     required String cardId,
     required String title,
     required String message,
@@ -691,6 +792,8 @@ class OrdersTableCompanion extends UpdateCompanion<OrderTableData> {
        addedAt = Value(addedAt);
   static Insertable<OrderTableData> custom({
     Expression<int>? id,
+    Expression<String>? remoteId,
+    Expression<String>? supabaseUserId,
     Expression<String>? cardId,
     Expression<String>? title,
     Expression<String>? message,
@@ -698,6 +801,8 @@ class OrdersTableCompanion extends UpdateCompanion<OrderTableData> {
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
+      if (remoteId != null) 'remote_id': remoteId,
+      if (supabaseUserId != null) 'supabase_user_id': supabaseUserId,
       if (cardId != null) 'card_id': cardId,
       if (title != null) 'title': title,
       if (message != null) 'message': message,
@@ -707,6 +812,8 @@ class OrdersTableCompanion extends UpdateCompanion<OrderTableData> {
 
   OrdersTableCompanion copyWith({
     Value<int>? id,
+    Value<String?>? remoteId,
+    Value<String?>? supabaseUserId,
     Value<String>? cardId,
     Value<String>? title,
     Value<String>? message,
@@ -714,6 +821,8 @@ class OrdersTableCompanion extends UpdateCompanion<OrderTableData> {
   }) {
     return OrdersTableCompanion(
       id: id ?? this.id,
+      remoteId: remoteId ?? this.remoteId,
+      supabaseUserId: supabaseUserId ?? this.supabaseUserId,
       cardId: cardId ?? this.cardId,
       title: title ?? this.title,
       message: message ?? this.message,
@@ -726,6 +835,12 @@ class OrdersTableCompanion extends UpdateCompanion<OrderTableData> {
     final map = <String, Expression>{};
     if (id.present) {
       map['id'] = Variable<int>(id.value);
+    }
+    if (remoteId.present) {
+      map['remote_id'] = Variable<String>(remoteId.value);
+    }
+    if (supabaseUserId.present) {
+      map['supabase_user_id'] = Variable<String>(supabaseUserId.value);
     }
     if (cardId.present) {
       map['card_id'] = Variable<String>(cardId.value);
@@ -746,6 +861,8 @@ class OrdersTableCompanion extends UpdateCompanion<OrderTableData> {
   String toString() {
     return (StringBuffer('OrdersTableCompanion(')
           ..write('id: $id, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('supabaseUserId: $supabaseUserId, ')
           ..write('cardId: $cardId, ')
           ..write('title: $title, ')
           ..write('message: $message, ')
@@ -773,6 +890,28 @@ class $EventsTableTable extends EventsTable
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'PRIMARY KEY AUTOINCREMENT',
     ),
+  );
+  static const VerificationMeta _remoteIdMeta = const VerificationMeta(
+    'remoteId',
+  );
+  @override
+  late final GeneratedColumn<String> remoteId = GeneratedColumn<String>(
+    'remote_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _supabaseUserIdMeta = const VerificationMeta(
+    'supabaseUserId',
+  );
+  @override
+  late final GeneratedColumn<String> supabaseUserId = GeneratedColumn<String>(
+    'supabase_user_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
@@ -818,7 +957,15 @@ class $EventsTableTable extends EventsTable
     ),
   );
   @override
-  List<GeneratedColumn> get $columns => [id, title, date, reminder, isCustom];
+  List<GeneratedColumn> get $columns => [
+    id,
+    remoteId,
+    supabaseUserId,
+    title,
+    date,
+    reminder,
+    isCustom,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -833,6 +980,21 @@ class $EventsTableTable extends EventsTable
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('remote_id')) {
+      context.handle(
+        _remoteIdMeta,
+        remoteId.isAcceptableOrUnknown(data['remote_id']!, _remoteIdMeta),
+      );
+    }
+    if (data.containsKey('supabase_user_id')) {
+      context.handle(
+        _supabaseUserIdMeta,
+        supabaseUserId.isAcceptableOrUnknown(
+          data['supabase_user_id']!,
+          _supabaseUserIdMeta,
+        ),
+      );
     }
     if (data.containsKey('title')) {
       context.handle(
@@ -879,6 +1041,14 @@ class $EventsTableTable extends EventsTable
         DriftSqlType.int,
         data['${effectivePrefix}id'],
       )!,
+      remoteId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}remote_id'],
+      ),
+      supabaseUserId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}supabase_user_id'],
+      ),
       title: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}title'],
@@ -906,12 +1076,16 @@ class $EventsTableTable extends EventsTable
 
 class EventTableData extends DataClass implements Insertable<EventTableData> {
   final int id;
+  final String? remoteId;
+  final String? supabaseUserId;
   final String title;
   final DateTime date;
   final String reminder;
   final bool isCustom;
   const EventTableData({
     required this.id,
+    this.remoteId,
+    this.supabaseUserId,
     required this.title,
     required this.date,
     required this.reminder,
@@ -921,6 +1095,12 @@ class EventTableData extends DataClass implements Insertable<EventTableData> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
+    if (!nullToAbsent || remoteId != null) {
+      map['remote_id'] = Variable<String>(remoteId);
+    }
+    if (!nullToAbsent || supabaseUserId != null) {
+      map['supabase_user_id'] = Variable<String>(supabaseUserId);
+    }
     map['title'] = Variable<String>(title);
     map['date'] = Variable<DateTime>(date);
     map['reminder'] = Variable<String>(reminder);
@@ -931,6 +1111,12 @@ class EventTableData extends DataClass implements Insertable<EventTableData> {
   EventsTableCompanion toCompanion(bool nullToAbsent) {
     return EventsTableCompanion(
       id: Value(id),
+      remoteId: remoteId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remoteId),
+      supabaseUserId: supabaseUserId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(supabaseUserId),
       title: Value(title),
       date: Value(date),
       reminder: Value(reminder),
@@ -945,6 +1131,8 @@ class EventTableData extends DataClass implements Insertable<EventTableData> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return EventTableData(
       id: serializer.fromJson<int>(json['id']),
+      remoteId: serializer.fromJson<String?>(json['remoteId']),
+      supabaseUserId: serializer.fromJson<String?>(json['supabaseUserId']),
       title: serializer.fromJson<String>(json['title']),
       date: serializer.fromJson<DateTime>(json['date']),
       reminder: serializer.fromJson<String>(json['reminder']),
@@ -956,6 +1144,8 @@ class EventTableData extends DataClass implements Insertable<EventTableData> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
+      'remoteId': serializer.toJson<String?>(remoteId),
+      'supabaseUserId': serializer.toJson<String?>(supabaseUserId),
       'title': serializer.toJson<String>(title),
       'date': serializer.toJson<DateTime>(date),
       'reminder': serializer.toJson<String>(reminder),
@@ -965,12 +1155,18 @@ class EventTableData extends DataClass implements Insertable<EventTableData> {
 
   EventTableData copyWith({
     int? id,
+    Value<String?> remoteId = const Value.absent(),
+    Value<String?> supabaseUserId = const Value.absent(),
     String? title,
     DateTime? date,
     String? reminder,
     bool? isCustom,
   }) => EventTableData(
     id: id ?? this.id,
+    remoteId: remoteId.present ? remoteId.value : this.remoteId,
+    supabaseUserId: supabaseUserId.present
+        ? supabaseUserId.value
+        : this.supabaseUserId,
     title: title ?? this.title,
     date: date ?? this.date,
     reminder: reminder ?? this.reminder,
@@ -979,6 +1175,10 @@ class EventTableData extends DataClass implements Insertable<EventTableData> {
   EventTableData copyWithCompanion(EventsTableCompanion data) {
     return EventTableData(
       id: data.id.present ? data.id.value : this.id,
+      remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
+      supabaseUserId: data.supabaseUserId.present
+          ? data.supabaseUserId.value
+          : this.supabaseUserId,
       title: data.title.present ? data.title.value : this.title,
       date: data.date.present ? data.date.value : this.date,
       reminder: data.reminder.present ? data.reminder.value : this.reminder,
@@ -990,6 +1190,8 @@ class EventTableData extends DataClass implements Insertable<EventTableData> {
   String toString() {
     return (StringBuffer('EventTableData(')
           ..write('id: $id, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('supabaseUserId: $supabaseUserId, ')
           ..write('title: $title, ')
           ..write('date: $date, ')
           ..write('reminder: $reminder, ')
@@ -999,12 +1201,22 @@ class EventTableData extends DataClass implements Insertable<EventTableData> {
   }
 
   @override
-  int get hashCode => Object.hash(id, title, date, reminder, isCustom);
+  int get hashCode => Object.hash(
+    id,
+    remoteId,
+    supabaseUserId,
+    title,
+    date,
+    reminder,
+    isCustom,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is EventTableData &&
           other.id == this.id &&
+          other.remoteId == this.remoteId &&
+          other.supabaseUserId == this.supabaseUserId &&
           other.title == this.title &&
           other.date == this.date &&
           other.reminder == this.reminder &&
@@ -1013,12 +1225,16 @@ class EventTableData extends DataClass implements Insertable<EventTableData> {
 
 class EventsTableCompanion extends UpdateCompanion<EventTableData> {
   final Value<int> id;
+  final Value<String?> remoteId;
+  final Value<String?> supabaseUserId;
   final Value<String> title;
   final Value<DateTime> date;
   final Value<String> reminder;
   final Value<bool> isCustom;
   const EventsTableCompanion({
     this.id = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.supabaseUserId = const Value.absent(),
     this.title = const Value.absent(),
     this.date = const Value.absent(),
     this.reminder = const Value.absent(),
@@ -1026,6 +1242,8 @@ class EventsTableCompanion extends UpdateCompanion<EventTableData> {
   });
   EventsTableCompanion.insert({
     this.id = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.supabaseUserId = const Value.absent(),
     required String title,
     required DateTime date,
     required String reminder,
@@ -1036,6 +1254,8 @@ class EventsTableCompanion extends UpdateCompanion<EventTableData> {
        isCustom = Value(isCustom);
   static Insertable<EventTableData> custom({
     Expression<int>? id,
+    Expression<String>? remoteId,
+    Expression<String>? supabaseUserId,
     Expression<String>? title,
     Expression<DateTime>? date,
     Expression<String>? reminder,
@@ -1043,6 +1263,8 @@ class EventsTableCompanion extends UpdateCompanion<EventTableData> {
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
+      if (remoteId != null) 'remote_id': remoteId,
+      if (supabaseUserId != null) 'supabase_user_id': supabaseUserId,
       if (title != null) 'title': title,
       if (date != null) 'date': date,
       if (reminder != null) 'reminder': reminder,
@@ -1052,6 +1274,8 @@ class EventsTableCompanion extends UpdateCompanion<EventTableData> {
 
   EventsTableCompanion copyWith({
     Value<int>? id,
+    Value<String?>? remoteId,
+    Value<String?>? supabaseUserId,
     Value<String>? title,
     Value<DateTime>? date,
     Value<String>? reminder,
@@ -1059,6 +1283,8 @@ class EventsTableCompanion extends UpdateCompanion<EventTableData> {
   }) {
     return EventsTableCompanion(
       id: id ?? this.id,
+      remoteId: remoteId ?? this.remoteId,
+      supabaseUserId: supabaseUserId ?? this.supabaseUserId,
       title: title ?? this.title,
       date: date ?? this.date,
       reminder: reminder ?? this.reminder,
@@ -1071,6 +1297,12 @@ class EventsTableCompanion extends UpdateCompanion<EventTableData> {
     final map = <String, Expression>{};
     if (id.present) {
       map['id'] = Variable<int>(id.value);
+    }
+    if (remoteId.present) {
+      map['remote_id'] = Variable<String>(remoteId.value);
+    }
+    if (supabaseUserId.present) {
+      map['supabase_user_id'] = Variable<String>(supabaseUserId.value);
     }
     if (title.present) {
       map['title'] = Variable<String>(title.value);
@@ -1091,6 +1323,8 @@ class EventsTableCompanion extends UpdateCompanion<EventTableData> {
   String toString() {
     return (StringBuffer('EventsTableCompanion(')
           ..write('id: $id, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('supabaseUserId: $supabaseUserId, ')
           ..write('title: $title, ')
           ..write('date: $date, ')
           ..write('reminder: $reminder, ')
@@ -3275,6 +3509,8 @@ typedef $$FavoritesTableTableProcessedTableManager =
 typedef $$OrdersTableTableCreateCompanionBuilder =
     OrdersTableCompanion Function({
       Value<int> id,
+      Value<String?> remoteId,
+      Value<String?> supabaseUserId,
       required String cardId,
       required String title,
       required String message,
@@ -3283,6 +3519,8 @@ typedef $$OrdersTableTableCreateCompanionBuilder =
 typedef $$OrdersTableTableUpdateCompanionBuilder =
     OrdersTableCompanion Function({
       Value<int> id,
+      Value<String?> remoteId,
+      Value<String?> supabaseUserId,
       Value<String> cardId,
       Value<String> title,
       Value<String> message,
@@ -3300,6 +3538,16 @@ class $$OrdersTableTableFilterComposer
   });
   ColumnFilters<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get remoteId => $composableBuilder(
+    column: $table.remoteId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get supabaseUserId => $composableBuilder(
+    column: $table.supabaseUserId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3338,6 +3586,16 @@ class $$OrdersTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get remoteId => $composableBuilder(
+    column: $table.remoteId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get supabaseUserId => $composableBuilder(
+    column: $table.supabaseUserId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get cardId => $composableBuilder(
     column: $table.cardId,
     builder: (column) => ColumnOrderings(column),
@@ -3370,6 +3628,14 @@ class $$OrdersTableTableAnnotationComposer
   });
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get remoteId =>
+      $composableBuilder(column: $table.remoteId, builder: (column) => column);
+
+  GeneratedColumn<String> get supabaseUserId => $composableBuilder(
+    column: $table.supabaseUserId,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get cardId =>
       $composableBuilder(column: $table.cardId, builder: (column) => column);
@@ -3416,12 +3682,16 @@ class $$OrdersTableTableTableManager
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
+                Value<String?> remoteId = const Value.absent(),
+                Value<String?> supabaseUserId = const Value.absent(),
                 Value<String> cardId = const Value.absent(),
                 Value<String> title = const Value.absent(),
                 Value<String> message = const Value.absent(),
                 Value<DateTime> addedAt = const Value.absent(),
               }) => OrdersTableCompanion(
                 id: id,
+                remoteId: remoteId,
+                supabaseUserId: supabaseUserId,
                 cardId: cardId,
                 title: title,
                 message: message,
@@ -3430,12 +3700,16 @@ class $$OrdersTableTableTableManager
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
+                Value<String?> remoteId = const Value.absent(),
+                Value<String?> supabaseUserId = const Value.absent(),
                 required String cardId,
                 required String title,
                 required String message,
                 required DateTime addedAt,
               }) => OrdersTableCompanion.insert(
                 id: id,
+                remoteId: remoteId,
+                supabaseUserId: supabaseUserId,
                 cardId: cardId,
                 title: title,
                 message: message,
@@ -3469,6 +3743,8 @@ typedef $$OrdersTableTableProcessedTableManager =
 typedef $$EventsTableTableCreateCompanionBuilder =
     EventsTableCompanion Function({
       Value<int> id,
+      Value<String?> remoteId,
+      Value<String?> supabaseUserId,
       required String title,
       required DateTime date,
       required String reminder,
@@ -3477,6 +3753,8 @@ typedef $$EventsTableTableCreateCompanionBuilder =
 typedef $$EventsTableTableUpdateCompanionBuilder =
     EventsTableCompanion Function({
       Value<int> id,
+      Value<String?> remoteId,
+      Value<String?> supabaseUserId,
       Value<String> title,
       Value<DateTime> date,
       Value<String> reminder,
@@ -3494,6 +3772,16 @@ class $$EventsTableTableFilterComposer
   });
   ColumnFilters<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get remoteId => $composableBuilder(
+    column: $table.remoteId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get supabaseUserId => $composableBuilder(
+    column: $table.supabaseUserId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3532,6 +3820,16 @@ class $$EventsTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get remoteId => $composableBuilder(
+    column: $table.remoteId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get supabaseUserId => $composableBuilder(
+    column: $table.supabaseUserId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get title => $composableBuilder(
     column: $table.title,
     builder: (column) => ColumnOrderings(column),
@@ -3564,6 +3862,14 @@ class $$EventsTableTableAnnotationComposer
   });
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get remoteId =>
+      $composableBuilder(column: $table.remoteId, builder: (column) => column);
+
+  GeneratedColumn<String> get supabaseUserId => $composableBuilder(
+    column: $table.supabaseUserId,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get title =>
       $composableBuilder(column: $table.title, builder: (column) => column);
@@ -3610,12 +3916,16 @@ class $$EventsTableTableTableManager
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
+                Value<String?> remoteId = const Value.absent(),
+                Value<String?> supabaseUserId = const Value.absent(),
                 Value<String> title = const Value.absent(),
                 Value<DateTime> date = const Value.absent(),
                 Value<String> reminder = const Value.absent(),
                 Value<bool> isCustom = const Value.absent(),
               }) => EventsTableCompanion(
                 id: id,
+                remoteId: remoteId,
+                supabaseUserId: supabaseUserId,
                 title: title,
                 date: date,
                 reminder: reminder,
@@ -3624,12 +3934,16 @@ class $$EventsTableTableTableManager
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
+                Value<String?> remoteId = const Value.absent(),
+                Value<String?> supabaseUserId = const Value.absent(),
                 required String title,
                 required DateTime date,
                 required String reminder,
                 required bool isCustom,
               }) => EventsTableCompanion.insert(
                 id: id,
+                remoteId: remoteId,
+                supabaseUserId: supabaseUserId,
                 title: title,
                 date: date,
                 reminder: reminder,

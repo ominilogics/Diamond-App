@@ -10,20 +10,24 @@ class NotificationCard extends StatelessWidget {
   final String title;
   final String description;
   final String time;
+  final VoidCallback? onTap;
 
   const NotificationCard({
     super.key,
     required this.title,
     required this.description,
     required this.time,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: 88.h,
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        height: 88.h,
+        padding: EdgeInsets.symmetric(horizontal: 16.w),
       decoration: BoxDecoration(
         color: const Color(0xFFFFFFFF),
         borderRadius: BorderRadius.circular(20.r),
@@ -94,6 +98,7 @@ class NotificationCard extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }

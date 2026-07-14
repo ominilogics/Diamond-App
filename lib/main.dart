@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter/foundation.dart';
 import 'package:daimond/l10n/app_localizations.dart';
 import 'core/routing/app_router.dart';
 import 'core/database/app_database.dart';
@@ -10,6 +11,13 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:daimond/features/payments/data/repositories/revenue_cat_repository_impl.dart';
 import 'package:daimond/features/payments/presentation/providers/payment_providers.dart';
+import 'core/services/notification_service.dart';
+import 'core/services/local_notification_service_impl.dart';
+import 'package:app_badge_plus/app_badge_plus.dart';
+import 'package:daimond/features/notifications/presentation/providers/notifications_provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,6 +28,16 @@ void main() async {
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
+  if (!kIsWeb) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
+
+  // Load user preferences
+  final prefs = await SharedPreferences.getInstance();
+  AppRouter.hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
+
   final appDatabase = AppDatabase();
 
   // Initialize RevenueCat and sync user if already logged in
@@ -28,6 +46,12 @@ void main() async {
   final user = Supabase.instance.client.auth.currentUser;
   if (user != null) {
     paymentRepository.loginUser(user.id);
+  }
+
+  // Initialize Notification Engine
+  final notificationService = LocalNotificationServiceImpl();
+  if (!kIsWeb) {
+    await notificationService.init();
   }
 
   // Configure system UI overlays for Android edge-to-edge support
@@ -50,17 +74,28 @@ void main() async {
         overrides: [
           appDatabaseProvider.overrideWithValue(appDatabase),
           paymentRepositoryProvider.overrideWithValue(paymentRepository),
+          notificationServiceProvider.overrideWithValue(notificationService),
         ],
       child: const MyApp(),
     ));
   });
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Globally listen to unread notifications to update the launcher badge
+    ref.listen<int>(unreadNotificationsCountProvider, (previous, next) {
+      if (!kIsWeb) {
+        if (next > 0) {
+          AppBadgePlus.updateBadge(next);
+        } else {
+          AppBadgePlus.updateBadge(0);
+        }
+      }
+    });
     return ScreenUtilInit(
       designSize: const Size(393, 852),
 

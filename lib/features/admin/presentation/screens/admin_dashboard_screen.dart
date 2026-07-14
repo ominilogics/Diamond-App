@@ -1,6 +1,8 @@
+import 'package:daimond/features/cards/presentation/providers/cards_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../providers/admin_provider.dart';
@@ -27,6 +29,296 @@ class AdminDashboardScreen extends ConsumerStatefulWidget {
 
 class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
   int _selectedIndex = 0;
+
+  void _showBroadcastDialog(BuildContext context) {
+    final titleController = TextEditingController();
+    final bodyController = TextEditingController();
+    String selectedType = 'special offer';
+    bool isSending = false;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Dialog(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              child: Container(
+                width: 450,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 30,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Header Area
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(24),
+                          topRight: Radius.circular(24),
+                        ),
+                        border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: _primaryAccent.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(Icons.campaign_rounded, color: _primaryAccent, size: 28),
+                          ),
+                          const SizedBox(width: 16),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Broadcast Notification',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF0F172A),
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  'Send a custom push notification to all users.',
+                                  style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    
+                    // Form Content Area
+                    Padding(
+                      padding: const EdgeInsets.all(32),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Notification Title',
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF1E293B)),
+                          ),
+                          const SizedBox(height: 8),
+                          TextField(
+                            controller: titleController,
+                            style: const TextStyle(fontSize: 15, color: Colors.black87),
+                            decoration: InputDecoration(
+                              hintText: 'e.g., Special Offer!',
+                              hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+                              filled: true,
+                              fillColor: const Color(0xFFF8FAFC),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: _primaryAccent, width: 2),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          
+                          const Text(
+                            'Notification Message',
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF1E293B)),
+                          ),
+                          const SizedBox(height: 8),
+                          TextField(
+                            controller: bodyController,
+                            maxLines: 4,
+                            style: const TextStyle(fontSize: 15, color: Colors.black87),
+                            decoration: InputDecoration(
+                              hintText: 'e.g., Get 50% off on all premium cards today.',
+                              hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+                              filled: true,
+                              fillColor: const Color(0xFFF8FAFC),
+                              contentPadding: const EdgeInsets.all(16),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: _primaryAccent, width: 2),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          
+                          const Text(
+                            'Notification Type',
+                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF1E293B)),
+                          ),
+                          const SizedBox(height: 8),
+                          DropdownButtonFormField<String>(
+                            value: selectedType,
+                            dropdownColor: Colors.white,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: const Color(0xFFF8FAFC),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: _primaryAccent, width: 2),
+                              ),
+                            ),
+                            items: const [
+                              DropdownMenuItem(value: 'new card', child: Text('New Card Alerts (Navigate to Cards)')),
+                              DropdownMenuItem(value: 'event reminder', child: Text('Event Reminders (Navigate to Events)')),
+                              DropdownMenuItem(value: 'special offer', child: Text('Special Offers (Navigate to Premium)')),
+                            ],
+                            onChanged: (val) {
+                              if (val != null) {
+                                setState(() => selectedType = val);
+                              }
+                            },
+                          ),
+                          
+                          if (isSending) ...[
+                            const SizedBox(height: 32),
+                            const Center(
+                              child: Column(
+                                children: [
+                                  SizedBox(
+                                    height: 24,
+                                    width: 24,
+                                    child: CircularProgressIndicator(strokeWidth: 2.5, color: _primaryAccent),
+                                  ),
+                                  SizedBox(height: 12),
+                                  Text('Broadcasting to all users...', style: TextStyle(color: Color(0xFF64748B), fontSize: 13, fontWeight: FontWeight.w500)),
+                                ],
+                              ),
+                            ),
+                          ]
+                        ],
+                      ),
+                    ),
+                    
+                    // Footer / Actions Area
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                      decoration: const BoxDecoration(
+                        border: Border(top: BorderSide(color: Color(0xFFF1F5F9))),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: isSending ? null : () => Navigator.pop(context),
+                            style: TextButton.styleFrom(
+                              foregroundColor: const Color(0xFF64748B),
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                            child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.w600)),
+                          ),
+                          const SizedBox(width: 12),
+                          ElevatedButton.icon(
+                            onPressed: isSending
+                                ? null
+                                : () async {
+                                    if (titleController.text.trim().isEmpty || bodyController.text.trim().isEmpty) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('Please fill out both fields')),
+                                      );
+                                      return;
+                                    }
+                                    setState(() => isSending = true);
+                                    try {
+                                      await Supabase.instance.client.functions.invoke(
+                                        'dynamic-processor',
+                                        body: {
+                                          'broadcast': true,
+                                          'title': titleController.text.trim(),
+                                          'body': bodyController.text.trim(),
+                                          'type': selectedType,
+                                        },
+                                      );
+                                      if (context.mounted) {
+                                        Navigator.pop(context);
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(
+                                            content: Text('Broadcast sent successfully!'),
+                                            backgroundColor: _success,
+                                          ),
+                                        );
+                                      }
+                                    } catch (e) {
+                                      setState(() => isSending = false);
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text('Failed: $e'),
+                                            backgroundColor: _danger,
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  },
+                            icon: isSending 
+                                ? const SizedBox.shrink()
+                                : const Icon(Icons.send_rounded, size: 18),
+                            label: Text(
+                              isSending ? 'Sending...' : 'Send Broadcast',
+                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _primaryAccent,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -107,6 +399,18 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                       ),
                       Row(
                         children: [
+                          ElevatedButton.icon(
+                            onPressed: () => _showBroadcastDialog(context),
+                            icon: const Icon(Icons.campaign),
+                            label: const Text('Broadcast Notification'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _primaryAccent,
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            ),
+                          ),
+                          const SizedBox(width: 24),
                           const CircleAvatar(
                             backgroundColor: _primaryAccent,
                             child: Icon(Icons.person, color: Colors.white),
@@ -351,25 +655,20 @@ class _CategoriesAdminView extends ConsumerWidget {
                                 ),
                               ),
                               DataCell(
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: cat.isActive
-                                        ? _success.withValues(alpha: 0.1)
-                                        : _danger.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Text(
-                                    cat.isActive ? 'Active' : 'Inactive',
-                                    style: TextStyle(
-                                      color: cat.isActive ? _success : _danger,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 12,
-                                    ),
-                                  ),
+                                Switch(
+                                  value: cat.isActive,
+                                  activeColor: _success,
+                                  onChanged: (val) async {
+                                    try {
+                                      await ref.read(adminRepositoryProvider).updateCategory(cat.id, cat.name, val);
+                                      ref.invalidate(adminCategoriesProvider);
+                                      await ref.read(cardsRepositoryProvider).syncData();
+                                    } catch (e) {
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e')));
+                                      }
+                                    }
+                                  },
                                 ),
                               ),
                               DataCell(
@@ -510,6 +809,7 @@ class _CategoriesAdminView extends ConsumerWidget {
                                     );
                               }
                               ref.invalidate(adminCategoriesProvider);
+                              await ref.read(cardsRepositoryProvider).syncData();
                               if (context.mounted) Navigator.pop(context);
                             } catch (e) {
                               setState(() => isSaving = false);
@@ -571,6 +871,7 @@ class _CategoriesAdminView extends ConsumerWidget {
                               .read(adminRepositoryProvider)
                               .deleteCategory(id);
                           ref.invalidate(adminCategoriesProvider);
+                          await ref.read(cardsRepositoryProvider).syncData();
                           if (context.mounted) Navigator.pop(context);
                         } catch (e) {
                           setState(() => isDeleting = false);
@@ -744,6 +1045,7 @@ class _CardsAdminView extends ConsumerWidget {
                         columns: const [
                           DataColumn(label: Text('CARD ID')),
                           DataColumn(label: Text('TITLE')),
+                          DataColumn(label: Text('CATEGORY')),
                           DataColumn(label: Text('STATUS')),
                           DataColumn(label: Text('ACTIONS')),
                         ],
@@ -768,25 +1070,46 @@ class _CardsAdminView extends ConsumerWidget {
                                 ),
                               ),
                               DataCell(
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: card.isActive
-                                        ? _success.withValues(alpha: 0.1)
-                                        : _danger.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Text(
-                                    card.isActive ? 'Active' : 'Inactive',
-                                    style: TextStyle(
-                                      color: card.isActive ? _success : _danger,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 12,
-                                    ),
-                                  ),
+                                Consumer(
+                                  builder: (context, ref, _) {
+                                    final categoriesAsync = ref.watch(adminCategoriesProvider);
+                                    return categoriesAsync.when(
+                                      data: (cats) {
+                                        final catName = cats.firstWhere((c) => c.id == card.categoryId, orElse: () => AdminCategory(id: '', name: 'Unknown', isActive: false)).name;
+                                        return Text(
+                                          catName,
+                                          style: const TextStyle(fontWeight: FontWeight.w500, color: Color(0xFF64748B)),
+                                        );
+                                      },
+                                      loading: () => const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+                                      error: (_, __) => const Text('Error'),
+                                    );
+                                  },
+                                ),
+                              ),
+                              DataCell(
+                                Switch(
+                                  value: card.isActive,
+                                  activeColor: _success,
+                                  onChanged: (val) async {
+                                    try {
+                                      await ref
+                                          .read(adminRepositoryProvider)
+                                          .updateCard(
+                                            cardId: card.id,
+                                            title: card.title,
+                                            isActive: val,
+                                          );
+                                      ref.invalidate(adminCardsProvider);
+                                      await ref.read(cardsRepositoryProvider).syncData();
+                                    } catch (e) {
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('Failed: $e')),
+                                        );
+                                      }
+                                    }
+                                  },
                                 ),
                               ),
                               DataCell(
@@ -1108,6 +1431,7 @@ class _CardsAdminView extends ConsumerWidget {
                                           selectedImage!.extension ?? 'jpg',
                                     );
                                 ref.invalidate(adminCardsProvider);
+                                await ref.read(cardsRepositoryProvider).syncData();
                                 if (context.mounted) Navigator.pop(context);
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -1129,6 +1453,7 @@ class _CardsAdminView extends ConsumerWidget {
                                       isActive: isActive,
                                     );
                                 ref.invalidate(adminCardsProvider);
+                                await ref.read(cardsRepositoryProvider).syncData();
                                 if (context.mounted) Navigator.pop(context);
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -1201,6 +1526,7 @@ class _CardsAdminView extends ConsumerWidget {
                               .read(adminRepositoryProvider)
                               .deleteCard(id);
                           ref.invalidate(adminCardsProvider);
+                          await ref.read(cardsRepositoryProvider).syncData();
                           if (context.mounted) Navigator.pop(context);
                         } catch (e) {
                           setState(() => isDeleting = false);

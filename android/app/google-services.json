@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "874123949335",
+    "project_id": "rivon-62e8a",
+    "storage_bucket": "rivon-62e8a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:874123949335:android:f6d1cbc816079be72b3352",
+        "android_client_info": {
+          "package_name": "com.greetingcards.invitationmaker.rivon"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnunBYjKvOimLZJtkaI4sldflB_vbvtHg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

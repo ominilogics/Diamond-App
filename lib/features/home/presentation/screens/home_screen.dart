@@ -157,19 +157,33 @@ class HomeScreen extends HookConsumerWidget {
                     ),
                     data: (cards) {
                       if (cards.isEmpty) {
-                        return SliverToBoxAdapter(
-                          child: Padding(
-                            padding: EdgeInsets.only(top: 100.h),
-                            child: Center(
-                              child: Text(
-                                isSearching
-                                    ? 'No search results found'
-                                    : 'No featured cards available',
-                                style: AppTextStyles.roboto300Light13(),
+                        if (isSearching) {
+                          return SliverToBoxAdapter(
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 100.h),
+                              child: Center(
+                                child: Text(
+                                  'No search results found',
+                                  style: AppTextStyles.roboto300Light13(),
+                                ),
                               ),
                             ),
-                          ),
-                        );
+                          );
+                        } else {
+                          // Instead of showing empty text, display shimmer to account for initial sync
+                          return SliverGrid(
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 14.w,
+                              mainAxisSpacing: 14.h,
+                              childAspectRatio: 171.w / 204.h,
+                            ),
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) => const CardShimmer(),
+                              childCount: 4,
+                            ),
+                          );
+                        }
                       }
                       return SliverGrid(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

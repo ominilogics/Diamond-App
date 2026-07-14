@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
 import '../../features/auth/presentation/screens/sign_up_screen.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/main/presentation/screens/main_screen.dart';
@@ -29,21 +30,43 @@ class AppRouter {
 
   static final rootNavigatorKey = GlobalKey<NavigatorState>();
 
+  static bool hasSeenOnboarding = false;
+
   static final router = GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: Supabase.instance.client.auth.currentSession != null 
         ? (kIsWeb ? AppRoute.adminDashboard.path : AppRoute.main.path) 
-        : AppRoute.login.path,
+        : (kIsWeb ? AppRoute.login.path : (hasSeenOnboarding ? AppRoute.login.path : AppRoute.onboarding.path)),
     redirect: (context, state) {
       final session = Supabase.instance.client.auth.currentSession;
-      final isAuthRoute = state.matchedLocation == AppRoute.login.path || 
+      final isAuthRoute = state.matchedLocation == AppRoute.onboarding.path ||
+                          state.matchedLocation == AppRoute.login.path || 
                           state.matchedLocation == '${AppRoute.login.path}/${AppRoute.signup.path}' || 
                           state.matchedLocation == '${AppRoute.login.path}/${AppRoute.forgotPassword.path}';
 
       if (session == null) {
-        if (!isAuthRoute) return AppRoute.login.path;
+        // Prevent web users from accessing onboarding
+        if (kIsWeb && state.matchedLocation == AppRoute.onboarding.path) {
+          return AppRoute.login.path;
+        }
+        
+        // Prevent users who have seen onboarding from going back to it
+        if (state.matchedLocation == AppRoute.onboarding.path && hasSeenOnboarding) {
+          return AppRoute.login.path;
+        }
+
+        if (!isAuthRoute) {
+          return kIsWeb ? AppRoute.login.path : (hasSeenOnboarding ? AppRoute.login.path : AppRoute.onboarding.path);
+        }
       } else {
         if (isAuthRoute) {
+          final isAnonymous = Supabase.instance.client.auth.currentUser?.isAnonymous ?? false;
+          
+          // Allow anonymous guests to access login/signup pages so they can upgrade their accounts
+          if (isAnonymous) {
+            return null;
+          }
+
           // If on web, redirect directly to admin dashboard
           if (kIsWeb) {
             return AppRoute.adminDashboard.path;
@@ -59,6 +82,11 @@ class AppRouter {
       return null;
     },
     routes: [
+      GoRoute(
+        name: AppRoute.onboarding.name,
+        path: AppRoute.onboarding.path,
+        builder: (context, state) => const OnboardingScreen(),
+      ),
       GoRoute(
         name: AppRoute.editProfile.name,
         path: AppRoute.editProfile.path,

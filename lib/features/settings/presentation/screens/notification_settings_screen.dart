@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:daimond/l10n/app_localizations.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
+import '../providers/notification_settings_provider.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -16,16 +16,13 @@ class NotificationSettingsScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final texts = AppLocalizations.of(context)!;
-
-    final pushNotifications = useState(true);
-    final islamicEvents = useState(false);
-    final newCardAlerts = useState(true);
-    final eventReminders = useState(true);
-    final specialOffers = useState(false);
+    final settings = ref.watch(notificationSettingsProvider);
+    final notifier = ref.read(notificationSettingsProvider.notifier);
 
     Widget buildToggleRow(
       String title,
-      ValueNotifier<bool> state, {
+      bool state,
+      ValueChanged<bool> onChanged, {
       bool isEnabled = true,
     }) {
       return IgnorePointer(
@@ -39,9 +36,9 @@ class NotificationSettingsScreen extends HookConsumerWidget {
               children: [
                 Text(title, style: AppTextStyles.roboto400Regular16()),
                 _GradientSwitch(
-                  value: isEnabled ? state.value : false,
+                  value: isEnabled ? state : false,
                   onChanged: (val) {
-                    if (isEnabled) state.value = val;
+                    if (isEnabled) onChanged(val);
                   },
                 ),
               ],
@@ -114,31 +111,30 @@ class NotificationSettingsScreen extends HookConsumerWidget {
                           children: [
                             buildToggleRow(
                               texts.pushNotifications,
-                              pushNotifications,
+                              settings.pushNotifications,
+                              (val) => notifier.togglePushNotifications(val),
                             ),
                             buildDivider(),
-                            buildToggleRow(
-                              texts.islamicEvents,
-                              islamicEvents,
-                              isEnabled: pushNotifications.value,
-                            ),
-                            buildDivider(),
+
                             buildToggleRow(
                               texts.newCardAlerts,
-                              newCardAlerts,
-                              isEnabled: pushNotifications.value,
+                              settings.newCardAlerts,
+                              (val) => notifier.toggleNewCardAlerts(val),
+                              isEnabled: settings.pushNotifications,
                             ),
                             buildDivider(),
                             buildToggleRow(
                               texts.eventReminders,
-                              eventReminders,
-                              isEnabled: pushNotifications.value,
+                              settings.eventReminders,
+                              (val) => notifier.toggleEventReminders(val),
+                              isEnabled: settings.pushNotifications,
                             ),
                             buildDivider(),
                             buildToggleRow(
                               texts.specialOffers,
-                              specialOffers,
-                              isEnabled: pushNotifications.value,
+                              settings.specialOffers,
+                              (val) => notifier.toggleSpecialOffers(val),
+                              isEnabled: settings.pushNotifications,
                             ),
                           ],
                         ),

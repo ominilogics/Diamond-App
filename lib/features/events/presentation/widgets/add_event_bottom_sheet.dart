@@ -13,6 +13,7 @@ import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/utils/app_snackbars.dart';
 import '../../domain/entities/event_entity.dart';
 import '../providers/events_provider.dart';
+import '../../../../core/services/notification_service.dart';
 import 'custom_date_picker_dialog.dart';
 
 class AddEventBottomSheet extends HookConsumerWidget {
@@ -236,12 +237,18 @@ class AddEventBottomSheet extends HookConsumerWidget {
                         hasAttemptedSubmit.value = true;
                         if (formKey.currentState?.validate() ?? false) {
                           debugPrint('Form validation passed. Saving event...');
+                          
+                          // Contextual permission request
+                          await ref.read(notificationServiceProvider).requestPermissions();
+
                           try {
                             await ref
                                 .read(eventsProvider.notifier)
                                 .addEvent(
                                   EventEntity(
                                     id: eventToEdit?.id ?? -1,
+                                    remoteId: eventToEdit?.remoteId,
+                                    supabaseUserId: eventToEdit?.supabaseUserId,
                                     title: titleController.text,
                                     date: selectedDateState.value!,
                                     reminder: reminderController.text,
