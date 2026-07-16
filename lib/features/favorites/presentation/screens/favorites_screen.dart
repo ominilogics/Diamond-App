@@ -1,3 +1,4 @@
+import 'package:daimond/features/auth/presentation/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:daimond/l10n/app_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,6 +13,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/favorites_provider.dart';
 import '../../../cards/presentation/providers/cards_provider.dart';
 import 'package:collection/collection.dart';
+import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../../core/routing/app_routes.dart';
+import '../../../../core/widgets/primary_button.dart';
 
 class FavoritesScreen extends ConsumerWidget {
   const FavoritesScreen({super.key});
@@ -26,70 +31,101 @@ class FavoritesScreen extends ConsumerWidget {
     final allCardsState = ref.watch(allCardsStreamProvider);
     final allCards = allCardsState.valueOrNull ?? [];
 
-    if (favorites.isEmpty) {
-      return Column(
-        children: [
-          SizedBox(height: 12.h),
-          AppBar1(title: texts.favoritesTitle),
-          Expanded(
+    final authState = ref.watch(authStateProvider);
+    final user = authState.value?.session?.user ?? Supabase.instance.client.auth.currentUser;
+    final bool isLoggedIn = user != null && !user.isAnonymous;
+
+    return RefreshIndicator(
+      color: AppColors.primaryButtonGradientStart,
+      backgroundColor: Colors.white,
+      onRefresh: () async {
+        await ref.read(favoritesProvider.notifier).syncAndRefresh();
+      },
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
+          SliverToBoxAdapter(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SvgPicture.asset(AppAssets.favouritesEmpty),
+                SizedBox(height: 12.h),
+                AppBar1(title: texts.favoritesTitle),
                 SizedBox(height: 24.h),
-                Text(
-                  texts.noCardsHere,
-                  style: AppTextStyles.colitez400Italic32(),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(
-                  height: 80.h,
-                ), // Offset from center to account for bottom nav
               ],
             ),
           ),
-        ],
-      );
-    }
-
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          SizedBox(height: 12.h),
-          AppBar1(title: texts.favoritesTitle),
-          SizedBox(height: 24.h),
-
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
-            child: GridView.builder(
-              padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: favorites.length,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 14.w,
-                mainAxisSpacing: 14.h,
-                childAspectRatio: 171.w / 204.h,
+          if (!isLoggedIn)
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      texts.loginPrompt,
+                      style: AppTextStyles.roboto400Regular20(),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 24.h),
+                    PrimaryButton(
+                      text: texts.loginAction,
+                      onPressed: () {
+                        context.pushNamed(AppRoute.login.name);
+                      },
+                    ),
+                  ],
+                ),
               ),
-              itemBuilder: (context, index) {
-                final favorite = favorites[index];
-                final card = allCards.firstWhereOrNull(
-                  (c) => c.id == favorite.cardId,
-                );
-
-                return FeaturedCard(
-                  cardId: favorite.cardId,
-                  title: favorite.title,
-                  cardColor: Color(favorite.colorValue),
-                  coverImageUrl: card?.coverImageUrl,
-                  frontMessage: card?.defaultFrontMessage,
-                  insideMessage: card?.defaultInsideMessage,
-                );
-              },
+            )
+          else if (favorites.isEmpty)
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SvgPicture.asset(AppAssets.favouritesEmpty),
+                  SizedBox(height: 24.h),
+                  Text(
+                    texts.noCardsHere,
+                    style: AppTextStyles.colitez400Italic32(),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 80.h),
+                ],
+              ),
+            )
+          else
+            SliverPadding(
+              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              sliver: SliverGrid(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 14.w,
+                  mainAxisSpacing: 14.h,
+                  childAspectRatio: 171.w / 204.h,
+                ),
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final favorite = favorites[index];
+                    final card = allCards.firstWhereOrNull(
+                      (c) => c.id == favorite.cardId,
+                    );
+                    return FeaturedCard(
+                      cardId: favorite.cardId,
+                      title: favorite.title,
+                      cardColor: Color(favorite.colorValue),
+                      coverImageUrl: card?.coverImageUrl,
+                      frontMessage: card?.defaultFrontMessage,
+                      insideMessage: card?.defaultInsideMessage,
+                    );
+                  },
+                  childCount: favorites.length,
+                ),
+              ),
             ),
+          SliverToBoxAdapter(
+            child: SizedBox(height: 40.h),
           ),
-          SizedBox(height: 40.h),
         ],
       ),
     );

@@ -34,6 +34,8 @@ class LocalEventsDataSource {
             date: event.date,
             reminder: event.reminder,
             isCustom: event.isCustom,
+            notificationTime: Value(event.notificationTime),
+            isNotified: Value(event.isNotified),
           ));
         } else {
           await (db.update(db.eventsTable)..where((t) => t.id.equals(existing.id))).write(
@@ -42,6 +44,8 @@ class LocalEventsDataSource {
               date: Value(event.date),
               reminder: Value(event.reminder),
               isCustom: Value(event.isCustom),
+              notificationTime: Value(event.notificationTime),
+              isNotified: Value(event.isNotified),
             ),
           );
         }

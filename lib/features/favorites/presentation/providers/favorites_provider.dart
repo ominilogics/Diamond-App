@@ -1,3 +1,4 @@
+import 'package:daimond/features/auth/presentation/providers/auth_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/providers/database_provider.dart';
 import '../../domain/entities/favorite_entity.dart';
@@ -17,12 +18,13 @@ final favoritesRepositoryProvider = Provider<FavoritesRepository>((ref) {
 class FavoritesNotifier extends AsyncNotifier<List<FavoriteEntity>> {
   @override
   Future<List<FavoriteEntity>> build() async {
+    ref.watch(authStateProvider);
     // Fire off sync in background, and don't await it so we show local data immediately
-    _syncAndRefresh();
+    syncAndRefresh();
     return _fetchFavorites();
   }
 
-  Future<void> _syncAndRefresh() async {
+  Future<void> syncAndRefresh() async {
     final repository = ref.read(favoritesRepositoryProvider);
     final result = await repository.syncFavorites();
     if (!result.isLeft) {

@@ -31,12 +31,13 @@ class AppRouter {
   static final rootNavigatorKey = GlobalKey<NavigatorState>();
 
   static bool hasSeenOnboarding = false;
+  static String? initialDeepLink;
 
   static final router = GoRouter(
     navigatorKey: rootNavigatorKey,
-    initialLocation: Supabase.instance.client.auth.currentSession != null 
+    initialLocation: initialDeepLink ?? (Supabase.instance.client.auth.currentSession != null 
         ? (kIsWeb ? AppRoute.adminDashboard.path : AppRoute.main.path) 
-        : (kIsWeb ? AppRoute.login.path : (hasSeenOnboarding ? AppRoute.login.path : AppRoute.onboarding.path)),
+        : (kIsWeb ? AppRoute.login.path : (hasSeenOnboarding ? AppRoute.login.path : AppRoute.onboarding.path))),
     redirect: (context, state) {
       final session = Supabase.instance.client.auth.currentSession;
       final isAuthRoute = state.matchedLocation == AppRoute.onboarding.path ||

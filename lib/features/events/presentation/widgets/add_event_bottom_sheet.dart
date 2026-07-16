@@ -52,6 +52,7 @@ class AddEventBottomSheet extends HookConsumerWidget {
     final selectedDateState = useState<DateTime?>(eventToEdit?.date);
     final formKey = useMemoized(() => GlobalKey<FormState>());
     final hasAttemptedSubmit = useState(false);
+    final isSaving = useState(false);
 
     return SafeArea(
       child: Form(
@@ -157,6 +158,11 @@ class AddEventBottomSheet extends HookConsumerWidget {
                               height: 32.h,
                               child: Text("One Day Before", style: itemStyle),
                             ),
+                            PopupMenuItem(
+                              value: "10 Seconds Test",
+                              height: 32.h,
+                              child: Text("10 Seconds Test", style: itemStyle),
+                            ),
                           ];
                         },
                         child: AbsorbPointer(
@@ -232,16 +238,18 @@ class AddEventBottomSheet extends HookConsumerWidget {
                     // Save Button
                     PrimaryButton(
                       text: texts.saveReminder,
+                      isLoading: isSaving.value,
                       onPressed: () async {
                         debugPrint('Save Reminder clicked. Attempting form validation.');
                         hasAttemptedSubmit.value = true;
                         if (formKey.currentState?.validate() ?? false) {
                           debugPrint('Form validation passed. Saving event...');
+                          isSaving.value = true;
                           
-                          // Contextual permission request
-                          await ref.read(notificationServiceProvider).requestPermissions();
-
                           try {
+                            // Contextual permission request
+                            await ref.read(notificationServiceProvider).requestPermissions();
+
                             await ref
                                 .read(eventsProvider.notifier)
                                 .addEvent(
@@ -261,9 +269,12 @@ class AddEventBottomSheet extends HookConsumerWidget {
                               AppSnackbars.showError(
                                 context,
                                 title: "Error",
-                                message:
-                                    "Failed to save event. Please try again.",
+                                message: "Failed to save event. Please check your connection and try again.",
                               );
+                            }
+                          } finally {
+                            if (context.mounted) {
+                              isSaving.value = false;
                             }
                           }
                         } else {
@@ -281,3 +292,4 @@ class AddEventBottomSheet extends HookConsumerWidget {
     );
   }
 }
+

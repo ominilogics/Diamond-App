@@ -9,4 +9,6 @@ class EventsTable extends Table {
   DateTimeColumn get date => dateTime()();
   TextColumn get reminder => text()();
   BoolColumn get isCustom => boolean()();
+  DateTimeColumn get notificationTime => dateTime().nullable()();
+  BoolColumn get isNotified => boolean().withDefault(const Constant(false))();
 }

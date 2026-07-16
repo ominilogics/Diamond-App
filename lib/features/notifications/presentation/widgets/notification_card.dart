@@ -11,6 +11,7 @@ class NotificationCard extends StatelessWidget {
   final String description;
   final String time;
   final VoidCallback? onTap;
+  final bool isRead;
 
   const NotificationCard({
     super.key,
@@ -18,6 +19,7 @@ class NotificationCard extends StatelessWidget {
     required this.description,
     required this.time,
     this.onTap,
+    this.isRead = true,
   });
 
   @override
@@ -29,9 +31,12 @@ class NotificationCard extends StatelessWidget {
         height: 88.h,
         padding: EdgeInsets.symmetric(horizontal: 16.w),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFFFFF),
+        color: isRead ? const Color(0xFFFFFFFF) : AppColors.primaryButtonGradientStart.withOpacity(0.05),
         borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(color: const Color(0xFF000000), width: 0.5.w),
+        border: Border.all(
+          color: isRead ? const Color(0xFF000000) : AppColors.primaryButtonGradientStart, 
+          width: isRead ? 0.5.w : 1.0.w,
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,

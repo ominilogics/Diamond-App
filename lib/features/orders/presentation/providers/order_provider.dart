@@ -1,3 +1,4 @@
+import 'package:daimond/features/auth/presentation/providers/auth_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/providers/database_provider.dart';
@@ -15,6 +16,7 @@ final orderRepositoryProvider = Provider((ref) {
 
 final orderProvider =
     StateNotifierProvider<OrderNotifier, AsyncValue<List<OrderEntity>>>((ref) {
+      ref.watch(authStateProvider);
       return OrderNotifier(ref.watch(orderRepositoryProvider));
     });
 

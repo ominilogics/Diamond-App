@@ -956,6 +956,33 @@ class $EventsTableTable extends EventsTable
       'CHECK ("is_custom" IN (0, 1))',
     ),
   );
+  static const VerificationMeta _notificationTimeMeta = const VerificationMeta(
+    'notificationTime',
+  );
+  @override
+  late final GeneratedColumn<DateTime> notificationTime =
+      GeneratedColumn<DateTime>(
+        'notification_time',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _isNotifiedMeta = const VerificationMeta(
+    'isNotified',
+  );
+  @override
+  late final GeneratedColumn<bool> isNotified = GeneratedColumn<bool>(
+    'is_notified',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_notified" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -965,6 +992,8 @@ class $EventsTableTable extends EventsTable
     date,
     reminder,
     isCustom,
+    notificationTime,
+    isNotified,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1028,6 +1057,21 @@ class $EventsTableTable extends EventsTable
     } else if (isInserting) {
       context.missing(_isCustomMeta);
     }
+    if (data.containsKey('notification_time')) {
+      context.handle(
+        _notificationTimeMeta,
+        notificationTime.isAcceptableOrUnknown(
+          data['notification_time']!,
+          _notificationTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_notified')) {
+      context.handle(
+        _isNotifiedMeta,
+        isNotified.isAcceptableOrUnknown(data['is_notified']!, _isNotifiedMeta),
+      );
+    }
     return context;
   }
 
@@ -1065,6 +1109,14 @@ class $EventsTableTable extends EventsTable
         DriftSqlType.bool,
         data['${effectivePrefix}is_custom'],
       )!,
+      notificationTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}notification_time'],
+      ),
+      isNotified: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_notified'],
+      )!,
     );
   }
 
@@ -1082,6 +1134,8 @@ class EventTableData extends DataClass implements Insertable<EventTableData> {
   final DateTime date;
   final String reminder;
   final bool isCustom;
+  final DateTime? notificationTime;
+  final bool isNotified;
   const EventTableData({
     required this.id,
     this.remoteId,
@@ -1090,6 +1144,8 @@ class EventTableData extends DataClass implements Insertable<EventTableData> {
     required this.date,
     required this.reminder,
     required this.isCustom,
+    this.notificationTime,
+    required this.isNotified,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -1105,6 +1161,10 @@ class EventTableData extends DataClass implements Insertable<EventTableData> {
     map['date'] = Variable<DateTime>(date);
     map['reminder'] = Variable<String>(reminder);
     map['is_custom'] = Variable<bool>(isCustom);
+    if (!nullToAbsent || notificationTime != null) {
+      map['notification_time'] = Variable<DateTime>(notificationTime);
+    }
+    map['is_notified'] = Variable<bool>(isNotified);
     return map;
   }
 
@@ -1121,6 +1181,10 @@ class EventTableData extends DataClass implements Insertable<EventTableData> {
       date: Value(date),
       reminder: Value(reminder),
       isCustom: Value(isCustom),
+      notificationTime: notificationTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notificationTime),
+      isNotified: Value(isNotified),
     );
   }
 
@@ -1137,6 +1201,10 @@ class EventTableData extends DataClass implements Insertable<EventTableData> {
       date: serializer.fromJson<DateTime>(json['date']),
       reminder: serializer.fromJson<String>(json['reminder']),
       isCustom: serializer.fromJson<bool>(json['isCustom']),
+      notificationTime: serializer.fromJson<DateTime?>(
+        json['notificationTime'],
+      ),
+      isNotified: serializer.fromJson<bool>(json['isNotified']),
     );
   }
   @override
@@ -1150,6 +1218,8 @@ class EventTableData extends DataClass implements Insertable<EventTableData> {
       'date': serializer.toJson<DateTime>(date),
       'reminder': serializer.toJson<String>(reminder),
       'isCustom': serializer.toJson<bool>(isCustom),
+      'notificationTime': serializer.toJson<DateTime?>(notificationTime),
+      'isNotified': serializer.toJson<bool>(isNotified),
     };
   }
 
@@ -1161,6 +1231,8 @@ class EventTableData extends DataClass implements Insertable<EventTableData> {
     DateTime? date,
     String? reminder,
     bool? isCustom,
+    Value<DateTime?> notificationTime = const Value.absent(),
+    bool? isNotified,
   }) => EventTableData(
     id: id ?? this.id,
     remoteId: remoteId.present ? remoteId.value : this.remoteId,
@@ -1171,6 +1243,10 @@ class EventTableData extends DataClass implements Insertable<EventTableData> {
     date: date ?? this.date,
     reminder: reminder ?? this.reminder,
     isCustom: isCustom ?? this.isCustom,
+    notificationTime: notificationTime.present
+        ? notificationTime.value
+        : this.notificationTime,
+    isNotified: isNotified ?? this.isNotified,
   );
   EventTableData copyWithCompanion(EventsTableCompanion data) {
     return EventTableData(
@@ -1183,6 +1259,12 @@ class EventTableData extends DataClass implements Insertable<EventTableData> {
       date: data.date.present ? data.date.value : this.date,
       reminder: data.reminder.present ? data.reminder.value : this.reminder,
       isCustom: data.isCustom.present ? data.isCustom.value : this.isCustom,
+      notificationTime: data.notificationTime.present
+          ? data.notificationTime.value
+          : this.notificationTime,
+      isNotified: data.isNotified.present
+          ? data.isNotified.value
+          : this.isNotified,
     );
   }
 
@@ -1195,7 +1277,9 @@ class EventTableData extends DataClass implements Insertable<EventTableData> {
           ..write('title: $title, ')
           ..write('date: $date, ')
           ..write('reminder: $reminder, ')
-          ..write('isCustom: $isCustom')
+          ..write('isCustom: $isCustom, ')
+          ..write('notificationTime: $notificationTime, ')
+          ..write('isNotified: $isNotified')
           ..write(')'))
         .toString();
   }
@@ -1209,6 +1293,8 @@ class EventTableData extends DataClass implements Insertable<EventTableData> {
     date,
     reminder,
     isCustom,
+    notificationTime,
+    isNotified,
   );
   @override
   bool operator ==(Object other) =>
@@ -1220,7 +1306,9 @@ class EventTableData extends DataClass implements Insertable<EventTableData> {
           other.title == this.title &&
           other.date == this.date &&
           other.reminder == this.reminder &&
-          other.isCustom == this.isCustom);
+          other.isCustom == this.isCustom &&
+          other.notificationTime == this.notificationTime &&
+          other.isNotified == this.isNotified);
 }
 
 class EventsTableCompanion extends UpdateCompanion<EventTableData> {
@@ -1231,6 +1319,8 @@ class EventsTableCompanion extends UpdateCompanion<EventTableData> {
   final Value<DateTime> date;
   final Value<String> reminder;
   final Value<bool> isCustom;
+  final Value<DateTime?> notificationTime;
+  final Value<bool> isNotified;
   const EventsTableCompanion({
     this.id = const Value.absent(),
     this.remoteId = const Value.absent(),
@@ -1239,6 +1329,8 @@ class EventsTableCompanion extends UpdateCompanion<EventTableData> {
     this.date = const Value.absent(),
     this.reminder = const Value.absent(),
     this.isCustom = const Value.absent(),
+    this.notificationTime = const Value.absent(),
+    this.isNotified = const Value.absent(),
   });
   EventsTableCompanion.insert({
     this.id = const Value.absent(),
@@ -1248,6 +1340,8 @@ class EventsTableCompanion extends UpdateCompanion<EventTableData> {
     required DateTime date,
     required String reminder,
     required bool isCustom,
+    this.notificationTime = const Value.absent(),
+    this.isNotified = const Value.absent(),
   }) : title = Value(title),
        date = Value(date),
        reminder = Value(reminder),
@@ -1260,6 +1354,8 @@ class EventsTableCompanion extends UpdateCompanion<EventTableData> {
     Expression<DateTime>? date,
     Expression<String>? reminder,
     Expression<bool>? isCustom,
+    Expression<DateTime>? notificationTime,
+    Expression<bool>? isNotified,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1269,6 +1365,8 @@ class EventsTableCompanion extends UpdateCompanion<EventTableData> {
       if (date != null) 'date': date,
       if (reminder != null) 'reminder': reminder,
       if (isCustom != null) 'is_custom': isCustom,
+      if (notificationTime != null) 'notification_time': notificationTime,
+      if (isNotified != null) 'is_notified': isNotified,
     });
   }
 
@@ -1280,6 +1378,8 @@ class EventsTableCompanion extends UpdateCompanion<EventTableData> {
     Value<DateTime>? date,
     Value<String>? reminder,
     Value<bool>? isCustom,
+    Value<DateTime?>? notificationTime,
+    Value<bool>? isNotified,
   }) {
     return EventsTableCompanion(
       id: id ?? this.id,
@@ -1289,6 +1389,8 @@ class EventsTableCompanion extends UpdateCompanion<EventTableData> {
       date: date ?? this.date,
       reminder: reminder ?? this.reminder,
       isCustom: isCustom ?? this.isCustom,
+      notificationTime: notificationTime ?? this.notificationTime,
+      isNotified: isNotified ?? this.isNotified,
     );
   }
 
@@ -1316,6 +1418,12 @@ class EventsTableCompanion extends UpdateCompanion<EventTableData> {
     if (isCustom.present) {
       map['is_custom'] = Variable<bool>(isCustom.value);
     }
+    if (notificationTime.present) {
+      map['notification_time'] = Variable<DateTime>(notificationTime.value);
+    }
+    if (isNotified.present) {
+      map['is_notified'] = Variable<bool>(isNotified.value);
+    }
     return map;
   }
 
@@ -1328,7 +1436,9 @@ class EventsTableCompanion extends UpdateCompanion<EventTableData> {
           ..write('title: $title, ')
           ..write('date: $date, ')
           ..write('reminder: $reminder, ')
-          ..write('isCustom: $isCustom')
+          ..write('isCustom: $isCustom, ')
+          ..write('notificationTime: $notificationTime, ')
+          ..write('isNotified: $isNotified')
           ..write(')'))
         .toString();
   }
@@ -3749,6 +3859,8 @@ typedef $$EventsTableTableCreateCompanionBuilder =
       required DateTime date,
       required String reminder,
       required bool isCustom,
+      Value<DateTime?> notificationTime,
+      Value<bool> isNotified,
     });
 typedef $$EventsTableTableUpdateCompanionBuilder =
     EventsTableCompanion Function({
@@ -3759,6 +3871,8 @@ typedef $$EventsTableTableUpdateCompanionBuilder =
       Value<DateTime> date,
       Value<String> reminder,
       Value<bool> isCustom,
+      Value<DateTime?> notificationTime,
+      Value<bool> isNotified,
     });
 
 class $$EventsTableTableFilterComposer
@@ -3802,6 +3916,16 @@ class $$EventsTableTableFilterComposer
 
   ColumnFilters<bool> get isCustom => $composableBuilder(
     column: $table.isCustom,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get notificationTime => $composableBuilder(
+    column: $table.notificationTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isNotified => $composableBuilder(
+    column: $table.isNotified,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -3849,6 +3973,16 @@ class $$EventsTableTableOrderingComposer
     column: $table.isCustom,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<DateTime> get notificationTime => $composableBuilder(
+    column: $table.notificationTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isNotified => $composableBuilder(
+    column: $table.isNotified,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$EventsTableTableAnnotationComposer
@@ -3882,6 +4016,16 @@ class $$EventsTableTableAnnotationComposer
 
   GeneratedColumn<bool> get isCustom =>
       $composableBuilder(column: $table.isCustom, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get notificationTime => $composableBuilder(
+    column: $table.notificationTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isNotified => $composableBuilder(
+    column: $table.isNotified,
+    builder: (column) => column,
+  );
 }
 
 class $$EventsTableTableTableManager
@@ -3922,6 +4066,8 @@ class $$EventsTableTableTableManager
                 Value<DateTime> date = const Value.absent(),
                 Value<String> reminder = const Value.absent(),
                 Value<bool> isCustom = const Value.absent(),
+                Value<DateTime?> notificationTime = const Value.absent(),
+                Value<bool> isNotified = const Value.absent(),
               }) => EventsTableCompanion(
                 id: id,
                 remoteId: remoteId,
@@ -3930,6 +4076,8 @@ class $$EventsTableTableTableManager
                 date: date,
                 reminder: reminder,
                 isCustom: isCustom,
+                notificationTime: notificationTime,
+                isNotified: isNotified,
               ),
           createCompanionCallback:
               ({
@@ -3940,6 +4088,8 @@ class $$EventsTableTableTableManager
                 required DateTime date,
                 required String reminder,
                 required bool isCustom,
+                Value<DateTime?> notificationTime = const Value.absent(),
+                Value<bool> isNotified = const Value.absent(),
               }) => EventsTableCompanion.insert(
                 id: id,
                 remoteId: remoteId,
@@ -3948,6 +4098,8 @@ class $$EventsTableTableTableManager
                 date: date,
                 reminder: reminder,
                 isCustom: isCustom,
+                notificationTime: notificationTime,
+                isNotified: isNotified,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

@@ -11,6 +11,7 @@ import 'package:daimond/features/payments/presentation/providers/payment_control
 import 'package:daimond/features/payments/presentation/providers/payment_providers.dart';
 
 import '../../../../core/routing/app_routes.dart';
+import '../../../../features/main/presentation/screens/main_screen.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
@@ -27,7 +28,7 @@ class SettingsScreen extends ConsumerWidget {
     final texts = AppLocalizations.of(context)!;
     final authState = ref.watch(authStateProvider);
     final user = authState.value?.session?.user ?? Supabase.instance.client.auth.currentUser;
-    final bool isLoggedIn = user != null && !(user.isAnonymous ?? false);
+    final bool isLoggedIn = user != null && !user.isAnonymous;
 
     return CustomScrollView(
       slivers: [
@@ -314,14 +315,21 @@ class SettingsScreen extends ConsumerWidget {
                               cancelText: texts.no,
                               onConfirm: () async {
                                 Navigator.of(dialogContext).pop();
+                                
+                                // Reset to Home tab so they don't see Settings when logging back in
+                                ref.read(bottomNavIndexProvider.notifier).state = 0;
+                                
                                 await ref.read(authProvider.notifier).signOut();
+                                
                                 if (context.mounted) {
                                   CustomSnackbar.showSuccess(
                                     context,
                                     texts.logoutSuccess,
                                   );
-                                  context.goNamed(AppRoute.login.name);
                                 }
+                                
+                                // Use root router to guarantee navigation even if context changes
+                                AppRouter.router.goNamed(AppRoute.login.name);
                               },
                             ),
                           );

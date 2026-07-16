@@ -51,15 +51,37 @@ class AppBar1 extends ConsumerWidget {
                   ),
                   if (ref.watch(unreadNotificationsCountProvider) > 0)
                     Positioned(
-                      right: 6.w,
-                      top: 6.w,
-                      child: Container(
-                        width: 10.w,
-                        height: 10.w,
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
+                      right: 4.w,
+                      top: 4.w,
+                      child: Consumer(
+                        builder: (context, ref, _) {
+                          final count = ref.watch(unreadNotificationsCountProvider);
+                          final displayCount = count > 9 ? '9+' : count.toString();
+                          return AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            transitionBuilder: (Widget child, Animation<double> animation) {
+                              return ScaleTransition(scale: animation, child: child);
+                            },
+                            child: Container(
+                              key: ValueKey<int>(count),
+                              padding: EdgeInsets.all(3.w),
+                              decoration: const BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                              constraints: BoxConstraints(
+                                minWidth: 16.w,
+                                minHeight: 16.w,
+                              ),
+                              alignment: Alignment.center,
+                              child: Text(
+                                displayCount,
+                                style: AppTextStyles.roboto400Regular9(color: Colors.white),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
                 ],

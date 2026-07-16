@@ -206,8 +206,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                               if (_isLoadingGuest) return;
                               setState(() => _isLoadingGuest = true);
                               try {
+                                debugPrint('[AUTH] Attempting Anonymous Sign-In...');
                                 await Supabase.instance.client.auth
                                     .signInAnonymously();
+                                debugPrint('[AUTH] Anonymous sign-in successful. User ID: ${Supabase.instance.client.auth.currentUser?.id}');
                                 if (context.mounted) {
                                   _completeOnboarding(() {
                                     context.replaceNamed(AppRoute.main.name);

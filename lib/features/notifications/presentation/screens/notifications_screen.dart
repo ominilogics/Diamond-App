@@ -116,30 +116,40 @@ class NotificationsScreen extends HookConsumerWidget {
                                 title: item.title,
                                 description: item.description,
                                 time: _getTimeAgo(item.createdAt),
+                                isRead: item.isRead,
                                 onTap: () {
-                                  // Mark as read in background
+                                  // 1. Mark as read immediately for snappy UI
                                   if (item.id != null && !item.isRead) {
                                     ref.read(notificationsRepositoryProvider).markAsRead(item.id!);
                                   }
                                   
-                                  // Simple NLP routing
-                                  String targetRoute = '';
-                                  final search = '${item.title.toLowerCase()} ${item.description.toLowerCase()}';
-                                  if (search.contains('event')) {
-                                    targetRoute = '/events';
-                                  } else if (search.contains('order') || search.contains('purchas') || search.contains('payment')) {
-                                    targetRoute = '/order-history';
-                                  } else if (search.contains('subscription') || search.contains('plan')) {
-                                    targetRoute = '/subscription';
-                                  } else {
-                                    // Default fallback
-                                    targetRoute = '/events'; 
-                                  }
+                                  // 2. Wait 250ms so user sees the ripple effect and state change
+                                  Future.delayed(const Duration(milliseconds: 250), () {
+                                    if (!context.mounted) return;
 
-                                  final currentPath = GoRouter.of(context).routerDelegate.currentConfiguration.uri.path;
-                                  if (currentPath != targetRoute) {
-                                    context.push(targetRoute);
-                                  }
+                                    // Robust Keyword Routing Fallback
+                                    String targetRoute = '/main'; // Safe global fallback
+                                    final search = '${item.title.toLowerCase()} ${item.description.toLowerCase()}';
+                                    
+                                    if (search.contains('event') || search.contains('reminder')) {
+                                      targetRoute = '/events';
+                                    } else if (search.contains('card') || search.contains('design')) {
+                                      targetRoute = '/cards';
+                                    } else if (search.contains('order') || search.contains('purchas') || search.contains('payment')) {
+                                      targetRoute = '/order-history';
+                                    } else if (search.contains('subscription') || search.contains('plan') || search.contains('offer')) {
+                                      targetRoute = '/subscription';
+                                    } else if (search.contains('draft')) {
+                                      targetRoute = '/my-drafts';
+                                    }
+
+                                    final currentPath = GoRouter.of(context).routerDelegate.currentConfiguration.uri.path;
+                                    
+                                    // 3. Use go() instead of push() to prevent duplicate stack building
+                                    if (currentPath != targetRoute) {
+                                      context.go(targetRoute);
+                                    }
+                                  });
                                 },
                               ),
                             ),

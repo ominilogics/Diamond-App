@@ -1,11 +1,15 @@
+import 'package:daimond/features/auth/presentation/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:daimond/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../providers/events_provider.dart';
+import '../../../../core/routing/app_routes.dart';
+import '../../../../core/widgets/primary_button.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -34,7 +38,11 @@ class EventsScreen extends HookConsumerWidget {
     final hasSystemEvents = systemEvents.isNotEmpty;
     final hasAnyEvents = hasCustomEvents || hasSystemEvents;
 
-    Widget fab = Container(
+    final authState = ref.watch(authStateProvider);
+    final user = authState.value?.session?.user ?? Supabase.instance.client.auth.currentUser;
+    final bool isLoggedIn = user != null && !user.isAnonymous;
+
+    Widget fab = isLoggedIn ? Container(
       width: 56.w,
       height: 56.w,
       margin: EdgeInsets.only(bottom: showBackButton ? 8.h : 16.h),
@@ -61,10 +69,17 @@ class EventsScreen extends HookConsumerWidget {
           ),
         ),
       ),
-    );
+    ) : const SizedBox.shrink();
 
-    Widget content = CustomScrollView(
-      slivers: [
+    Widget content = RefreshIndicator(
+      color: AppColors.primaryButtonGradientStart,
+      backgroundColor: Colors.white,
+      onRefresh: () async {
+        await ref.read(eventsProvider.notifier).syncAndRefresh();
+      },
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
         SliverLayoutBuilder(
           builder: (context, constraints) {
             final isScrolled = constraints.scrollOffset > 0;
@@ -91,7 +106,32 @@ class EventsScreen extends HookConsumerWidget {
             );
           },
         ),
-        if (hasAnyEvents)
+        if (!isLoggedIn) ...[
+          SliverToBoxAdapter(child: SizedBox(height: 24.h)),
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    texts.loginPrompt,
+                    style: AppTextStyles.roboto400Regular20(),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 24.h),
+                  PrimaryButton(
+                    text: texts.loginAction,
+                    onPressed: () {
+                      context.pushNamed(AppRoute.login.name);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          )
+        ] else if (hasAnyEvents)
           SliverToBoxAdapter(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -179,7 +219,7 @@ class EventsScreen extends HookConsumerWidget {
               ],
             ),
           ),
-      ],
+      ],)
     );
 
     if (showBackButton) {

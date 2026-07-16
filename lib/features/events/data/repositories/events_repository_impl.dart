@@ -43,9 +43,50 @@ class EventsRepositoryImpl implements EventsRepository {
   @override
   Future<Either<Failure, void>> saveEvent(EventEntity event) async {
     try {
+      final calculatedNotificationTime = _calculateNotificationTime(event.date, event.reminder);
+      bool newIsNotifiedState = false;
+
+      // Rule 2: Too Late Rule
+      if (calculatedNotificationTime.isBefore(DateTime.now())) {
+        newIsNotifiedState = true; // Mark as already notified so it doesn't fire instantly
+      } else {
+        // It's in the future. Let's check if it's an edit.
+        if (event.id != -1 && event.id != 0) {
+          // Fetch existing event
+          final existingEvents = await dataSource.getEvents();
+          final existingEvent = existingEvents.where((e) => e.id == event.id).firstOrNull;
+          
+          if (existingEvent != null && existingEvent.notificationTime == calculatedNotificationTime) {
+            // Rule 1: Time didn't change (e.g. just a title edit).
+            // Senior Level Sync: Verify with Supabase if it was notified while the app was closed!
+            bool serverNotified = existingEvent.isNotified;
+            if (event.remoteId != null) {
+              final remoteStatus = await remoteDataSource.getEventNotifiedStatus(event.remoteId!);
+              if (remoteStatus != null) {
+                serverNotified = remoteStatus;
+              }
+            }
+            newIsNotifiedState = serverNotified;
+          } else {
+            // Rule 3: Time changed. Reset to false so it fires!
+            newIsNotifiedState = false;
+          }
+        } else {
+          // Brand new event in the future
+          newIsNotifiedState = false;
+        }
+      }
+      
       final eventWithId = (event.isCustom && event.remoteId == null) 
-          ? event.copyWith(remoteId: const Uuid().v4()) 
-          : event;
+          ? event.copyWith(
+              remoteId: const Uuid().v4(), 
+              notificationTime: calculatedNotificationTime,
+              isNotified: newIsNotifiedState,
+            )
+          : event.copyWith(
+              notificationTime: calculatedNotificationTime,
+              isNotified: newIsNotifiedState,
+            );
 
       final companion = EventsTableCompanion(
         id: eventWithId.id != -1 && eventWithId.id != 0 ? Value(eventWithId.id) : const Value.absent(),
@@ -55,6 +96,8 @@ class EventsRepositoryImpl implements EventsRepository {
         date: Value(eventWithId.date),
         reminder: Value(eventWithId.reminder),
         isCustom: Value(eventWithId.isCustom),
+        notificationTime: Value(eventWithId.notificationTime),
+        isNotified: Value(eventWithId.isNotified),
       );
 
       await dataSource.saveEvent(companion);
@@ -115,36 +158,26 @@ class EventsRepositoryImpl implements EventsRepository {
     }
   }
 
+  DateTime _calculateNotificationTime(DateTime eventDate, String reminder) {
+    // Assume notification time is 9:00 AM local time on the target day
+    DateTime notificationDate = DateTime(eventDate.year, eventDate.month, eventDate.day, 9, 0);
+
+    if (reminder == "3 Days Before") {
+      notificationDate = notificationDate.subtract(const Duration(days: 3));
+    } else if (reminder == "A Week Before") {
+      notificationDate = notificationDate.subtract(const Duration(days: 7));
+    } else if (reminder == "One Day Before") {
+      notificationDate = notificationDate.subtract(const Duration(days: 1));
+    } else if (reminder == "10 Seconds Test") {
+      // For immediate testing
+      return DateTime.now().add(const Duration(seconds: 10));
+    }
+    
+    return notificationDate;
+  }
+
   void _scheduleNotification(EventEntity event) {
     if (event.remoteId == null) return;
-
-    // -------------------------------------------------------------
-    // TODO: TEMPORARY TESTING LOGIC - Fire in 10 seconds!
-    // -------------------------------------------------------------
-    DateTime notificationDate = DateTime.now().add(const Duration(seconds: 10));
-    
-    /* ORIGINAL PRODUCTION SCHEDULING LOGIC
-    DateTime notificationDate = event.date;
-    // Assume notification time is 9:00 AM on the target day
-    notificationDate = DateTime(event.date.year, event.date.month, event.date.day, 9, 0);
-
-    if (event.reminder == "3 Days Before") {
-      notificationDate = notificationDate.subtract(const Duration(days: 3));
-    } else if (event.reminder == "A Week Before") {
-      notificationDate = notificationDate.subtract(const Duration(days: 7));
-    } else if (event.reminder == "One Day Before") {
-      notificationDate = notificationDate.subtract(const Duration(days: 1));
-    }
-    */
-
-    final notificationId = event.remoteId.hashCode.abs() & 0x7FFFFFFF;
-
-    notificationService.scheduleEventReminder(
-      id: notificationId,
-      title: "Upcoming Event: ${event.title}",
-      body: "Don't forget, ${event.title} is coming up on ${event.date.month}/${event.date.day}!",
-      scheduledDate: notificationDate,
-      payload: '/events',
-    );
+    // Local scheduling disabled in favor of FCM backend logic.
   }
 }

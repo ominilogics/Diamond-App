@@ -1,6 +1,9 @@
 import 'package:daimond/features/home/presentation/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../../core/routing/app_routes.dart';
 
 import '../../../../core/widgets/gradient_scaffold.dart';
 import '../../../../features/events/presentation/screens/events_screen.dart';

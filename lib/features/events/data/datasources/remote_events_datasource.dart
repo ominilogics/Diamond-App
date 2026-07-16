@@ -5,6 +5,7 @@ abstract class RemoteEventsDataSource {
   Future<List<EventEntity>> getCustomEvents();
   Future<String?> saveEvent(EventEntity event);
   Future<void> deleteEvent(String remoteId);
+  Future<bool?> getEventNotifiedStatus(String remoteId);
 }
 
 class RemoteEventsDataSourceImpl implements RemoteEventsDataSource {
@@ -30,6 +31,8 @@ class RemoteEventsDataSourceImpl implements RemoteEventsDataSource {
       date: DateTime.parse(data['date']),
       reminder: data['reminder'],
       isCustom: data['is_custom'] ?? true, // Read from DB, fallback to true
+      notificationTime: data['notification_time'] != null ? DateTime.parse(data['notification_time']) : null,
+      isNotified: data['is_notified'] ?? false,
     )).toList();
   }
 
@@ -45,6 +48,8 @@ class RemoteEventsDataSourceImpl implements RemoteEventsDataSource {
       'date': event.date.toIso8601String(),
       'reminder': event.reminder,
       'is_custom': event.isCustom,
+      if (event.notificationTime != null) 'notification_time': event.notificationTime!.toUtc().toIso8601String(),
+      'is_notified': event.isNotified,
     }).select('id').single();
 
     return response['id'] as String?;
@@ -59,5 +64,20 @@ class RemoteEventsDataSourceImpl implements RemoteEventsDataSource {
         .from('events')
         .delete()
         .match({'id': remoteId, 'user_id': userId});
+  }
+
+  @override
+  Future<bool?> getEventNotifiedStatus(String remoteId) async {
+    try {
+      final response = await supabaseClient
+          .from('events')
+          .select('is_notified')
+          .eq('id', remoteId)
+          .single()
+          .timeout(const Duration(seconds: 3));
+      return response['is_notified'] as bool?;
+    } catch (_) {
+      return null;
+    }
   }
 }

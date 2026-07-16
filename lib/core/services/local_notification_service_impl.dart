@@ -15,7 +15,7 @@ import 'notification_service.dart';
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going to use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
-  debugPrint("Handling a background message: ${message.messageId}");
+  debugPrint("[NOTIFICATIONS] 👻 BACKGROUND handler triggered for message: ${message.messageId}");
 }
 
 class LocalNotificationServiceImpl implements NotificationService {
@@ -24,6 +24,8 @@ class LocalNotificationServiceImpl implements NotificationService {
 
   @override
   Future<void> init() async {
+    debugPrint('[NOTIFICATIONS] 🚀 Initializing Notification Service...');
+    
     // Initialize timezone for scheduling
     tz.initializeTimeZones();
 
@@ -33,15 +35,16 @@ class LocalNotificationServiceImpl implements NotificationService {
     // For iOS, request permissions later manually
     const DarwinInitializationSettings initializationSettingsDarwin =
         DarwinInitializationSettings(
-      requestAlertPermission: false,
-      requestBadgePermission: false,
-      requestSoundPermission: false,
-    );
+          requestAlertPermission: false,
+          requestBadgePermission: false,
+          requestSoundPermission: false,
+        );
 
-    const InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: initializationSettingsDarwin,
-    );
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+          android: initializationSettingsAndroid,
+          iOS: initializationSettingsDarwin,
+        );
 
     await _flutterLocalNotificationsPlugin.initialize(
       settings: initializationSettings,
@@ -56,8 +59,8 @@ class LocalNotificationServiceImpl implements NotificationService {
 
     // Setup foreground FCM message handling
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      debugPrint('Got a message whilst in the foreground!');
-      
+      debugPrint('[NOTIFICATIONS] 🔔 FOREGROUND message received! Title: ${message.notification?.title}, Body: ${message.notification?.body}');
+
       // We can use flutter_local_notifications to show a heads-up display while app is open!
       if (message.notification != null) {
         _flutterLocalNotificationsPlugin.show(
@@ -73,47 +76,52 @@ class LocalNotificationServiceImpl implements NotificationService {
               icon: '@mipmap/ic_launcher',
             ),
           ),
-          // We can pass routing path here if we included it in FCM data payload
-          payload: '/notifications', 
+          // Pass the dynamic payload encoded by our backend
+          payload: message.data['payload'] as String? ?? '/notifications',
         );
       }
     });
 
-    String _getRouteFromMessage(RemoteMessage message) {
-      final type = message.data['type'] as String?;
-      if (type == 'new card') return AppRoute.cards.path; 
-      if (type == 'event reminder') return AppRoute.events.path;
-      if (type == 'special offer') return AppRoute.subscription.path;
-      return AppRoute.main.path;
-    }
-
     // Handle FCM Notification Taps (App in Background)
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      debugPrint('FCM Notification caused app to open from background! Data: ${message.data}');
-      _handlePayload(_getRouteFromMessage(message));
+      debugPrint(
+        '[NOTIFICATIONS] 📲 APP OPENED from BACKGROUND via notification! Data: ${message.data}',
+      );
+      _handlePayload(message.data['payload'] as String?);
     });
 
     // Handle FCM Notification Taps (App was Killed)
-    final RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+    final RemoteMessage? initialMessage = await FirebaseMessaging.instance
+        .getInitialMessage();
     if (initialMessage != null) {
-      debugPrint('FCM Notification caused app to open from KILLED state! Data: ${initialMessage.data}');
-      _handlePayload(_getRouteFromMessage(initialMessage)); 
+      debugPrint(
+        '[NOTIFICATIONS] 💀 APP LAUNCHED from KILLED state via notification! Data: ${initialMessage.data}',
+      );
+      final payload = initialMessage.data['payload'] as String?;
+      if (payload != null && payload.isNotEmpty) {
+        AppRouter.initialDeepLink = payload;
+      }
     }
 
     // Handle local AlarmManager notification taps from killed state
-    final NotificationAppLaunchDetails? launchDetails = 
-        await _flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+    final NotificationAppLaunchDetails? launchDetails =
+        await _flutterLocalNotificationsPlugin
+            .getNotificationAppLaunchDetails();
     if (launchDetails != null && launchDetails.didNotificationLaunchApp) {
       final payload = launchDetails.notificationResponse?.payload;
-      debugPrint('App launched from killed state via notification. Payload: $payload');
-      _handlePayload(payload);
+      debugPrint(
+        'App launched from killed state via notification. Payload: $payload',
+      );
+      if (payload != null && payload.isNotEmpty) {
+        AppRouter.initialDeepLink = payload;
+      }
     }
-    
+
     // Sync FCM Token
     _syncFcmToken();
     // Listen to Supabase Auth changes to sync token after login
     Supabase.instance.client.auth.onAuthStateChange.listen((data) {
-      if (data.event == AuthChangeEvent.signedIn || 
+      if (data.event == AuthChangeEvent.signedIn ||
           data.event == AuthChangeEvent.initialSession) {
         _syncFcmToken();
       }
@@ -121,6 +129,7 @@ class LocalNotificationServiceImpl implements NotificationService {
   }
 
   Future<void> _syncFcmToken() async {
+    debugPrint('[NOTIFICATIONS] 🔄 Starting FCM Token sync check...');
     try {
       final session = Supabase.instance.client.auth.currentSession;
       if (session == null) return;
@@ -128,9 +137,11 @@ class LocalNotificationServiceImpl implements NotificationService {
       // 🟢 ALWAYS check SharedPreferences before uploading the token!
       final prefs = await SharedPreferences.getInstance();
       final pushEnabled = prefs.getBool('pushNotifications') ?? true;
-      
+
       if (!pushEnabled) {
-        debugPrint('Push notifications are disabled in settings. Skipping FCM token sync.');
+        debugPrint(
+          '[NOTIFICATIONS] 🛑 Push notifications disabled in local settings. Skipping token upload.',
+        );
         return;
       }
 
@@ -141,7 +152,7 @@ class LocalNotificationServiceImpl implements NotificationService {
       // Get the token
       final fcmToken = await FirebaseMessaging.instance.getToken();
       if (fcmToken != null) {
-        debugPrint('FCM Token: $fcmToken');
+        debugPrint('[NOTIFICATIONS] 🔑 FCM Token successfully retrieved.');
         // Save to Supabase with current preferences
         await Supabase.instance.client.from('user_fcm_tokens').upsert({
           'user_id': session.user.id,
@@ -154,21 +165,23 @@ class LocalNotificationServiceImpl implements NotificationService {
       }
 
       // Listen to token changes
-      FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) async {
-        final session = Supabase.instance.client.auth.currentSession;
-        if (session != null) {
-          await Supabase.instance.client.from('user_fcm_tokens').upsert({
-            'user_id': session.user.id,
-            'token': fcmToken,
-            'new_card_alerts': newCardAlerts,
-            'event_reminders': eventReminders,
-            'special_offers': specialOffers,
-            'updated_at': DateTime.now().toUtc().toIso8601String(),
+      FirebaseMessaging.instance.onTokenRefresh
+          .listen((fcmToken) async {
+            final session = Supabase.instance.client.auth.currentSession;
+            if (session != null) {
+              await Supabase.instance.client.from('user_fcm_tokens').upsert({
+                'user_id': session.user.id,
+                'token': fcmToken,
+                'new_card_alerts': newCardAlerts,
+                'event_reminders': eventReminders,
+                'special_offers': specialOffers,
+                'updated_at': DateTime.now().toUtc().toIso8601String(),
+              });
+            }
+          })
+          .onError((err) {
+            debugPrint('Error listening to FCM token refresh: $err');
           });
-        }
-      }).onError((err) {
-        debugPrint('Error listening to FCM token refresh: $err');
-      });
     } catch (e) {
       debugPrint('Failed to sync FCM token: $e');
     }
@@ -176,20 +189,18 @@ class LocalNotificationServiceImpl implements NotificationService {
 
   void _handlePayload(String? payload) {
     if (payload == null) return;
-    
-    // Abstract NotificationRouter implementation
+
     try {
-      // In the future, this can decode JSON: `{"route": "/card-detail", "id": "123"}`
       if (payload.isNotEmpty) {
-        // Delayed to guarantee the MaterialApp and GoRouter have fully mounted
-        Future.delayed(const Duration(milliseconds: 1500), () {
-          final currentPath = AppRouter.router.routerDelegate.currentConfiguration.uri.path;
-          
-          // Only push the route if we aren't already looking at it!
-          if (currentPath != payload) {
-            AppRouter.router.push(payload);
-          }
-        });
+        final currentPath =
+            AppRouter.router.routerDelegate.currentConfiguration.uri.path;
+
+        // Only navigate if we aren't already looking at it!
+        if (currentPath != payload) {
+          // Senior approach: Use `go()` to prevent infinite screen stacking.
+          // Fallback logic in AppBar2 ensures the back button still cleanly returns to `/main`!
+          AppRouter.router.go(payload);
+        }
       }
     } catch (e) {
       debugPrint('Failed to route notification payload: $e');
@@ -198,25 +209,27 @@ class LocalNotificationServiceImpl implements NotificationService {
 
   @override
   Future<void> requestPermissions() async {
+    debugPrint('[NOTIFICATIONS] 🔐 Requesting notification permissions from OS...');
+    
     // Android 13+ Notification Permission
-    await Permission.notification.request();
+    final status = await Permission.notification.request();
+    debugPrint('[NOTIFICATIONS] 🔐 Permission status: $status');
 
     // iOS Notification Permissions
     await _flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin>()
-        ?.requestPermissions(
-          alert: true,
-          badge: true,
-          sound: true,
-        );
+          IOSFlutterLocalNotificationsPlugin
+        >()
+        ?.requestPermissions(alert: true, badge: true, sound: true);
 
     // Android 14+ Exact Alarms Permission (Required for scheduled alarms in killed state)
     final androidImplementation = _flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
     if (androidImplementation != null) {
       await androidImplementation.requestExactAlarmsPermission();
-      
+
       // Explicitly create the channel so FCM can use it immediately!
       await androidImplementation.createNotificationChannel(
         const AndroidNotificationChannel(
@@ -256,13 +269,13 @@ class LocalNotificationServiceImpl implements NotificationService {
 
     const AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
-      'event_reminders_channel',
-      'Event Reminders',
-      channelDescription: 'Notifications for upcoming events and reminders',
-      importance: Importance.max,
-      priority: Priority.high,
-      icon: '@mipmap/ic_launcher',
-    );
+          'event_reminders_channel',
+          'Event Reminders',
+          channelDescription: 'Notifications for upcoming events and reminders',
+          importance: Importance.max,
+          priority: Priority.high,
+          icon: '@mipmap/ic_launcher',
+        );
 
     const DarwinNotificationDetails iosDetails = DarwinNotificationDetails();
 
@@ -272,11 +285,13 @@ class LocalNotificationServiceImpl implements NotificationService {
     );
 
     // Use timezone-aware scheduling
-    final tz.TZDateTime scheduledTzDate =
-        tz.TZDateTime.from(scheduledDate, tz.local);
+    final tz.TZDateTime scheduledTzDate = tz.TZDateTime.from(
+      scheduledDate,
+      tz.local,
+    );
 
     // [OPTION B - BACKEND FCM]
-    // Local scheduling has been intentionally disabled. 
+    // Local scheduling has been intentionally disabled.
     // Event reminders will now be processed centrally by Supabase pg_cron
     // and delivered reliably via Firebase Cloud Messaging even when killed.
     /*

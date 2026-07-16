@@ -1,3 +1,4 @@
+import 'package:daimond/features/auth/presentation/providers/auth_provider.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/providers/database_provider.dart';
@@ -7,7 +8,6 @@ import '../../data/repositories/events_repository_impl.dart';
 import '../../domain/entities/event_entity.dart';
 import '../../domain/repositories/events_repository.dart';
 import '../../../../core/services/notification_service.dart';
-
 final eventsRepositoryProvider = Provider<EventsRepository>((ref) {
   final db = ref.watch(appDatabaseProvider);
   final dataSource = LocalEventsDataSource(db);
@@ -19,11 +19,12 @@ final eventsRepositoryProvider = Provider<EventsRepository>((ref) {
 class EventsNotifier extends AsyncNotifier<List<EventEntity>> {
   @override
   Future<List<EventEntity>> build() async {
-    _syncAndRefresh();
+    ref.watch(authStateProvider);
+    syncAndRefresh();
     return _fetchEvents();
   }
 
-  Future<void> _syncAndRefresh() async {
+  Future<void> syncAndRefresh() async {
     final repository = ref.read(eventsRepositoryProvider);
     final result = await repository.syncEvents();
     if (!result.isLeft) {

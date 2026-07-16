@@ -6,6 +6,8 @@ class EventEntity {
   final DateTime date;
   final String reminder;
   final bool isCustom;
+  final DateTime? notificationTime;
+  final bool isNotified;
 
   EventEntity({
     required this.id,
@@ -15,6 +17,8 @@ class EventEntity {
     required this.date,
     required this.reminder,
     this.isCustom = true,
+    this.notificationTime,
+    this.isNotified = false,
   });
 
   EventEntity copyWith({
@@ -25,6 +29,8 @@ class EventEntity {
     DateTime? date,
     String? reminder,
     bool? isCustom,
+    DateTime? notificationTime,
+    bool? isNotified,
   }) {
     return EventEntity(
       id: id ?? this.id,
@@ -34,6 +40,8 @@ class EventEntity {
       date: date ?? this.date,
       reminder: reminder ?? this.reminder,
       isCustom: isCustom ?? this.isCustom,
+      notificationTime: notificationTime ?? this.notificationTime,
+      isNotified: isNotified ?? this.isNotified,
     );
   }
 }
