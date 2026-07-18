@@ -3031,6 +3031,17 @@ class $NotificationsTableTable extends NotificationsTable
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _payloadMeta = const VerificationMeta(
+    'payload',
+  );
+  @override
+  late final GeneratedColumn<String> payload = GeneratedColumn<String>(
+    'payload',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -3039,6 +3050,7 @@ class $NotificationsTableTable extends NotificationsTable
     description,
     createdAt,
     isRead,
+    payload,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -3094,6 +3106,12 @@ class $NotificationsTableTable extends NotificationsTable
         isRead.isAcceptableOrUnknown(data['is_read']!, _isReadMeta),
       );
     }
+    if (data.containsKey('payload')) {
+      context.handle(
+        _payloadMeta,
+        payload.isAcceptableOrUnknown(data['payload']!, _payloadMeta),
+      );
+    }
     return context;
   }
 
@@ -3127,6 +3145,10 @@ class $NotificationsTableTable extends NotificationsTable
         DriftSqlType.bool,
         data['${effectivePrefix}is_read'],
       )!,
+      payload: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload'],
+      ),
     );
   }
 
@@ -3144,6 +3166,7 @@ class NotificationTableData extends DataClass
   final String description;
   final DateTime createdAt;
   final bool isRead;
+  final String? payload;
   const NotificationTableData({
     required this.id,
     this.remoteId,
@@ -3151,6 +3174,7 @@ class NotificationTableData extends DataClass
     required this.description,
     required this.createdAt,
     required this.isRead,
+    this.payload,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -3163,6 +3187,9 @@ class NotificationTableData extends DataClass
     map['description'] = Variable<String>(description);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['is_read'] = Variable<bool>(isRead);
+    if (!nullToAbsent || payload != null) {
+      map['payload'] = Variable<String>(payload);
+    }
     return map;
   }
 
@@ -3176,6 +3203,9 @@ class NotificationTableData extends DataClass
       description: Value(description),
       createdAt: Value(createdAt),
       isRead: Value(isRead),
+      payload: payload == null && nullToAbsent
+          ? const Value.absent()
+          : Value(payload),
     );
   }
 
@@ -3191,6 +3221,7 @@ class NotificationTableData extends DataClass
       description: serializer.fromJson<String>(json['description']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       isRead: serializer.fromJson<bool>(json['isRead']),
+      payload: serializer.fromJson<String?>(json['payload']),
     );
   }
   @override
@@ -3203,6 +3234,7 @@ class NotificationTableData extends DataClass
       'description': serializer.toJson<String>(description),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'isRead': serializer.toJson<bool>(isRead),
+      'payload': serializer.toJson<String?>(payload),
     };
   }
 
@@ -3213,6 +3245,7 @@ class NotificationTableData extends DataClass
     String? description,
     DateTime? createdAt,
     bool? isRead,
+    Value<String?> payload = const Value.absent(),
   }) => NotificationTableData(
     id: id ?? this.id,
     remoteId: remoteId.present ? remoteId.value : this.remoteId,
@@ -3220,6 +3253,7 @@ class NotificationTableData extends DataClass
     description: description ?? this.description,
     createdAt: createdAt ?? this.createdAt,
     isRead: isRead ?? this.isRead,
+    payload: payload.present ? payload.value : this.payload,
   );
   NotificationTableData copyWithCompanion(NotificationsTableCompanion data) {
     return NotificationTableData(
@@ -3231,6 +3265,7 @@ class NotificationTableData extends DataClass
           : this.description,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       isRead: data.isRead.present ? data.isRead.value : this.isRead,
+      payload: data.payload.present ? data.payload.value : this.payload,
     );
   }
 
@@ -3242,14 +3277,15 @@ class NotificationTableData extends DataClass
           ..write('title: $title, ')
           ..write('description: $description, ')
           ..write('createdAt: $createdAt, ')
-          ..write('isRead: $isRead')
+          ..write('isRead: $isRead, ')
+          ..write('payload: $payload')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode =>
-      Object.hash(id, remoteId, title, description, createdAt, isRead);
+      Object.hash(id, remoteId, title, description, createdAt, isRead, payload);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -3259,7 +3295,8 @@ class NotificationTableData extends DataClass
           other.title == this.title &&
           other.description == this.description &&
           other.createdAt == this.createdAt &&
-          other.isRead == this.isRead);
+          other.isRead == this.isRead &&
+          other.payload == this.payload);
 }
 
 class NotificationsTableCompanion
@@ -3270,6 +3307,7 @@ class NotificationsTableCompanion
   final Value<String> description;
   final Value<DateTime> createdAt;
   final Value<bool> isRead;
+  final Value<String?> payload;
   const NotificationsTableCompanion({
     this.id = const Value.absent(),
     this.remoteId = const Value.absent(),
@@ -3277,6 +3315,7 @@ class NotificationsTableCompanion
     this.description = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.isRead = const Value.absent(),
+    this.payload = const Value.absent(),
   });
   NotificationsTableCompanion.insert({
     this.id = const Value.absent(),
@@ -3285,6 +3324,7 @@ class NotificationsTableCompanion
     required String description,
     required DateTime createdAt,
     this.isRead = const Value.absent(),
+    this.payload = const Value.absent(),
   }) : title = Value(title),
        description = Value(description),
        createdAt = Value(createdAt);
@@ -3295,6 +3335,7 @@ class NotificationsTableCompanion
     Expression<String>? description,
     Expression<DateTime>? createdAt,
     Expression<bool>? isRead,
+    Expression<String>? payload,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -3303,6 +3344,7 @@ class NotificationsTableCompanion
       if (description != null) 'description': description,
       if (createdAt != null) 'created_at': createdAt,
       if (isRead != null) 'is_read': isRead,
+      if (payload != null) 'payload': payload,
     });
   }
 
@@ -3313,6 +3355,7 @@ class NotificationsTableCompanion
     Value<String>? description,
     Value<DateTime>? createdAt,
     Value<bool>? isRead,
+    Value<String?>? payload,
   }) {
     return NotificationsTableCompanion(
       id: id ?? this.id,
@@ -3321,6 +3364,7 @@ class NotificationsTableCompanion
       description: description ?? this.description,
       createdAt: createdAt ?? this.createdAt,
       isRead: isRead ?? this.isRead,
+      payload: payload ?? this.payload,
     );
   }
 
@@ -3345,6 +3389,9 @@ class NotificationsTableCompanion
     if (isRead.present) {
       map['is_read'] = Variable<bool>(isRead.value);
     }
+    if (payload.present) {
+      map['payload'] = Variable<String>(payload.value);
+    }
     return map;
   }
 
@@ -3356,7 +3403,8 @@ class NotificationsTableCompanion
           ..write('title: $title, ')
           ..write('description: $description, ')
           ..write('createdAt: $createdAt, ')
-          ..write('isRead: $isRead')
+          ..write('isRead: $isRead, ')
+          ..write('payload: $payload')
           ..write(')'))
         .toString();
   }
@@ -5152,6 +5200,7 @@ typedef $$NotificationsTableTableCreateCompanionBuilder =
       required String description,
       required DateTime createdAt,
       Value<bool> isRead,
+      Value<String?> payload,
     });
 typedef $$NotificationsTableTableUpdateCompanionBuilder =
     NotificationsTableCompanion Function({
@@ -5161,6 +5210,7 @@ typedef $$NotificationsTableTableUpdateCompanionBuilder =
       Value<String> description,
       Value<DateTime> createdAt,
       Value<bool> isRead,
+      Value<String?> payload,
     });
 
 class $$NotificationsTableTableFilterComposer
@@ -5199,6 +5249,11 @@ class $$NotificationsTableTableFilterComposer
 
   ColumnFilters<bool> get isRead => $composableBuilder(
     column: $table.isRead,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payload => $composableBuilder(
+    column: $table.payload,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -5241,6 +5296,11 @@ class $$NotificationsTableTableOrderingComposer
     column: $table.isRead,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$NotificationsTableTableAnnotationComposer
@@ -5271,6 +5331,9 @@ class $$NotificationsTableTableAnnotationComposer
 
   GeneratedColumn<bool> get isRead =>
       $composableBuilder(column: $table.isRead, builder: (column) => column);
+
+  GeneratedColumn<String> get payload =>
+      $composableBuilder(column: $table.payload, builder: (column) => column);
 }
 
 class $$NotificationsTableTableTableManager
@@ -5319,6 +5382,7 @@ class $$NotificationsTableTableTableManager
                 Value<String> description = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<bool> isRead = const Value.absent(),
+                Value<String?> payload = const Value.absent(),
               }) => NotificationsTableCompanion(
                 id: id,
                 remoteId: remoteId,
@@ -5326,6 +5390,7 @@ class $$NotificationsTableTableTableManager
                 description: description,
                 createdAt: createdAt,
                 isRead: isRead,
+                payload: payload,
               ),
           createCompanionCallback:
               ({
@@ -5335,6 +5400,7 @@ class $$NotificationsTableTableTableManager
                 required String description,
                 required DateTime createdAt,
                 Value<bool> isRead = const Value.absent(),
+                Value<String?> payload = const Value.absent(),
               }) => NotificationsTableCompanion.insert(
                 id: id,
                 remoteId: remoteId,
@@ -5342,6 +5408,7 @@ class $$NotificationsTableTableTableManager
                 description: description,
                 createdAt: createdAt,
                 isRead: isRead,
+                payload: payload,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

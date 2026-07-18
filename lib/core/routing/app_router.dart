@@ -118,7 +118,11 @@ class AppRouter {
       GoRoute(
         name: AppRoute.main.name,
         path: AppRoute.main.path,
-        builder: (context, state) => const MainScreen(),
+        builder: (context, state) {
+          final tabStr = state.uri.queryParameters['tab'];
+          final initialTab = tabStr != null ? int.tryParse(tabStr) : null;
+          return MainScreen(initialTabIndex: initialTab);
+        },
       ),
       GoRoute(
         name: AppRoute.notifications.name,

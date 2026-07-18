@@ -1,29 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:daimond/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_bar2.dart';
 import '../../../../core/widgets/gradient_scaffold.dart';
 import '../widgets/notification_card.dart';
 import '../providers/notifications_provider.dart';
-import '../../domain/entities/notification_entity.dart';
 
 class NotificationsScreen extends HookConsumerWidget {
   const NotificationsScreen({super.key});
 
-  String _getTimeAgo(DateTime date) {
+  String _getTimeAgo(BuildContext context, DateTime date) {
+    final texts = AppLocalizations.of(context)!;
     final difference = DateTime.now().difference(date);
-    if (difference.isNegative) return '0m';
-    if (difference.inMinutes < 60) {
+    if (difference.isNegative || difference.inMinutes < 1) {
+      return texts.now;
+    } else if (difference.inMinutes < 60) {
       return '${difference.inMinutes}m';
     } else if (difference.inHours < 24) {
       return '${difference.inHours}h';
-    } else {
+    } else if (difference.inDays < 7) {
       return '${difference.inDays}d';
+    } else if (difference.inDays < 365) {
+      return '${(difference.inDays / 7).floor()}w';
+    } else {
+      return '${(difference.inDays / 365).floor()}y';
     }
   }
 
@@ -35,9 +40,35 @@ class NotificationsScreen extends HookConsumerWidget {
     // Trigger sync
     ref.watch(syncNotificationsProvider);
 
+    useEffect(() {
+      Future.microtask(() => ref.read(lastOpenedNotificationsProvider.notifier).markOpened());
+      return null;
+    }, const []);
+
+    final scrollController = useScrollController();
+    useEffect(() {
+      void listener() {
+        if (scrollController.position.pixels >= scrollController.position.maxScrollExtent - 200) {
+           final currentLimit = ref.read(notificationsLimitProvider);
+           final asyncState = ref.read(groupedNotificationsProvider);
+           
+           if (!asyncState.isLoading && asyncState.hasValue) {
+             final currentItemsCount = asyncState.value!.values.fold<int>(0, (prev, list) => prev + list.length);
+             // Only increase limit if we actually maxed out the current limit
+             if (currentItemsCount >= currentLimit) {
+               ref.read(notificationsLimitProvider.notifier).state = currentLimit + 20;
+             }
+           }
+        }
+      }
+      scrollController.addListener(listener);
+      return () => scrollController.removeListener(listener);
+    }, [scrollController]);
+
     return GradientScaffold(
       body: SafeArea(
         child: CustomScrollView(
+          controller: scrollController,
           slivers: [
             SliverLayoutBuilder(
               builder: (context, constraints) {
@@ -64,59 +95,82 @@ class NotificationsScreen extends HookConsumerWidget {
               },
             ),
             SliverToBoxAdapter(child: SizedBox(height: 24.h)),
-            groupedAsync.when(
-              loading: () => const SliverFillRemaining(
-                child: Center(
-                  child: CircularProgressIndicator(color: Colors.black),
-                ),
-              ),
-              error: (err, stack) => SliverFillRemaining(
-                child: Center(child: Text('${texts.errorOccurred}$err')),
-              ),
-              data: (grouped) {
-                if (grouped.isEmpty) {
-                  return SliverFillRemaining(
-                    child: Center(
-                      child: Text(
-                        texts.noNotificationsYet,
-                        style: AppTextStyles.roboto300Light13(),
+            if (groupedAsync.hasValue)
+              SliverPadding(
+                padding: EdgeInsets.symmetric(horizontal: 24.w),
+                sliver: groupedAsync.value!.isEmpty 
+                  ? SliverFillRemaining(
+                      child: Center(
+                        child: Text(
+                          texts.noNotificationsYet,
+                          style: AppTextStyles.roboto300Light13(),
+                        ),
                       ),
-                    ),
-                  );
-                }
-
-                return SliverPadding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate((context, index) {
-                      final rawTitle = grouped.keys.elementAt(index);
-                      final items = grouped[rawTitle]!;
+                    )
+                  : SliverList(
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final rawTitle = groupedAsync.value!.keys.elementAt(index);
+                        final items = groupedAsync.value![rawTitle]!;
 
                       String displayTitle = rawTitle;
-                      if (rawTitle == 'today_key') {
-                        displayTitle = texts.today;
-                      } else if (rawTitle == 'yesterday_key') {
-                        displayTitle = texts.yesterday;
+                      if (rawTitle == 'newNotifications') {
+                        displayTitle = texts.newNotifications;
+                      } else if (rawTitle == 'earlierNotifications') {
+                        displayTitle = texts.earlierNotifications;
                       }
 
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (rawTitle != 'today_key') ...[
-                            Text(
-                              displayTitle,
-                              style: AppTextStyles.roboto500Medium14(),
-                            ),
-                            SizedBox(height: 16.h),
-                          ],
+                          Text(
+                            displayTitle,
+                            style: AppTextStyles.roboto500Medium14(),
+                          ),
+                          SizedBox(height: 16.h),
                           ...items.map(
                             (item) => Padding(
                               padding: EdgeInsets.only(bottom: 16.h),
                               child: NotificationCard(
                                 title: item.title,
                                 description: item.description,
-                                time: _getTimeAgo(item.createdAt),
+                                time: _getTimeAgo(context, item.createdAt),
                                 isRead: item.isRead,
+                                onTrailingTap: () {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20.r))),
+                                    builder: (context) {
+                                      return SafeArea(
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            if (!item.isRead)
+                                              ListTile(
+                                                leading: const Icon(Icons.mark_email_read),
+                                                title: Text(texts.markAsRead),
+                                                onTap: () {
+                                                  if (item.id != null) {
+                                                    ref.read(notificationsRepositoryProvider).markAsRead(item.id!);
+                                                  }
+                                                  Navigator.pop(context);
+                                                },
+                                              ),
+                                            ListTile(
+                                              leading: const Icon(Icons.delete_outline, color: Colors.red),
+                                              title: Text(texts.deleteNotification, style: const TextStyle(color: Colors.red)),
+                                              onTap: () {
+                                                if (item.id != null) {
+                                                  ref.read(notificationsRepositoryProvider).deleteNotification(item.id!);
+                                                }
+                                                Navigator.pop(context);
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
                                 onTap: () {
                                   // 1. Mark as read immediately for snappy UI
                                   if (item.id != null && !item.isRead) {
@@ -127,20 +181,29 @@ class NotificationsScreen extends HookConsumerWidget {
                                   Future.delayed(const Duration(milliseconds: 250), () {
                                     if (!context.mounted) return;
 
-                                    // Robust Keyword Routing Fallback
                                     String targetRoute = '/main'; // Safe global fallback
-                                    final search = '${item.title.toLowerCase()} ${item.description.toLowerCase()}';
-                                    
-                                    if (search.contains('event') || search.contains('reminder')) {
-                                      targetRoute = '/events';
-                                    } else if (search.contains('card') || search.contains('design')) {
-                                      targetRoute = '/cards';
-                                    } else if (search.contains('order') || search.contains('purchas') || search.contains('payment')) {
-                                      targetRoute = '/order-history';
-                                    } else if (search.contains('subscription') || search.contains('plan') || search.contains('offer')) {
-                                      targetRoute = '/subscription';
-                                    } else if (search.contains('draft')) {
-                                      targetRoute = '/my-drafts';
+                                    // Use explicit payload if available
+                                    if (item.payload != null && item.payload!.isNotEmpty) {
+                                      targetRoute = item.payload!;
+                                      // Backward compatibility for legacy payloads already in the database
+                                      if (targetRoute == '/events') {
+                                        targetRoute = '/main?tab=1';
+                                      }
+                                    } else {
+                                      // Robust Keyword Routing Fallback
+                                      final search = '${item.title.toLowerCase()} ${item.description.toLowerCase()}';
+                                      
+                                      if (search.contains('event') || search.contains('reminder')) {
+                                        targetRoute = '/main?tab=1';
+                                      } else if (search.contains('card') || search.contains('design')) {
+                                        targetRoute = '/cards';
+                                      } else if (search.contains('order') || search.contains('purchas') || search.contains('payment')) {
+                                        targetRoute = '/orderHistory';
+                                      } else if (search.contains('subscription') || search.contains('plan') || search.contains('offer')) {
+                                        targetRoute = '/subscription';
+                                      } else if (search.contains('draft')) {
+                                        targetRoute = '/my-drafts';
+                                      }
                                     }
 
                                     final currentPath = GoRouter.of(context).routerDelegate.currentConfiguration.uri.path;
@@ -157,11 +220,19 @@ class NotificationsScreen extends HookConsumerWidget {
                           SizedBox(height: 8.h),
                         ],
                       );
-                    }, childCount: grouped.length),
-                  ),
-                );
-              },
-            ),
+                      }, childCount: groupedAsync.value!.length),
+                    ),
+              )
+            else if (groupedAsync.hasError)
+              SliverFillRemaining(
+                child: Center(child: Text('${texts.errorOccurred}${groupedAsync.error}')),
+              )
+            else
+              const SliverFillRemaining(
+                child: Center(
+                  child: CircularProgressIndicator(color: Colors.black),
+                ),
+              ),
           ],
         ),
       ),

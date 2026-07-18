@@ -8,4 +8,5 @@ class NotificationsTable extends Table {
   TextColumn get description => text()();
   DateTimeColumn get createdAt => dateTime()();
   BoolColumn get isRead => boolean().withDefault(const Constant(false))();
+  TextColumn get payload => text().nullable()();
 }

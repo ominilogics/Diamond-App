@@ -5,6 +5,7 @@ class NotificationEntity {
   final String description;
   final DateTime createdAt;
   final bool isRead;
+  final String? payload;
 
   NotificationEntity({
     this.id,
@@ -13,5 +14,6 @@ class NotificationEntity {
     required this.description,
     required this.createdAt,
     this.isRead = false,
+    this.payload,
   });
 }

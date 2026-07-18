@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:daimond/core/routing/app_routes.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -21,6 +22,11 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 class LocalNotificationServiceImpl implements NotificationService {
   final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
+      
+  final _onNotificationReceivedController = StreamController<void>.broadcast();
+
+  @override
+  Stream<void> get onNotificationReceived => _onNotificationReceivedController.stream;
 
   @override
   Future<void> init() async {
@@ -57,6 +63,29 @@ class LocalNotificationServiceImpl implements NotificationService {
     // Setup Firebase Messaging background handler
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
+    String _resolvePayload(Map<String, dynamic> data) {
+      // 1. If payload is explicitly provided by modern functions, use it
+      if (data['payload'] != null && data['payload'].toString().isNotEmpty) {
+        return data['payload'].toString();
+      }
+      
+      // 2. Fallback mapping for legacy 'type' keys (like Admin Broadcasts)
+      final type = data['type']?.toString();
+      if (type == 'new card') return '/cards';
+      if (type == 'event reminder') return '/main?tab=1';
+      if (type == 'special offer') return '/subscription';
+      
+      // 3. Absolute fallback
+      return '/notifications';
+    }
+
+    // Wrap the payload resolver to globally intercept legacy /events payloads
+    String _getFinalPayload(Map<String, dynamic> data) {
+       final p = _resolvePayload(data);
+       if (p == '/events') return '/main?tab=1';
+       return p;
+    }
+
     // Setup foreground FCM message handling
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       debugPrint('[NOTIFICATIONS] 🔔 FOREGROUND message received! Title: ${message.notification?.title}, Body: ${message.notification?.body}');
@@ -76,10 +105,13 @@ class LocalNotificationServiceImpl implements NotificationService {
               icon: '@mipmap/ic_launcher',
             ),
           ),
-          // Pass the dynamic payload encoded by our backend
-          payload: message.data['payload'] as String? ?? '/notifications',
+          // Pass the dynamically resolved payload
+          payload: _getFinalPayload(message.data),
         );
       }
+      
+      // Emit event so the app can instantly trigger a database sync for the Inbox and Badge!
+      _onNotificationReceivedController.add(null);
     });
 
     // Handle FCM Notification Taps (App in Background)
@@ -87,7 +119,7 @@ class LocalNotificationServiceImpl implements NotificationService {
       debugPrint(
         '[NOTIFICATIONS] 📲 APP OPENED from BACKGROUND via notification! Data: ${message.data}',
       );
-      _handlePayload(message.data['payload'] as String?);
+      _handlePayload(_getFinalPayload(message.data));
     });
 
     // Handle FCM Notification Taps (App was Killed)
@@ -97,10 +129,7 @@ class LocalNotificationServiceImpl implements NotificationService {
       debugPrint(
         '[NOTIFICATIONS] 💀 APP LAUNCHED from KILLED state via notification! Data: ${initialMessage.data}',
       );
-      final payload = initialMessage.data['payload'] as String?;
-      if (payload != null && payload.isNotEmpty) {
-        AppRouter.initialDeepLink = payload;
-      }
+      AppRouter.initialDeepLink = _getFinalPayload(initialMessage.data);
     }
 
     // Handle local AlarmManager notification taps from killed state

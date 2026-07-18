@@ -612,4 +612,19 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get defaultCardDescription =>
       'Loving you has been one of life\'s greatest gifts. No matter where life takes us, my heart will always find its way back to you.';
+
+  @override
+  String get now => 'Now';
+
+  @override
+  String get newNotifications => 'New';
+
+  @override
+  String get earlierNotifications => 'Earlier';
+
+  @override
+  String get deleteNotification => 'Remove this notification';
+
+  @override
+  String get markAsRead => 'Mark as read';
 }

@@ -14,18 +14,37 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
   NotificationsRepositoryImpl(this._db, this._remoteDataSource);
 
   @override
-  Stream<List<NotificationEntity>> watchNotifications() {
+  Stream<List<NotificationEntity>> watchNotifications({int limit = 50}) {
+    debugPrint('[NOTIFICATIONS_DEBUG] NotificationsRepository: watchNotifications stream initialized with limit $limit.');
     return (_db.select(_db.notificationsTable)..orderBy([
           (t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc),
-        ]))
+        ])..limit(limit))
         .watch()
-        .map((rows) => rows.map((row) => _mapToEntity(row)).toList());
+        .map((rows) {
+          debugPrint('[NOTIFICATIONS_DEBUG] NotificationsRepository: watchNotifications emitted ${rows.length} rows from Drift DB.');
+          return rows.map((row) => _mapToEntity(row)).toList();
+        });
   }
 
   @override
   Future<Either<Failure, void>> syncNotifications() async {
     try {
+      debugPrint('[NOTIFICATIONS_DEBUG] NotificationsRepository: Starting syncNotifications()...');
+
+      // 1. Cleanup old local notifications to free up phone storage
+      final thirtyDaysAgo = DateTime.now().subtract(const Duration(days: 30));
+      final deletedOld = await (_db.delete(_db.notificationsTable)
+            ..where((t) => t.createdAt.isSmallerThanValue(thirtyDaysAgo)))
+          .go();
+      if (deletedOld > 0) {
+        debugPrint('🧹 [NOTIFICATIONS_CLEANUP] Deleted $deletedOld notifications older than 30 days from device.');
+      }
+
       final remoteNotifications = await _remoteDataSource.getNotifications();
+      debugPrint('[NOTIFICATIONS_DEBUG] NotificationsRepository: Received ${remoteNotifications.length} notifications from RemoteDataSource.');
+      
+      int insertedCount = 0;
+      int updatedCount = 0;
       
       await _db.transaction(() async {
         for (var n in remoteNotifications) {
@@ -36,6 +55,7 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
               .getSingleOrNull();
 
           if (existing == null) {
+            insertedCount++;
             await _db.into(_db.notificationsTable).insert(
                   NotificationsTableCompanion.insert(
                     remoteId: Value(n.remoteId),
@@ -43,9 +63,11 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
                     description: n.description,
                     createdAt: n.createdAt,
                     isRead: Value(n.isRead),
+                    payload: Value(n.payload),
                   ),
                 );
           } else {
+            updatedCount++;
             // Update read status if changed remotely
             await (_db.update(_db.notificationsTable)
                   ..where((t) => t.id.equals(existing.id)))
@@ -53,8 +75,10 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
           }
         }
       });
+      debugPrint('[NOTIFICATIONS_DEBUG] NotificationsRepository: Sync complete. Inserted $insertedCount, Updated $updatedCount into local Drift DB.');
       return Either.right(null);
-    } catch (e) {
+    } catch (e, stack) {
+      debugPrint('[NOTIFICATIONS_DEBUG] NotificationsRepository sync ERROR: $e\n$stack');
       return Either.left(ServerFailure('Failed to sync notifications: $e'));
     }
   }
@@ -86,6 +110,29 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, void>> deleteNotification(int id) async {
+    try {
+      final localNotif = await (_db.select(_db.notificationsTable)..where((t) => t.id.equals(id))).getSingleOrNull();
+      if (localNotif == null) return Either.left(DatabaseFailure('Notification not found locally.'));
+
+      await (_db.delete(_db.notificationsTable)..where((t) => t.id.equals(id))).go();
+
+      if (localNotif.remoteId != null) {
+        // Fire and forget remote deletion
+        _remoteDataSource.deleteNotification(localNotif.remoteId!).then((_) {
+          debugPrint('✅ Successfully deleted notification from Supabase');
+        }).catchError((e) {
+          debugPrint('❌ Failed to delete notification from Supabase: $e');
+        });
+      }
+
+      return Either.right(null);
+    } catch (e) {
+      return Either.left(DatabaseFailure('Failed to delete notification: $e'));
+    }
+  }
+
   NotificationEntity _mapToEntity(NotificationTableData data) {
     return NotificationEntity(
       id: data.id,
@@ -94,6 +141,7 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
       description: data.description,
       createdAt: data.createdAt,
       isRead: data.isRead,
+      payload: data.payload,
     );
   }
 }

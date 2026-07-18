@@ -81,6 +81,10 @@ void main() async {
   });
 }
 
+final foregroundFCMStreamProvider = StreamProvider<void>((ref) {
+  return ref.watch(notificationServiceProvider).onNotificationReceived;
+});
+
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
@@ -96,6 +100,13 @@ class MyApp extends ConsumerWidget {
         }
       }
     });
+
+    // Trigger real-time database sync when a push notification is received in the foreground
+    ref.listen(foregroundFCMStreamProvider, (_, __) {
+      debugPrint('[NOTIFICATIONS_DEBUG] Foreground push received. Triggering background sync!');
+      ref.read(notificationsRepositoryProvider).syncNotifications();
+    });
+
     return ScreenUtilInit(
       designSize: const Size(393, 852),
 

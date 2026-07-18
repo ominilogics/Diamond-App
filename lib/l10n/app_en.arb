@@ -194,5 +194,10 @@
   "cardDetails": "Card Details",
   "preview": "Preview",
   "continueBtn": "Continue",
-  "defaultCardDescription": "Loving you has been one of life's greatest gifts. No matter where life takes us, my heart will always find its way back to you."
+  "defaultCardDescription": "Loving you has been one of life's greatest gifts. No matter where life takes us, my heart will always find its way back to you.",
+  "now": "Now",
+  "newNotifications": "New",
+  "earlierNotifications": "Earlier",
+  "deleteNotification": "Remove this notification",
+  "markAsRead": "Mark as read"
 }

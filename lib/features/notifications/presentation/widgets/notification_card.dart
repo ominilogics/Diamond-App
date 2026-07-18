@@ -11,6 +11,7 @@ class NotificationCard extends StatelessWidget {
   final String description;
   final String time;
   final VoidCallback? onTap;
+  final VoidCallback? onTrailingTap;
   final bool isRead;
 
   const NotificationCard({
@@ -19,6 +20,7 @@ class NotificationCard extends StatelessWidget {
     required this.description,
     required this.time,
     this.onTap,
+    this.onTrailingTap,
     this.isRead = true,
   });
 
@@ -101,6 +103,13 @@ class NotificationCard extends StatelessWidget {
               ],
             ),
           ),
+          if (onTrailingTap != null)
+            IconButton(
+              icon: Icon(Icons.more_horiz, color: AppColors.textSecondary),
+              onPressed: onTrailingTap,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
         ],
       ),
     ),

@@ -1257,6 +1257,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Loving you has been one of life\'s greatest gifts. No matter where life takes us, my heart will always find its way back to you.'**
   String get defaultCardDescription;
+
+  /// No description provided for @now.
+  ///
+  /// In en, this message translates to:
+  /// **'Now'**
+  String get now;
+
+  /// No description provided for @newNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get newNotifications;
+
+  /// No description provided for @earlierNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Earlier'**
+  String get earlierNotifications;
+
+  /// No description provided for @deleteNotification.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove this notification'**
+  String get deleteNotification;
+
+  /// No description provided for @markAsRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as read'**
+  String get markAsRead;
 }
 
 class _AppLocalizationsDelegate

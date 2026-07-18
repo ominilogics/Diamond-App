@@ -1,6 +1,7 @@
 import 'package:daimond/features/home/presentation/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/routing/app_routes.dart';
@@ -14,10 +15,18 @@ import '../widgets/custom_bottom_nav_bar.dart';
 final bottomNavIndexProvider = StateProvider<int>((ref) => 0);
 
 class MainScreen extends HookConsumerWidget {
-  const MainScreen({super.key});
+  final int? initialTabIndex;
+  const MainScreen({super.key, this.initialTabIndex});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    useEffect(() {
+      if (initialTabIndex != null) {
+        Future.microtask(() => ref.read(bottomNavIndexProvider.notifier).state = initialTabIndex!);
+      }
+      return null;
+    }, [initialTabIndex]);
+
     final currentIndex = ref.watch(bottomNavIndexProvider);
 
     final pages = [

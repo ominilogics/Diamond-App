@@ -66,7 +66,7 @@ class AppBar1 extends ConsumerWidget {
                               key: ValueKey<int>(count),
                               padding: EdgeInsets.all(3.w),
                               decoration: const BoxDecoration(
-                                color: Colors.red,
+                                gradient: AppColors.primaryButtonGradient,
                                 shape: BoxShape.circle,
                               ),
                               constraints: BoxConstraints(
