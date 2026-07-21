@@ -283,44 +283,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                                         },
                                       );
 
-                                      // [QUICK FIX] Insert into DB for all users
-                                      try {
-                                        // Temporarily use service_role_key to bypass RLS for admin DB insertion
-                                        final url = dotenv.env['SUPABASE_URL'];
-                                        final serviceKey = dotenv.env['SUPABASE_SERVICE_ROLE_KEY'];
-                                        
-                                        final dbClient = (url != null && serviceKey != null) 
-                                            ? SupabaseClient(url, serviceKey) 
-                                            : Supabase.instance.client;
-
-                                        // Get all unique users who have registered a token
-                                        final tokens = await dbClient.from('user_fcm_tokens').select('user_id');
-                                        
-                                        final Set<String> userIds = {};
-                                        for (var row in tokens) {
-                                          if (row['user_id'] != null) {
-                                            userIds.add(row['user_id'].toString());
-                                          }
-                                        }
-
-                                        if (userIds.isNotEmpty) {
-                                          final insertData = userIds.map((id) => {
-                                            'user_id': id,
-                                            'title': titleController.text.trim(),
-                                            'description': bodyController.text.trim(),
-                                            'is_read': false,
-                                          }).toList();
-
-                                          await dbClient.from('notifications').insert(insertData);
-                                          debugPrint('✅ DB Insert Quick Fix: inserted for ${userIds.length} users.');
-                                        }
-                                        
-                                        if (dbClient != Supabase.instance.client) {
-                                          dbClient.dispose();
-                                        }
-                                      } catch (dbError) {
-                                        debugPrint('❌ DB Insert Quick Fix failed: $dbError');
-                                      }
+                                      // DB insertion is fully handled by the dynamic-processor Edge Function!
                                       if (context.mounted) {
                                         Navigator.pop(context);
                                         ScaffoldMessenger.of(context).showSnackBar(

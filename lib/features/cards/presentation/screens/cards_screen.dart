@@ -3,6 +3,7 @@ import 'package:daimond/l10n/app_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -120,9 +121,17 @@ class CardsScreen extends HookConsumerWidget {
                           itemCount: 4,
                           separatorBuilder: (context, index) =>
                               SizedBox(width: 8.w),
-                          itemBuilder: (context, index) => SizedBox(
-                            width: 76.w,
-                            child: const CategoryShimmer(),
+                          itemBuilder: (context, index) => Shimmer.fromColors(
+                            baseColor: Colors.grey[300]!,
+                            highlightColor: Colors.grey[100]!,
+                            child: Container(
+                              width: 76.w,
+                              height: 30.h,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20.r),
+                              ),
+                            ),
                           ),
                         ),
                         error: (error, stack) => const Center(

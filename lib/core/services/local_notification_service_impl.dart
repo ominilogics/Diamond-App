@@ -24,9 +24,13 @@ class LocalNotificationServiceImpl implements NotificationService {
       FlutterLocalNotificationsPlugin();
       
   final _onNotificationReceivedController = StreamController<void>.broadcast();
+  final _onPayloadHandledController = StreamController<String>.broadcast();
 
   @override
   Stream<void> get onNotificationReceived => _onNotificationReceivedController.stream;
+
+  @override
+  Stream<String> get onPayloadHandled => _onPayloadHandledController.stream;
 
   @override
   Future<void> init() async {
@@ -129,7 +133,12 @@ class LocalNotificationServiceImpl implements NotificationService {
       debugPrint(
         '[NOTIFICATIONS] 💀 APP LAUNCHED from KILLED state via notification! Data: ${initialMessage.data}',
       );
-      AppRouter.initialDeepLink = _getFinalPayload(initialMessage.data);
+      final p = _getFinalPayload(initialMessage.data);
+      AppRouter.initialDeepLink = p;
+      // Delay so Riverpod has time to attach listeners before we broadcast
+      Future.delayed(const Duration(seconds: 2), () {
+        _onPayloadHandledController.add('${DateTime.now().millisecondsSinceEpoch}_$p');
+      });
     }
 
     // Handle local AlarmManager notification taps from killed state
@@ -143,6 +152,9 @@ class LocalNotificationServiceImpl implements NotificationService {
       );
       if (payload != null && payload.isNotEmpty) {
         AppRouter.initialDeepLink = payload;
+        Future.delayed(const Duration(seconds: 2), () {
+          _onPayloadHandledController.add('${DateTime.now().millisecondsSinceEpoch}_$payload');
+        });
       }
     }
 
@@ -221,6 +233,9 @@ class LocalNotificationServiceImpl implements NotificationService {
 
     try {
       if (payload.isNotEmpty) {
+        // Broadcast the payload with a unique timestamp prefix so Riverpod ALWAYS triggers
+        _onPayloadHandledController.add('${DateTime.now().millisecondsSinceEpoch}_$payload');
+
         final currentPath =
             AppRouter.router.routerDelegate.currentConfiguration.uri.path;
 

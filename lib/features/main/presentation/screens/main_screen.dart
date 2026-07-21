@@ -48,6 +48,8 @@ class MainScreen extends HookConsumerWidget {
           currentIndex: currentIndex,
           onTap: (index) {
             ref.read(bottomNavIndexProvider.notifier).state = index;
+            // Keep GoRouter's URL in sync so deep linking and parameters don't get stuck
+            context.go('/main?tab=$index');
           },
         ),
         body: IndexedStack(index: currentIndex, children: pages),

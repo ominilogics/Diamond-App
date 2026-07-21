@@ -10,7 +10,10 @@ The entry point for push notifications is the `LocalNotificationServiceImpl` (im
 - Permissions are requested dynamically (Android 13+ Notification, iOS Alerts/Badges, Android 14+ Exact Alarms).
 
 ### Payload Routing (System-Level)
-Notifications carry deep-link payloads. When a push notification arrives (whether in foreground, background, or killed state), the service extracts the payload and invokes `AppRouter.router.go(payload)`. This enables seamless deep-linking to screens like `/events` or `/cards`.
+Notifications carry deep-link payloads. When a push notification arrives (in foreground, background, or killed state), the service extracts the payload.
+- **Background/Killed State**: Tapped payloads are immediately broadcast via `onPayloadHandled` stream. To ensure Riverpod's `StreamProvider` always detects state changes (even if the identical notification is tapped twice), the payload is prefixed with a millisecond timestamp (`${timestamp}_$payload`).
+- **Smart Navigation**: When navigating from the in-app Notifications Screen, the app differentiates between "Root Tabs" (e.g., `/main?tab=1`) and "Deep Pages" (e.g., `/cards`). It uses `context.go()` for root tabs to perform a clean backward transition (preventing duplicate MainScreen stacks) and `context.push()` for deep pages to preserve back-navigation into the Notifications Inbox.
+- **Bottom Navigation Sync**: Tapping a bottom nav tab also actively invokes `context.go('/main?tab=$index')` to keep GoRouter's internal URL perfectly synchronized with Riverpod state, ensuring subsequent payload navigation correctly triggers Riverpod `useEffect` rebuilds.
 
 ### Token Synchronization
 FCM tokens are continuously synchronized with the Supabase `user_fcm_tokens` table, strictly respecting user opt-in preferences stored in `SharedPreferences`.
@@ -26,6 +29,7 @@ A scheduled cron-job function designed to autonomously process upcoming events.
 
 ### B. The `dynamic-processor` Function
 An HTTP endpoint for ad-hoc and broadcast notification dispatch, respecting granular user preferences and inserting dynamically routed payloads.
+- **Single Source of Truth**: The `dynamic-processor` handles both sending the push (via FCM Multicast) AND executing the Supabase database insertion (with payload). Client-side screens like the Admin Dashboard only trigger this Edge Function and deliberately avoid duplicate raw database insertions.
 
 ### C. Automated Data Cleanup (Retention Policy)
 To prevent database bloat, a native Postgres `pg_cron` worker automatically runs every day at 3:00 AM, deleting any notifications older than 30 days from the Supabase cloud.
@@ -55,7 +59,6 @@ The global red Bell Badge is decoupled from the individual tile read state:
 - **`groupedNotificationsProvider`**: Categorizes the raw Drift stream into two distinct buckets: **"New"** (unread or received within the last 24 hours) and **"Earlier"** (read and older than 24 hours). This focuses user attention exactly where it belongs.
 
 ## 5. Global Real-Time Reactivity (`main.dart`)
-1. When a foreground FCM message is received, `LocalNotificationServiceImpl` pushes an event to the `onNotificationReceived` Stream.
-2. `MyApp` triggers `ref.read(notificationsRepositoryProvider).syncNotifications()`.
-3. The background sync pulls the new record from Supabase into Drift.
-4. Riverpod streams instantly rebuild the Inbox UI and update the home screen launcher badge via `AppBadgePlus.updateBadge()`.
+1. **Foreground Syncs**: When a foreground FCM message is received, `LocalNotificationServiceImpl` pushes an event to `onNotificationReceived`. `MyApp` instantly triggers `syncNotifications()`, seamlessly updating the UI and launcher badge.
+2. **Background/Killed Syncs**: When a system-tray notification is tapped, `LocalNotificationServiceImpl` emits the unique timestamped string to `onPayloadHandled`. 
+3. **Auto Mark-As-Read**: Inside `MyApp`'s listener, the timestamp is stripped. The app actively runs `syncNotifications()` to ensure the Drift database downloads the new record, and then invokes `markLatestAsReadByPayload(payload)`. This completely guarantees that any background notification immediately marks itself as read and drops the red badge count upon tap.

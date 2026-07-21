@@ -208,9 +208,14 @@ class NotificationsScreen extends HookConsumerWidget {
 
                                     final currentPath = GoRouter.of(context).routerDelegate.currentConfiguration.uri.path;
                                     
-                                    // 3. Use go() instead of push() to prevent duplicate stack building
+                                    // 3. Smart routing: Use go() for main shell to prevent duplicate tabs.
+                                    // Use push() for everything else so the user can smoothly navigate back to Notifications!
                                     if (currentPath != targetRoute) {
-                                      context.go(targetRoute);
+                                      if (targetRoute.startsWith('/main')) {
+                                        context.go(targetRoute);
+                                      } else {
+                                        context.push(targetRoute);
+                                      }
                                     }
                                   });
                                 },

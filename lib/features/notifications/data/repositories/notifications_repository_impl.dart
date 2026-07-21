@@ -111,6 +111,25 @@ class NotificationsRepositoryImpl implements NotificationsRepository {
   }
 
   @override
+  Future<Either<Failure, void>> markLatestAsReadByPayload(String payload) async {
+    try {
+      final localNotif = await (_db.select(_db.notificationsTable)
+            ..where((t) => t.isRead.equals(false))
+            ..where((t) => t.payload.equals(payload))
+            ..orderBy([(t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc)])
+            ..limit(1))
+          .getSingleOrNull();
+
+      if (localNotif != null) {
+        return await markAsRead(localNotif.id);
+      }
+      return Either.right(null);
+    } catch (e) {
+      return Either.left(DatabaseFailure('Failed to mark latest as read: $e'));
+    }
+  }
+
+  @override
   Future<Either<Failure, void>> deleteNotification(int id) async {
     try {
       final localNotif = await (_db.select(_db.notificationsTable)..where((t) => t.id.equals(id))).getSingleOrNull();

@@ -3,6 +3,7 @@ import 'local_notification_service_impl.dart';
 
 abstract class NotificationService {
   Stream<void> get onNotificationReceived;
+  Stream<String> get onPayloadHandled;
   Future<void> init();
   Future<void> requestPermissions();
   Future<void> scheduleEventReminder({

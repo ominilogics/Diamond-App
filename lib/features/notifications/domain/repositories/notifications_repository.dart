@@ -6,5 +6,6 @@ abstract class NotificationsRepository {
   Stream<List<NotificationEntity>> watchNotifications({int limit = 50});
   Future<Either<Failure, void>> syncNotifications();
   Future<Either<Failure, void>> markAsRead(int id);
+  Future<Either<Failure, void>> markLatestAsReadByPayload(String payload);
   Future<Either<Failure, void>> deleteNotification(int id);
 }

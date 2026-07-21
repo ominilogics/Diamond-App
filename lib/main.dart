@@ -85,6 +85,10 @@ final foregroundFCMStreamProvider = StreamProvider<void>((ref) {
   return ref.watch(notificationServiceProvider).onNotificationReceived;
 });
 
+final payloadHandledStreamProvider = StreamProvider<String>((ref) {
+  return ref.watch(notificationServiceProvider).onPayloadHandled;
+});
+
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
@@ -105,6 +109,23 @@ class MyApp extends ConsumerWidget {
     ref.listen(foregroundFCMStreamProvider, (_, __) {
       debugPrint('[NOTIFICATIONS_DEBUG] Foreground push received. Triggering background sync!');
       ref.read(notificationsRepositoryProvider).syncNotifications();
+    });
+
+    // Mark notifications as read globally when a system tray payload is tapped
+    ref.listen(payloadHandledStreamProvider, (_, asyncPayload) {
+      final rawPayload = asyncPayload.valueOrNull;
+      if (rawPayload != null && rawPayload.contains('_')) {
+        // Strip the unique timestamp prefix to get the actual route payload
+        final payload = rawPayload.substring(rawPayload.indexOf('_') + 1);
+        
+        debugPrint('[NOTIFICATIONS_DEBUG] Payload handled: $payload. Syncing then marking as read...');
+        // 1. We must sync FIRST, because if the app was in the background, the notification is NOT in local Drift DB yet!
+        ref.read(notificationsRepositoryProvider).syncNotifications().then((_) {
+          // 2. Now that it is in the local DB, we can find it and mark it as read!
+          ref.read(notificationsRepositoryProvider).markLatestAsReadByPayload(payload);
+          ref.read(lastOpenedNotificationsProvider.notifier).markOpened();
+        });
+      }
     });
 
     return ScreenUtilInit(
