@@ -7,8 +7,9 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_bar1.dart';
 import '../widgets/search_bar_widget.dart';
 import '../widgets/categories_section.dart';
-import '../widgets/islamic_cards_section.dart';
+import '../widgets/home_banner_carousel.dart';
 import '../widgets/featured_card.dart';
+
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import '../../../cards/presentation/providers/cards_provider.dart';
@@ -80,7 +81,7 @@ class HomeScreen extends HookConsumerWidget {
                   elevation: 0,
                   scrolledUnderElevation: 3.0,
                   automaticallyImplyLeading: false,
-                  toolbarHeight: 88.h,
+                  toolbarHeight: 76.h,
                   titleSpacing: 0,
                   title: Column(
                     children: [
@@ -90,7 +91,7 @@ class HomeScreen extends HookConsumerWidget {
                         onChanged: (val) =>
                             ref.read(searchQueryProvider.notifier).state = val,
                       ),
-                      SizedBox(height: 20.h),
+                      SizedBox(height: 8.h),
                     ],
                   ),
                 );
@@ -100,18 +101,18 @@ class HomeScreen extends HookConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 12.h),
+                  SizedBox(height: 16.h),
 
                   if (!isSearching) ...[
-                    // 4. Islamic Cards Section
-                    // const IslamicCardsSection(),
-                    // SizedBox(height: 32.h),
+                    // 1. Home Banner Carousel
+                    const HomeBannerCarousel(),
+                    SizedBox(height: 20.h),
 
-                    // 5. Categories Section
+                    // 2. Categories Section
                     const CategoriesSection(),
                     SizedBox(height: 32.h),
 
-                    // 5. Featured Cards Section
+                    // 3. Featured Cards Section Title
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 24.w),
                       child: Text(
@@ -120,6 +121,9 @@ class HomeScreen extends HookConsumerWidget {
                       ),
                     ),
                     SizedBox(height: 16.h),
+
+
+
                   ] else ...[
                     // Search Results Header
                     Padding(

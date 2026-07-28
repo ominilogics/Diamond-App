@@ -33,7 +33,8 @@ class NotificationCard extends StatelessWidget {
         height: 88.h,
         padding: EdgeInsets.symmetric(horizontal: 16.w),
       decoration: BoxDecoration(
-        color: isRead ? const Color(0xFFFFFFFF) : AppColors.primaryButtonGradientStart.withOpacity(0.05),
+        color: isRead ? const Color(0xFFFFFFFF) : AppColors.primaryButtonGradientStart.withValues(alpha: 0.05),
+
         borderRadius: BorderRadius.circular(20.r),
         border: Border.all(
           color: isRead ? const Color(0xFF000000) : AppColors.primaryButtonGradientStart, 
@@ -104,12 +105,21 @@ class NotificationCard extends StatelessWidget {
             ),
           ),
           if (onTrailingTap != null)
-            IconButton(
-              icon: Icon(Icons.more_horiz, color: AppColors.textSecondary),
-              onPressed: onTrailingTap,
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onTrailingTap,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+                child: Icon(
+                  Icons.more_vert,
+                  color: AppColors.textSecondary,
+                  size: 22.w,
+                ),
+              ),
             ),
+
+
+
         ],
       ),
     ),

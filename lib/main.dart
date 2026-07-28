@@ -106,10 +106,11 @@ class MyApp extends ConsumerWidget {
     });
 
     // Trigger real-time database sync when a push notification is received in the foreground
-    ref.listen(foregroundFCMStreamProvider, (_, __) {
+    ref.listen(foregroundFCMStreamProvider, (previous, next) {
       debugPrint('[NOTIFICATIONS_DEBUG] Foreground push received. Triggering background sync!');
       ref.read(notificationsRepositoryProvider).syncNotifications();
     });
+
 
     // Mark notifications as read globally when a system tray payload is tapped
     ref.listen(payloadHandledStreamProvider, (_, asyncPayload) {

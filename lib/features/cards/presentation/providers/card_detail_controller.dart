@@ -36,10 +36,10 @@ class CardDetailController extends StateNotifier<CardDetailState> {
       return;
     }
     if (from.trim().isEmpty || to.trim().isEmpty) {
-      CustomSnackbar.showError(context, texts.pleaseFillRecipientFields);
       pageController.animateToPage(2, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
       return;
     }
+
 
     state = const CardDetailState(isLoading: true);
 

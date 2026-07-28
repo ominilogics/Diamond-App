@@ -8,6 +8,8 @@ The entry point for push notifications is the `LocalNotificationServiceImpl` (im
 ### Initialization & Permissions
 - It initializes `flutter_local_notifications` for foreground displays and `FirebaseMessaging` for push delivery.
 - Permissions are requested dynamically (Android 13+ Notification, iOS Alerts/Badges, Android 14+ Exact Alarms).
+- **OS Permission Synchronization**: The UI in `NotificationSettingsScreen` and `NotificationSettingsNotifier` dynamically cross-references `SharedPreferences` with native OS permission status (`Permission.notification.status`). If system-level notifications are denied by the user, the in-app toggle automatically syncs to OFF. Toggling ON prompts for permission or presents a direct option to `openAppSettings()`. Resuming the app from device settings automatically re-checks and refreshes the switch state.
+
 
 ### Payload Routing (System-Level)
 Notifications carry deep-link payloads. When a push notification arrives (in foreground, background, or killed state), the service extracts the payload.
@@ -55,8 +57,13 @@ The global red Bell Badge is decoupled from the individual tile read state:
 - **`lastOpenedNotificationsProvider`**: Stores a `DateTime` in `SharedPreferences` marking the exact moment the user last opened the Notifications tab.
 - **`unreadNotificationsCountProvider`**: Actively computes the badge count by filtering out any notifications received *before* the `lastOpened` timestamp. This makes the global red badge instantly disappear when the user checks their inbox.
 
-### "New" vs "Earlier" Grouping
-- **`groupedNotificationsProvider`**: Categorizes the raw Drift stream into two distinct buckets: **"New"** (unread or received within the last 24 hours) and **"Earlier"** (read and older than 24 hours). This focuses user attention exactly where it belongs.
+### "Unread" vs Date-Based Read Grouping
+- **`groupedNotificationsProvider`**: Categorizes notifications into:
+  - **"Unread"**: All unread notifications (`!isRead`) grouped at the top.
+  - **"Today"**: Read notifications received today.
+  - **"Yesterday"**: Read notifications received yesterday.
+  - **Date Sections** (e.g. `Jul 21`): Read notifications received on older dates.
+
 
 ## 5. Global Real-Time Reactivity (`main.dart`)
 1. **Foreground Syncs**: When a foreground FCM message is received, `LocalNotificationServiceImpl` pushes an event to `onNotificationReceived`. `MyApp` instantly triggers `syncNotifications()`, seamlessly updating the UI and launcher badge.

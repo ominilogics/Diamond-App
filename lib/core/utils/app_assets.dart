@@ -38,4 +38,17 @@ class AppAssets {
   static const String warning = '$_iconsPath/warning.svg';
   static const String cancel = '$_iconsPath/cancel.svg';
   static const String cart = '$_iconsPath/cart.svg';
+  static const String envelopeFront = '$_iconsPath/Envelope_front.png';
+  static const String envelopeBack = '$_iconsPath/envelope_Back.svg';
+
+  static const String animateEnvelopeBack = '$_iconsPath/Envelope.svg';
+  static const String animateMiddle = '$_iconsPath/animate_middle.svg';
+  static const String animateTop = '$_iconsPath/animate_top.svg';
+  static const String closedFront = '$_iconsPath/closed_front.png';
+  static const String closedTop = '$_iconsPath/closed_top.svg';
+  static const String eye = '$_iconsPath/eye.svg';
 }
+
+
+
+

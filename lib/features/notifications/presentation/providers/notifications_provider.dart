@@ -58,29 +58,61 @@ final groupedNotificationsProvider =
       final notificationsAsync = ref.watch(notificationsStreamProvider);
 
       return notificationsAsync.whenData((notifications) {
-        debugPrint('[NOTIFICATIONS_DEBUG] NotificationsProvider: groupedNotificationsProvider mapping ${notifications.length} notifications.');
-        final Map<String, List<NotificationEntity>> grouped = {
-          'newNotifications': [],
-          'earlierNotifications': [],
-        };
+        final List<NotificationEntity> unreadList = [];
+        final Map<String, List<NotificationEntity>> readGrouped = {};
+
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        final yesterday = today.subtract(const Duration(days: 1));
+        const monthNames = [
+          'Jan',
+          'Feb',
+          'Mar',
+          'Apr',
+          'May',
+          'Jun',
+          'Jul',
+          'Aug',
+          'Sep',
+          'Oct',
+          'Nov',
+          'Dec',
+        ];
+
         for (final n in notifications) {
-          final now = DateTime.now();
-          final difference = now.difference(n.createdAt);
-          
-          if (!n.isRead || difference.inHours < 24) {
-            grouped['newNotifications']!.add(n);
+          if (!n.isRead) {
+            unreadList.add(n);
           } else {
-            grouped['earlierNotifications']!.add(n);
+            final itemDate = DateTime(
+              n.createdAt.year,
+              n.createdAt.month,
+              n.createdAt.day,
+            );
+
+            if (itemDate.isAtSameMomentAs(today)) {
+              readGrouped.putIfAbsent('today', () => []).add(n);
+            } else if (itemDate.isAtSameMomentAs(yesterday)) {
+              readGrouped.putIfAbsent('yesterday', () => []).add(n);
+            } else {
+              final formattedDate = now.year == itemDate.year
+                  ? '${monthNames[itemDate.month - 1]} ${itemDate.day}'
+                  : '${monthNames[itemDate.month - 1]} ${itemDate.day}, ${itemDate.year}';
+              readGrouped.putIfAbsent(formattedDate, () => []).add(n);
+            }
           }
         }
-        
-        // Remove empty groups
-        if (grouped['newNotifications']!.isEmpty) grouped.remove('newNotifications');
-        if (grouped['earlierNotifications']!.isEmpty) grouped.remove('earlierNotifications');
-        
-        return grouped;
+
+        final Map<String, List<NotificationEntity>> result = {};
+        if (unreadList.isNotEmpty) {
+          result['unread'] = unreadList;
+        }
+        result.addAll(readGrouped);
+
+        return result;
       });
     });
+
+
 
 final syncNotificationsProvider = FutureProvider<void>((ref) async {
   debugPrint('[NOTIFICATIONS_DEBUG] NotificationsProvider: syncNotificationsProvider triggered!');

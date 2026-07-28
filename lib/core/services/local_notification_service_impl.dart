@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'package:daimond/core/routing/app_routes.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
+
 import 'package:permission_handler/permission_handler.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -67,7 +67,7 @@ class LocalNotificationServiceImpl implements NotificationService {
     // Setup Firebase Messaging background handler
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-    String _resolvePayload(Map<String, dynamic> data) {
+    String resolvePayload(Map<String, dynamic> data) {
       // 1. If payload is explicitly provided by modern functions, use it
       if (data['payload'] != null && data['payload'].toString().isNotEmpty) {
         return data['payload'].toString();
@@ -84,15 +84,31 @@ class LocalNotificationServiceImpl implements NotificationService {
     }
 
     // Wrap the payload resolver to globally intercept legacy /events payloads
-    String _getFinalPayload(Map<String, dynamic> data) {
-       final p = _resolvePayload(data);
+    String getFinalPayload(Map<String, dynamic> data) {
+       final p = resolvePayload(data);
        if (p == '/events') return '/main?tab=1';
        return p;
     }
 
     // Setup foreground FCM message handling
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      debugPrint('[NOTIFICATIONS] 🔔 FOREGROUND message received! Title: ${message.notification?.title}, Body: ${message.notification?.body}');
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      debugPrint(
+        '[NOTIFICATIONS] 🔔 FOREGROUND message received! Title: ${message.notification?.title}, Body: ${message.notification?.body}',
+      );
+
+      final prefs = await SharedPreferences.getInstance();
+      final pushEnabled = prefs.getBool('pushNotifications') ?? true;
+      if (!pushEnabled) {
+        debugPrint(
+          '[NOTIFICATIONS] 🛑 Push notifications disabled locally. Suppressing foreground notification.',
+        );
+        return;
+      }
+
+      final type = message.data['type']?.toString();
+      if (type == 'new card' && !(prefs.getBool('newCardAlerts') ?? true)) return;
+      if (type == 'event reminder' && !(prefs.getBool('eventReminders') ?? true)) return;
+      if (type == 'special offer' && !(prefs.getBool('specialOffers') ?? true)) return;
 
       // We can use flutter_local_notifications to show a heads-up display while app is open!
       if (message.notification != null) {
@@ -110,20 +126,21 @@ class LocalNotificationServiceImpl implements NotificationService {
             ),
           ),
           // Pass the dynamically resolved payload
-          payload: _getFinalPayload(message.data),
+          payload: getFinalPayload(message.data),
         );
       }
-      
+
       // Emit event so the app can instantly trigger a database sync for the Inbox and Badge!
       _onNotificationReceivedController.add(null);
     });
+
 
     // Handle FCM Notification Taps (App in Background)
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       debugPrint(
         '[NOTIFICATIONS] 📲 APP OPENED from BACKGROUND via notification! Data: ${message.data}',
       );
-      _handlePayload(_getFinalPayload(message.data));
+      _handlePayload(getFinalPayload(message.data));
     });
 
     // Handle FCM Notification Taps (App was Killed)
@@ -133,13 +150,14 @@ class LocalNotificationServiceImpl implements NotificationService {
       debugPrint(
         '[NOTIFICATIONS] 💀 APP LAUNCHED from KILLED state via notification! Data: ${initialMessage.data}',
       );
-      final p = _getFinalPayload(initialMessage.data);
+      final p = getFinalPayload(initialMessage.data);
       AppRouter.initialDeepLink = p;
       // Delay so Riverpod has time to attach listeners before we broadcast
       Future.delayed(const Duration(seconds: 2), () {
         _onPayloadHandledController.add('${DateTime.now().millisecondsSinceEpoch}_$p');
       });
     }
+
 
     // Handle local AlarmManager notification taps from killed state
     final NotificationAppLaunchDetails? launchDetails =
@@ -175,16 +193,23 @@ class LocalNotificationServiceImpl implements NotificationService {
       final session = Supabase.instance.client.auth.currentSession;
       if (session == null) return;
 
-      // 🟢 ALWAYS check SharedPreferences before uploading the token!
       final prefs = await SharedPreferences.getInstance();
       final pushEnabled = prefs.getBool('pushNotifications') ?? true;
 
-      if (!pushEnabled) {
+      bool osPermissionGranted = true;
+      if (!kIsWeb) {
+        final status = await Permission.notification.status;
+        osPermissionGranted =
+            status.isGranted || status.isProvisional || status.isLimited;
+      }
+
+      if (!pushEnabled || !osPermissionGranted) {
         debugPrint(
-          '[NOTIFICATIONS] 🛑 Push notifications disabled in local settings. Skipping token upload.',
+          '[NOTIFICATIONS] 🛑 Push notifications disabled in local settings or OS permission denied. Skipping token upload.',
         );
         return;
       }
+
 
       final newCardAlerts = prefs.getBool('newCardAlerts') ?? true;
       final eventReminders = prefs.getBool('eventReminders') ?? true;
@@ -311,50 +336,12 @@ class LocalNotificationServiceImpl implements NotificationService {
       return;
     }
 
-    const AndroidNotificationDetails androidDetails =
-        AndroidNotificationDetails(
-          'event_reminders_channel',
-          'Event Reminders',
-          channelDescription: 'Notifications for upcoming events and reminders',
-          importance: Importance.max,
-          priority: Priority.high,
-          icon: '@mipmap/ic_launcher',
-        );
-
-    const DarwinNotificationDetails iosDetails = DarwinNotificationDetails();
-
-    const NotificationDetails platformDetails = NotificationDetails(
-      android: androidDetails,
-      iOS: iosDetails,
-    );
-
-    // Use timezone-aware scheduling
-    final tz.TZDateTime scheduledTzDate = tz.TZDateTime.from(
-      scheduledDate,
-      tz.local,
-    );
-
     // [OPTION B - BACKEND FCM]
     // Local scheduling has been intentionally disabled.
     // Event reminders will now be processed centrally by Supabase pg_cron
     // and delivered reliably via Firebase Cloud Messaging even when killed.
-    /*
-    try {
-      await _flutterLocalNotificationsPlugin.zonedSchedule(
-        id: id,
-        title: title,
-        body: body,
-        scheduledDate: scheduledTzDate,
-        notificationDetails: platformDetails,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        payload: payload,
-      );
-      debugPrint('✅ Notification scheduled locally for id: $id at $scheduledTzDate');
-    } catch (e) {
-      debugPrint('❌ Failed to schedule notification: $e');
-    }
-    */
   }
+
 
   @override
   Future<void> cancelReminder(int id) async {

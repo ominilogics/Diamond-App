@@ -161,21 +161,77 @@ class AuthRepositoryImpl implements AuthRepository {
 
   String _parseErrorMessage(String originalMessage) {
     final lowerMessage = originalMessage.toLowerCase();
+
+    // 1. Network / Server 5xx / Connection errors
     if (lowerMessage.contains('500') ||
         lowerMessage.contains('501') ||
         lowerMessage.contains('502') ||
         lowerMessage.contains('503') ||
         lowerMessage.contains('504') ||
         lowerMessage.contains('522') ||
-        lowerMessage.contains('error code:')) {
+        lowerMessage.contains('error code:') ||
+        lowerMessage.contains('network') ||
+        lowerMessage.contains('timeout')) {
       return 'Something went wrong. Please check your internet connection or try again later.';
     }
-    if (lowerMessage.contains('invalid login credentials')) {
+
+    // 2. Login credentials failure
+    if (lowerMessage.contains('invalid login credentials') ||
+        lowerMessage.contains('invalid credentials') ||
+        lowerMessage.contains('wrong password') ||
+        lowerMessage.contains('user not found')) {
       return 'Invalid email or password. Please try again.';
     }
-    if (lowerMessage.contains('user already registered')) {
+
+    // 3. User already registered
+    if (lowerMessage.contains('user already registered') ||
+        lowerMessage.contains('already registered') ||
+        lowerMessage.contains('already in use') ||
+        lowerMessage.contains('email address is already registered')) {
       return 'This email is already registered. Please log in instead.';
     }
+
+    // 4. Rate limiting / Throttling
+
+    if (lowerMessage.contains('rate limit') ||
+        lowerMessage.contains('too many requests') ||
+        lowerMessage.contains('exceeded')) {
+      return 'Too many attempts. Please wait a few minutes before trying again.';
+    }
+
+    // 6. Google Sign-In cancellation
+    if (lowerMessage.contains('google sign in was aborted') ||
+        lowerMessage.contains('sign in was aborted') ||
+        lowerMessage.contains('aborted')) {
+      return 'Google Sign-In was cancelled.';
+    }
+
+    // 7. Password requirements
+    if (lowerMessage.contains('password should be at least') ||
+        lowerMessage.contains('weak password')) {
+      return 'Password must be at least 6 characters long.';
+    }
+
+    // 8. Invalid email address
+    if (lowerMessage.contains('invalid email') ||
+        lowerMessage.contains('unable to validate email')) {
+      return 'Please enter a valid email address.';
+    }
+
+    // 9. Protect against raw technical database / backend exceptions
+    if (lowerMessage.contains('postgrest') ||
+        lowerMessage.contains('database') ||
+        lowerMessage.contains('sql') ||
+        lowerMessage.contains('jwt') ||
+        lowerMessage.contains('exception') ||
+        lowerMessage.contains('null') ||
+        lowerMessage.contains('column') ||
+        lowerMessage.contains('table') ||
+        lowerMessage.contains('syntax')) {
+      return 'An unexpected error occurred. Please try again.';
+    }
+
     return originalMessage;
   }
 }
+

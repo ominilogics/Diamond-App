@@ -27,101 +27,114 @@ class ConfirmationDialog extends StatelessWidget {
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
-      insetPadding: EdgeInsets.symmetric(horizontal: 24.w),
+      insetPadding: EdgeInsets.symmetric(horizontal: 20.w),
       child: Container(
-          width: 310.w,
-          padding: EdgeInsets.symmetric(vertical: 32.h, horizontal: 8.w),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFFFFFF),
-            borderRadius: BorderRadius.circular(20.r),
-            border: Border.all(color: const Color(0xFF000000), width: 0.5),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: Text(
-                  title,
-                  style: AppTextStyles.colitez400Italic20(
-                    letterSpacing: 20.0 * -0.03,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              SizedBox(height: 24.h),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 40.w),
-                child: Text(
-                  message,
-                  style: AppTextStyles.roboto400Regular13(),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              SizedBox(height: 32.h),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 30.w),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: onCancel ?? () => Navigator.of(context).pop(),
-                        child: Container(
-                          height: 34.h,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFFFFFF),
-                            borderRadius: BorderRadius.circular(20.r),
-                            border: Border.all(
-                              color: const Color(0xFF000000),
-                              width: 0.5,
-                            ),
-                          ),
-                          alignment: Alignment.center,
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 4.w),
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                cancelText,
-                                style: AppTextStyles.roboto500Medium14(),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 15.w),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: onConfirm,
-                        child: Container(
-                          height: 34.h,
-                          decoration: BoxDecoration(
-                            gradient: AppColors.primaryButtonGradient,
-                            borderRadius: BorderRadius.circular(20.r),
-                          ),
-                          alignment: Alignment.center,
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 4.w),
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                confirmText,
-                                style: AppTextStyles.roboto500Medium14()
-                                    .copyWith(color: Colors.white),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+        width: 310.w,
+        padding: EdgeInsets.symmetric(vertical: 32.h, horizontal: 8.w),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFFFFF),
+          borderRadius: BorderRadius.circular(20.r),
+          border: Border.all(color: const Color(0xFF000000), width: 0.5),
         ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12.w),
+              child: Text(
+                title,
+                style: AppTextStyles.colitez400Italic22(
+                  letterSpacing: 22.0 * -0.03,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            SizedBox(height: 20.h),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 14.w),
+              child: Text(
+                message,
+                style: AppTextStyles.roboto400Regular14(
+                  letterSpacing: 0.0,
+                  height: 1.3,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+
+
+
+            SizedBox(height: 28.h),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: onCancel ?? () => Navigator.of(context).pop(),
+                      child: Container(
+                        height: 38.h,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFFFFF),
+                          borderRadius: BorderRadius.circular(20.r),
+                          border: Border.all(
+                            color: const Color(0xFF000000),
+                            width: 0.5,
+                          ),
+                        ),
+                        alignment: Alignment.center,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 4.w),
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              cancelText,
+                              style: AppTextStyles.roboto500Medium14(
+                                fontSize: 16.sp,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: onConfirm,
+                      child: Container(
+                        height: 38.h,
+                        decoration: BoxDecoration(
+                          gradient: AppColors.primaryButtonGradient,
+                          borderRadius: BorderRadius.circular(20.r),
+                        ),
+                        alignment: Alignment.center,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 4.w),
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              confirmText,
+                              style: AppTextStyles.roboto500Medium14(
+                                fontSize: 16.sp,
+                              ).copyWith(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+          ],
+        ),
+      ),
+
     );
   }
 }

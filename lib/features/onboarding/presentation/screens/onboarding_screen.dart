@@ -8,13 +8,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/routing/app_routes.dart';
 import '../../../../core/routing/app_router.dart';
 
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../core/widgets/gradient_scaffold.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/secondary_button.dart';
+import '../../../../core/widgets/carousel_dots_indicator.dart';
 import '../providers/onboarding_provider.dart';
+
+
 
 class OnboardingData {
   final String image;
@@ -248,8 +250,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 );
               }
 
-              final pageTextTop = isSmallScreen ? 0.55 : 0.65;
               final pageImageHeight = isSmallScreen ? 0.60 : 0.70;
+
 
               return Stack(
                 children: [
@@ -318,29 +320,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           // Dots
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: List.generate(
-                              _onboardingPages.length - 1,
-                              (index) {
-                                final isActive = currentIndex == index;
-                                return AnimatedContainer(
-                                  duration: const Duration(milliseconds: 300),
-                                  margin: EdgeInsets.only(
-                                    right: index == _onboardingPages.length - 2
-                                        ? 0
-                                        : 4.w,
-                                  ),
-                                  width: isActive ? 24.w : 8.w,
-                                  height: 8.h,
-                                  decoration: BoxDecoration(
-                                    gradient: AppColors.primaryButtonGradient,
-                                    borderRadius: BorderRadius.circular(4.r),
-                                  ),
-                                );
-                              },
-                            ),
+                          CarouselDotsIndicator(
+                            count: _onboardingPages.length - 1,
+                            currentIndex: currentIndex,
                           ),
+
                           SizedBox(height: 31.h),
 
                           // Buttons

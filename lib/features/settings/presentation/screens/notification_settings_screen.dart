@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:daimond/l10n/app_localizations.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../providers/notification_settings_provider.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_bar2.dart';
 import '../../../../core/widgets/gradient_scaffold.dart';
+import '../../../../core/widgets/confirmation_dialog.dart';
 
 class NotificationSettingsScreen extends HookConsumerWidget {
   const NotificationSettingsScreen({super.key});
@@ -18,6 +20,12 @@ class NotificationSettingsScreen extends HookConsumerWidget {
     final texts = AppLocalizations.of(context)!;
     final settings = ref.watch(notificationSettingsProvider);
     final notifier = ref.read(notificationSettingsProvider.notifier);
+
+    useOnAppLifecycleStateChange((previous, current) {
+      if (current == AppLifecycleState.resumed) {
+        notifier.refreshPermissionState();
+      }
+    });
 
     Widget buildToggleRow(
       String title,
@@ -112,9 +120,37 @@ class NotificationSettingsScreen extends HookConsumerWidget {
                             buildToggleRow(
                               texts.pushNotifications,
                               settings.pushNotifications,
-                              (val) => notifier.togglePushNotifications(val),
+                              (val) async {
+                                if (val) {
+                                  final result = await notifier.togglePushNotifications(true);
+                                  if (result == PushToggleResult.permissionDenied ||
+                                      result == PushToggleResult.permanentlyDenied) {
+                                    if (!context.mounted) return;
+                                    showDialog(
+                                      context: context,
+                                      builder: (dialogCtx) => ConfirmationDialog(
+                                        title: 'Notifications Disabled',
+                                        message:
+                                            'Notification permissions are disabled in your device settings. Please enable notifications in your phone settings to receive push updates.',
+                                        confirmText: 'Settings',
+                                        cancelText: texts.cancel,
+                                        onConfirm: () async {
+                                          Navigator.pop(dialogCtx);
+                                          await openAppSettings();
+                                          await notifier.refreshPermissionState();
+                                        },
+                                        onCancel: () => Navigator.pop(dialogCtx),
+                                      ),
+                                    );
+                                  }
+                                } else {
+                                  await notifier.togglePushNotifications(false);
+                                }
+                              },
                             ),
                             buildDivider(),
+
+
 
                             buildToggleRow(
                               texts.newCardAlerts,
@@ -183,10 +219,11 @@ class _GradientSwitch extends StatelessWidget {
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: const Color(0x1A000000),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),
+
                 ],
               ),
             ),

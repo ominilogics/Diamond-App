@@ -6,6 +6,7 @@ import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/onboarding/presentation/screens/onboarding_screen.dart';
 import '../../features/auth/presentation/screens/sign_up_screen.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
+import '../../features/onboarding/presentation/screens/splash_screen.dart';
 import '../../features/main/presentation/screens/main_screen.dart';
 import '../../features/notifications/presentation/screens/notifications_screen.dart';
 import '../../features/cards/presentation/screens/cards_screen.dart';
@@ -35,10 +36,14 @@ class AppRouter {
 
   static final router = GoRouter(
     navigatorKey: rootNavigatorKey,
-    initialLocation: initialDeepLink ?? (Supabase.instance.client.auth.currentSession != null 
-        ? (kIsWeb ? AppRoute.adminDashboard.path : AppRoute.main.path) 
-        : (kIsWeb ? AppRoute.login.path : (hasSeenOnboarding ? AppRoute.login.path : AppRoute.onboarding.path))),
+    initialLocation: initialDeepLink ?? (kIsWeb 
+        ? (Supabase.instance.client.auth.currentSession != null ? AppRoute.adminDashboard.path : AppRoute.login.path) 
+        : AppRoute.splash.path),
     redirect: (context, state) {
+      if (!kIsWeb && state.matchedLocation == AppRoute.splash.path) {
+        return null; // Let the animated splash screen finish playing
+      }
+
       final session = Supabase.instance.client.auth.currentSession;
       final isAuthRoute = state.matchedLocation == AppRoute.onboarding.path ||
                           state.matchedLocation == AppRoute.login.path || 
@@ -83,6 +88,11 @@ class AppRouter {
       return null;
     },
     routes: [
+      GoRoute(
+        name: AppRoute.splash.name,
+        path: AppRoute.splash.path,
+        builder: (context, state) => const SplashScreen(),
+      ),
       GoRoute(
         name: AppRoute.onboarding.name,
         path: AppRoute.onboarding.path,
@@ -188,10 +198,13 @@ class AppRouter {
         builder: (context, state) {
           final extra = state.extra as Map<String, dynamic>? ?? {};
           return PreviewCardScreen(
-            message: extra['message'] as String? ?? '',
+            message: extra['message'] as String?,
+            coverImageUrl: extra['coverImageUrl'] as String?,
+            frontMessage: extra['frontMessage'] as String?,
           );
         },
       ),
+
       GoRoute(
         name: AppRoute.editCard.name,
         path: AppRoute.editCard.path,

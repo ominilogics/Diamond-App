@@ -72,7 +72,7 @@ class FeaturedCard extends ConsumerWidget {
                   children: [
                     if (coverImageUrl != null && coverImageUrl!.isNotEmpty)
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(4.r),
+                        borderRadius: BorderRadius.zero,
                         child: CachedNetworkImage(
                               imageUrl: coverImageUrl!,
                               width: 84.5.w,
@@ -88,9 +88,9 @@ class FeaturedCard extends ConsumerWidget {
                                   child: Container(
                                     width: 84.5.w,
                                     height: 118.3.h,
-                                    decoration: BoxDecoration(
+                                    decoration: const BoxDecoration(
                                       color: Colors.white,
-                                      borderRadius: BorderRadius.circular(4.r),
+                                      borderRadius: BorderRadius.zero,
                                     ),
                                   ),
                                 );
@@ -129,11 +129,12 @@ class FeaturedCard extends ConsumerWidget {
                                   ],
                                 );
                               },
-                              errorWidget: (context, url, error) => SizedBox(
+                              errorWidget: (context, url, error) => SvgPicture.asset(
+                                AppAssets.gatta,
                                 width: 84.5.w,
                                 height: 118.3.h,
-                                child: const Icon(Icons.error),
                               ),
+
                             ),
                       )
                     else
@@ -144,11 +145,8 @@ class FeaturedCard extends ConsumerWidget {
                             AppAssets.gatta,
                             width: 84.5.w,
                             height: 118.3.h,
-                            colorFilter: ColorFilter.mode(
-                              cardColor,
-                              BlendMode.srcIn,
-                            ),
                           ),
+
                           if (frontMessage != null && frontMessage!.isNotEmpty)
                             Positioned(
                               top: 83.h,

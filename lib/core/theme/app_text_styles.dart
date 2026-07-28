@@ -214,6 +214,7 @@ class AppTextStyles {
   }
 
   static TextStyle colitez400Italic13({
+
     Color? color,
     double? fontSize,
     FontWeight? fontWeight,
@@ -380,8 +381,9 @@ class AppTextStyles {
       leadingDistribution: leadingDistribution ?? TextLeadingDistribution.even,
     );
   }
-
   static TextStyle roboto500Medium14({
+
+
     Color? color,
     double? fontSize,
     FontWeight? fontWeight,

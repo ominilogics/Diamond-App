@@ -113,11 +113,16 @@ class NotificationsScreen extends HookConsumerWidget {
                         final items = groupedAsync.value![rawTitle]!;
 
                       String displayTitle = rawTitle;
-                      if (rawTitle == 'newNotifications') {
-                        displayTitle = texts.newNotifications;
+                      if (rawTitle == 'unread' || rawTitle == 'newNotifications') {
+                        displayTitle = 'Unread';
+                      } else if (rawTitle == 'today') {
+                        displayTitle = texts.today;
+                      } else if (rawTitle == 'yesterday') {
+                        displayTitle = texts.yesterday;
                       } else if (rawTitle == 'earlierNotifications') {
                         displayTitle = texts.earlierNotifications;
                       }
+
 
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,38 +143,144 @@ class NotificationsScreen extends HookConsumerWidget {
                                 onTrailingTap: () {
                                   showModalBottomSheet(
                                     context: context,
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20.r))),
+                                    backgroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(24.r),
+                                      ),
+                                    ),
                                     builder: (context) {
                                       return SafeArea(
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            if (!item.isRead)
-                                              ListTile(
-                                                leading: const Icon(Icons.mark_email_read),
-                                                title: Text(texts.markAsRead),
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 24.w,
+                                            vertical: 12.h,
+                                          ),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Center(
+                                                child: Container(
+                                                  width: 40.w,
+                                                  height: 4.h,
+                                                  decoration: BoxDecoration(
+                                                    color: const Color(
+                                                      0xFFE2E8F0,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          2.r,
+                                                        ),
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(height: 12.h),
+                                              if (!item.isRead) ...[
+                                                InkWell(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        12.r,
+                                                      ),
+                                                  onTap: () {
+                                                    if (item.id != null) {
+                                                      ref
+                                                          .read(
+                                                            notificationsRepositoryProvider,
+                                                          )
+                                                          .markAsRead(item.id!);
+                                                    }
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: Padding(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                          vertical: 8.h,
+                                                          horizontal: 8.w,
+                                                        ),
+                                                    child: Row(
+                                                      children: [
+                                                        const Icon(
+                                                          Icons
+                                                              .mark_email_read_outlined,
+                                                          color: Color(
+                                                            0xFF0F172A,
+                                                          ),
+                                                          size: 22,
+                                                        ),
+                                                        SizedBox(width: 14.w),
+                                                        Text(
+                                                          texts.markAsRead,
+                                                          style:
+                                                              AppTextStyles
+                                                                  .roboto400Regular16(
+                                                                    color:
+                                                                        const Color(
+                                                                          0xFF0F172A,
+                                                                        ),
+                                                                  ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(height: 4.h),
+                                              ],
+                                              InkWell(
+                                                borderRadius:
+                                                    BorderRadius.circular(12.r),
                                                 onTap: () {
                                                   if (item.id != null) {
-                                                    ref.read(notificationsRepositoryProvider).markAsRead(item.id!);
+                                                    ref
+                                                        .read(
+                                                          notificationsRepositoryProvider,
+                                                        )
+                                                        .deleteNotification(
+                                                          item.id!,
+                                                        );
                                                   }
                                                   Navigator.pop(context);
                                                 },
+                                                child: Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                    vertical: 8.h,
+                                                    horizontal: 8.w,
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      const Icon(
+                                                        Icons.delete_outline,
+                                                        color: Color(
+                                                          0xFFEF4444,
+                                                        ),
+                                                        size: 22,
+                                                      ),
+                                                      SizedBox(width: 14.w),
+                                                      Text(
+                                                        texts.deleteNotification,
+                                                        style:
+                                                            AppTextStyles
+                                                                .roboto400Regular16(
+                                                                  color:
+                                                                      const Color(
+                                                                        0xFFEF4444,
+                                                                      ),
+                                                                ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
                                               ),
-                                            ListTile(
-                                              leading: const Icon(Icons.delete_outline, color: Colors.red),
-                                              title: Text(texts.deleteNotification, style: const TextStyle(color: Colors.red)),
-                                              onTap: () {
-                                                if (item.id != null) {
-                                                  ref.read(notificationsRepositoryProvider).deleteNotification(item.id!);
-                                                }
-                                                Navigator.pop(context);
-                                              },
-                                            ),
-                                          ],
+                                              SizedBox(height: 4.h),
+                                            ],
+                                          ),
                                         ),
                                       );
+
                                     },
                                   );
+
                                 },
                                 onTap: () {
                                   // 1. Mark as read immediately for snappy UI

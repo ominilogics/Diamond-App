@@ -1,36 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:shimmer/shimmer.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../../../core/utils/app_assets.dart';
 import '../../../../core/widgets/app_bar2.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../../../core/widgets/gradient_scaffold.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/confirmation_dialog.dart';
-import '../../../../core/providers/database_provider.dart';
-import '../../../../core/database/app_database.dart';
-import '../../../../core/routing/app_routes.dart';
 import 'package:go_router/go_router.dart';
 import 'package:daimond/l10n/app_localizations.dart';
 import '../widgets/custom_card_text_field.dart';
+import '../widgets/recipient_delivery_form.dart';
 import '../../../../core/widgets/custom_snackbar.dart';
-import 'package:drift/drift.dart' as drift;
-import 'package:drift/drift.dart' hide Column;
 import '../providers/cards_provider.dart';
-import '../../../../features/payments/presentation/providers/payment_providers.dart';
-import '../../../../features/payments/presentation/providers/payment_controller.dart';
-import '../../../orders/domain/entities/order_entity.dart';
-import '../../../orders/presentation/providers/order_provider.dart';
-import 'package:collection/collection.dart';
 import '../widgets/edit_card_carousel.dart';
 import '../providers/edit_card_controller.dart';
 
@@ -70,20 +56,26 @@ class EditCardScreen extends HookConsumerWidget {
 
     final fromController = useTextEditingController();
     final toController = useTextEditingController();
-    final fromFocusNode = useFocusNode();
-    final toFocusNode = useFocusNode();
-    final formKey = useMemoized(() => GlobalKey<FormState>());
 
     final texts = AppLocalizations.of(context)!;
     final cardAsync = ref.watch(cardDetailProvider(cardId));
     final card = cardAsync.valueOrNull;
 
-    final offeringsAsync = ref.watch(offeringsProvider);
-    final paymentState = ref.watch(paymentControllerProvider);
-    final customerInfo = ref.watch(customerInfoStreamProvider).valueOrNull;
-    final hasActiveSubscription = customerInfo?.entitlements.active.containsKey('premium') ?? false;
-
     final editCardState = ref.watch(editCardControllerProvider);
+
+
+    final initialCoverText = useMemoized(() => coverTextController.text);
+    final initialInsideText = useMemoized(() => insideMessageController.text);
+
+    bool hasUserMadeChanges() {
+      final coverChanged =
+          coverTextController.text.trim() != initialCoverText.trim();
+      final insideChanged =
+          insideMessageController.text.trim() != initialInsideText.trim();
+      final fromChanged = fromController.text.trim().isNotEmpty;
+      final toChanged = toController.text.trim().isNotEmpty;
+      return coverChanged || insideChanged || fromChanged || toChanged;
+    }
 
     void showExitDialog() {
       showDialog(
@@ -91,22 +83,43 @@ class EditCardScreen extends HookConsumerWidget {
         builder: (dialogContext) => ConfirmationDialog(
           title: texts.discardChanges,
           message: texts.discardChangesDesc,
-          confirmText: texts.discard,
-          cancelText: texts.keepEditing,
+          confirmText: texts.keepEditing,
+          cancelText: texts.discard,
           onConfirm: () {
+            Navigator.pop(dialogContext); // Close dialog and remain on customize page
+          },
+          onCancel: () {
             Navigator.pop(dialogContext); // Close dialog
-            context.pop(); // Go back
+            context.pop(); // Discard changes & go back
           },
         ),
       );
     }
 
+    void handleBackNavigation() {
+      if (currentPage.value == 2) {
+        pageController.animateToPage(
+          0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+        return;
+      }
+      if (!hasUserMadeChanges()) {
+        context.pop();
+        return;
+      }
+      showExitDialog();
+    }
+
+
     return PopScope(
       canPop: false,
-      onPopInvoked: (didPop) {
+      onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
-        showExitDialog();
+        handleBackNavigation();
       },
+
       child: GradientScaffold(
         body: SafeArea(
           child: CustomScrollView(
@@ -131,13 +144,14 @@ class EditCardScreen extends HookConsumerWidget {
                         SizedBox(height: 12.h),
                         AppBar2(
                           title: texts.customizeCard,
-                          onBackPressed: showExitDialog,
+                          onBackPressed: handleBackNavigation,
                         ),
                       ],
                     ),
                   );
                 },
               ),
+
               SliverToBoxAdapter(
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 24.w),
@@ -224,6 +238,8 @@ class EditCardScreen extends HookConsumerWidget {
                             ),
                           ],
                         ),
+
+
                         SizedBox(height: 32.h),
 
                         // Buttons
@@ -240,10 +256,6 @@ class EditCardScreen extends HookConsumerWidget {
                             }
                             if (fromController.text.trim().isEmpty ||
                                 toController.text.trim().isEmpty) {
-                              CustomSnackbar.showError(
-                                context,
-                                texts.pleaseFillRecipientFields,
-                              );
                               pageController.animateToPage(
                                 2,
                                 duration: const Duration(milliseconds: 300),
@@ -251,6 +263,7 @@ class EditCardScreen extends HookConsumerWidget {
                               );
                               return;
                             }
+
                             // Navigate back to the Card Detail Screen with updated data
                             context.pop({
                               'coverText': coverTextController.text,
@@ -408,6 +421,7 @@ class EditCardScreen extends HookConsumerWidget {
                             );
 
                             if (result != null) {
+                              if (!context.mounted) return;
                               ref.read(editCardControllerProvider.notifier).saveDraft(
                                 context: context,
                                 cardId: cardId,
@@ -417,6 +431,7 @@ class EditCardScreen extends HookConsumerWidget {
                                 texts: texts,
                               );
                             }
+
                           },
                           style: OutlinedButton.styleFrom(
                             padding: EdgeInsets.zero,
@@ -432,67 +447,25 @@ class EditCardScreen extends HookConsumerWidget {
                           ),
                         ),
                       ] else ...[
-                        Form(
-                          key: formKey,
-                          child: Column(
-                            children: [
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  texts.addRecipient,
-                                  style: AppTextStyles.colitez400Italic24(),
-                                ),
-                              ),
-                              SizedBox(height: 24.h),
-                              AppTextField(
-                                labelText: texts.fromLabel,
-                                hintText: texts.fromHint,
-                                controller: fromController,
-                                focusNode: fromFocusNode,
-                                textInputAction: TextInputAction.next,
-                                onFieldSubmitted: (_) =>
-                                    toFocusNode.requestFocus(),
-                                validator: (value) =>
-                                    value == null || value.trim().isEmpty
-                                    ? texts.thisFieldIsRequired
-                                    : null,
-                              ),
-                              SizedBox(height: 24.h),
-                              AppTextField(
-                                labelText: texts.toLabel,
-                                hintText: texts.toHint,
-                                controller: toController,
-                                focusNode: toFocusNode,
-                                textInputAction: TextInputAction.done,
-                                validator: (value) =>
-                                    value == null || value.trim().isEmpty
-                                    ? texts.thisFieldIsRequired
-                                    : null,
-                              ),
-                              SizedBox(height: 32.h),
-                              PrimaryButton(
-                                text: texts.sendButton,
-                                isLoading: editCardState.isLoading,
-                                onPressed: editCardState.isLoading ? null : () {
-                                  if (formKey.currentState?.validate() ??
-                                      false) {
-                                    ref.read(editCardControllerProvider.notifier).handlePurchaseAndOrder(
-                                      context: context,
-                                      cardId: cardId,
-                                      insideMessage: insideMessageController.text,
-                                      from: fromController.text,
-                                      to: toController.text,
-                                      draftId: draftId,
-                                      texts: texts,
-                                      pageController: pageController,
-                                    );
-                                  }
-                                },
-                              ),
-                            ],
-                          ),
+                        RecipientDeliveryForm(
+                          isLoading: editCardState.isLoading,
+                          onSendPressed: () {
+                            ref
+                                .read(editCardControllerProvider.notifier)
+                                .handlePurchaseAndOrder(
+                                  context: context,
+                                  cardId: cardId,
+                                  insideMessage: insideMessageController.text,
+                                  from: fromController.text,
+                                  to: toController.text,
+                                  draftId: draftId,
+                                  texts: texts,
+                                  pageController: pageController,
+                                );
+                          },
                         ),
                       ],
+
                       SizedBox(height: 40.h),
                     ],
                   ),
@@ -528,6 +501,11 @@ class PhysicalBoundsTextInputFormatter extends TextInputFormatter {
   ) {
     if (newValue.text.isEmpty) return newValue;
 
+    // Always allow deleting/shortening text regardless of height
+    if (newValue.text.length < oldValue.text.length) {
+      return newValue;
+    }
+
     final span = TextSpan(
       text: isUpperCase ? newValue.text.toUpperCase() : newValue.text,
       style: style,
@@ -545,4 +523,5 @@ class PhysicalBoundsTextInputFormatter extends TextInputFormatter {
     }
     return newValue;
   }
+
 }

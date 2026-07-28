@@ -5,16 +5,16 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:daimond/l10n/app_localizations.dart';
-import 'package:collection/collection.dart';
+
 
 import '../../../../core/routing/app_routes.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/app_assets.dart';
+
 import '../../../../core/widgets/shimmers/category_shimmer.dart';
 import '../../../../core/utils/category_localization.dart';
-import '../../../../core/utils/app_helpers.dart';
 import '../../../cards/presentation/providers/cards_provider.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../cards/domain/entities/category_entity.dart';
@@ -149,17 +149,16 @@ class _CategoryItem extends ConsumerWidget {
                           child: Container(
                             width: 44.w,
                             height: 67.h,
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(4.r),
+                              borderRadius: BorderRadius.zero,
                             ),
                           ),
                         )
                       : hasImage
                           ? ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                            4.r,
-                          ), // Adds subtle rounding to the tiny card
+                          borderRadius: BorderRadius.zero,
+
                           child: Stack(
                             alignment: Alignment.center,
                             children: [
@@ -184,10 +183,6 @@ class _CategoryItem extends ConsumerWidget {
                                   width: 44.w,
                                   height: 67.h,
                                   fit: BoxFit.fill,
-                                  colorFilter: const ColorFilter.mode(
-                                    AppColors.card1,
-                                    BlendMode.srcIn,
-                                  ),
                                 ),
                               ),
                               if (firstCard.defaultFrontMessage != null &&
@@ -216,10 +211,6 @@ class _CategoryItem extends ConsumerWidget {
                           width: 44.w,
                           height: 67.h,
                           fit: BoxFit.fill,
-                          colorFilter: const ColorFilter.mode(
-                            AppColors.card1,
-                            BlendMode.srcIn,
-                          ),
                         ),
                 ),
               ),
@@ -228,11 +219,13 @@ class _CategoryItem extends ConsumerWidget {
           SizedBox(height: 10.h),
           Text(
             cat.name.localized(texts),
-            style: AppTextStyles.roboto400Regular14(height: 1.2),
+            style: AppTextStyles.roboto400Regular13(),
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
+
+
         ],
       ),
     );
