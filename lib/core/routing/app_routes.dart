@@ -19,7 +19,8 @@ enum AppRoute {
   orderHistory('/orderHistory'),
   subscription('/subscription'),
   myDrafts('/my-drafts'),
-  adminDashboard('/admin-dashboard');
+  adminDashboard('/admin-dashboard'),
+  openCard('/open');
 
   const AppRoute(this.path);
   final String path;

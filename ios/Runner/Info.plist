@@ -70,5 +70,18 @@
 		</array>
 		<key>UIStatusBarHidden</key>
 		<false/>
+
+		<!-- Deep Links: Custom URL Scheme for card sharing via SMS/WhatsApp redirect -->
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>rivon</string>
+				</array>
+			</dict>
+		</array>
 	</dict>
 </plist>

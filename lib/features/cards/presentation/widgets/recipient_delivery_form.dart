@@ -12,13 +12,16 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/custom_snackbar.dart';
 import '../../domain/entities/country_code.dart';
+import '../../domain/entities/delivery_method.dart';
 import 'country_picker_bottom_sheet.dart';
 
-enum DeliveryMethod { sms, whatsApp }
 
 class RecipientDeliveryForm extends HookWidget {
   final TextEditingController? phoneController;
-  final VoidCallback? onSendPressed;
+
+  /// Called when the user taps Send with valid input.
+  /// Provides the E.164 formatted phone number and the selected delivery method.
+  final void Function(String e164Phone, DeliveryMethod method)? onSendPressed;
   final bool isLoading;
 
   const RecipientDeliveryForm({
@@ -118,7 +121,11 @@ class RecipientDeliveryForm extends HookWidget {
         );
         return;
       }
-      onSendPressed?.call();
+
+      // Build an E.164 formatted phone number for the backend
+      final e164Phone =
+          '${selectedCountry.value.dialCode}$phoneText';
+      onSendPressed?.call(e164Phone, selectedMethod.value);
     }
 
     return Column(

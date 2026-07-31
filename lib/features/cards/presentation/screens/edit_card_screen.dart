@@ -20,6 +20,7 @@ import '../providers/cards_provider.dart';
 import '../widgets/edit_card_carousel.dart';
 import '../providers/edit_card_controller.dart';
 
+
 class EditCardScreen extends HookConsumerWidget {
   final String cardId;
 
@@ -449,7 +450,7 @@ class EditCardScreen extends HookConsumerWidget {
                       ] else ...[
                         RecipientDeliveryForm(
                           isLoading: editCardState.isLoading,
-                          onSendPressed: () {
+                          onSendPressed: (e164Phone, deliveryMethod) {
                             ref
                                 .read(editCardControllerProvider.notifier)
                                 .handlePurchaseAndOrder(
@@ -461,6 +462,10 @@ class EditCardScreen extends HookConsumerWidget {
                                   draftId: draftId,
                                   texts: texts,
                                   pageController: pageController,
+                                  recipientPhone: e164Phone,
+                                  deliveryMethod: deliveryMethod,
+                                  coverImageUrl: coverImageUrl,
+                                  frontMessage: frontMessage,
                                 );
                           },
                         ),

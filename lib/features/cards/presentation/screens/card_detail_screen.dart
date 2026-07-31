@@ -237,7 +237,7 @@ class CardDetailScreen extends HookConsumerWidget {
                     ] else ...[
                       RecipientDeliveryForm(
                         isLoading: cardDetailState.isLoading,
-                        onSendPressed: () {
+                        onSendPressed: (e164Phone, deliveryMethod) {
                           ref
                               .read(cardDetailControllerProvider.notifier)
                               .handlePurchaseAndOrder(
@@ -249,6 +249,10 @@ class CardDetailScreen extends HookConsumerWidget {
                                 to: toController.text,
                                 texts: texts,
                                 pageController: pageController,
+                                recipientPhone: e164Phone,
+                                deliveryMethod: deliveryMethod,
+                                coverImageUrl: coverImageUrl,
+                                frontMessage: frontMessage,
                               );
                         },
                       ),

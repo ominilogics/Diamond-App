@@ -19,3 +19,7 @@ class PaymentFailure extends Failure {
   final bool isCancelled;
   PaymentFailure(super.message, {this.isCancelled = false});
 }
+
+class SmsFailure extends Failure {
+  SmsFailure(super.message);
+}

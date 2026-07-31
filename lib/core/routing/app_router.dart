@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -42,6 +43,11 @@ class AppRouter {
     redirect: (context, state) {
       if (!kIsWeb && state.matchedLocation == AppRoute.splash.path) {
         return null; // Let the animated splash screen finish playing
+      }
+
+      // Deep link: /open is a public route — always allow through regardless of auth state
+      if (state.matchedLocation.startsWith(AppRoute.openCard.path)) {
+        return null;
       }
 
       final session = Supabase.instance.client.auth.currentSession;
@@ -243,6 +249,34 @@ class AppRouter {
         name: AppRoute.adminDashboard.name,
         path: AppRoute.adminDashboard.path,
         builder: (context, state) => const AdminDashboardScreen(),
+      ),
+
+      // ── Deep Link: /open?data=<base64> ─────────────────────────────────────
+      // This route is triggered when a recipient taps the SMS/WhatsApp link.
+      // It decodes the Base64 payload and launches PreviewCardScreen directly,
+      // bypassing the splash/auth flow intentionally (the link is public).
+      GoRoute(
+        name: AppRoute.openCard.name,
+        path: AppRoute.openCard.path,
+        builder: (context, state) {
+          final base64Data = state.uri.queryParameters['data'];
+          if (base64Data != null && base64Data.isNotEmpty) {
+            try {
+              final jsonStr = utf8.decode(base64Url.decode(base64Data));
+              final Map<String, dynamic> payload =
+                  jsonDecode(jsonStr) as Map<String, dynamic>;
+              return PreviewCardScreen(
+                coverImageUrl: payload['coverImageUrl'] as String?,
+                frontMessage: payload['frontMessage'] as String?,
+                message: payload['message'] as String?,
+              );
+            } catch (_) {
+              // Malformed payload — fall through to main screen
+            }
+          }
+          // Fallback: invalid or missing data → go to main
+          return const MainScreen();
+        },
       ),
     ],
   );

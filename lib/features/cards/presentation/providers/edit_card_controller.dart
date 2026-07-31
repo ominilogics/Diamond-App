@@ -7,6 +7,7 @@ import 'package:daimond/l10n/app_localizations.dart';
 
 import '../../../../core/routing/app_routes.dart';
 import '../../../../core/widgets/custom_snackbar.dart';
+import '../../../../core/error/failures.dart';
 import '../../../orders/domain/entities/order_entity.dart';
 import '../../../orders/presentation/providers/order_provider.dart';
 import '../../../../features/payments/presentation/providers/payment_providers.dart';
@@ -14,6 +15,9 @@ import '../../../../features/payments/presentation/providers/payment_controller.
 import '../../../../core/providers/database_provider.dart';
 import '../../../../core/database/app_database.dart';
 import '../providers/cards_provider.dart';
+import '../../data/repositories/sms_repository_impl.dart';
+import '../../domain/entities/delivery_method.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EditCardState {
   final bool isLoading;
@@ -34,6 +38,11 @@ class EditCardController extends StateNotifier<EditCardState> {
     required int? draftId,
     required AppLocalizations texts,
     required PageController pageController,
+    // Optional SMS delivery params
+    String? recipientPhone,
+    DeliveryMethod? deliveryMethod,
+    String? coverImageUrl,
+    String? frontMessage,
   }) async {
     if (insideMessage.trim().isEmpty) {
       CustomSnackbar.showError(context, texts.pleaseEnterMessage);
@@ -52,7 +61,18 @@ class EditCardController extends StateNotifier<EditCardState> {
       final hasActiveSubscription = customerInfo?.entitlements.active.containsKey('premium') ?? false;
 
       if (hasActiveSubscription) {
-        await _placeOrder(context: context, cardId: cardId, insideMessage: insideMessage, draftId: draftId, texts: texts);
+        await _placeOrderAndSend(
+          context: context,
+          cardId: cardId,
+          insideMessage: insideMessage,
+          from: from,
+          draftId: draftId,
+          texts: texts,
+          recipientPhone: recipientPhone,
+          deliveryMethod: deliveryMethod,
+          coverImageUrl: coverImageUrl,
+          frontMessage: frontMessage,
+        );
       } else {
         final offeringsAsync = ref.read(offeringsProvider);
         final availablePackages = offeringsAsync.valueOrNull?.current?.availablePackages ?? [];
@@ -63,7 +83,18 @@ class EditCardController extends StateNotifier<EditCardState> {
         if (singleCardPackage != null) {
           final success = await ref.read(paymentControllerProvider.notifier).purchase(context, singleCardPackage);
           if (success) {
-            await _placeOrder(context: context, cardId: cardId, insideMessage: insideMessage, draftId: draftId, texts: texts);
+            await _placeOrderAndSend(
+              context: context,
+              cardId: cardId,
+              insideMessage: insideMessage,
+              from: from,
+              draftId: draftId,
+              texts: texts,
+              recipientPhone: recipientPhone,
+              deliveryMethod: deliveryMethod,
+              coverImageUrl: coverImageUrl,
+              frontMessage: frontMessage,
+            );
           }
         } else {
           CustomSnackbar.showError(context, texts.singleCardNotAvailable);
@@ -76,12 +107,17 @@ class EditCardController extends StateNotifier<EditCardState> {
     }
   }
 
-  Future<void> _placeOrder({
+  Future<void> _placeOrderAndSend({
     required BuildContext context,
     required String cardId,
     required String insideMessage,
+    required String from,
     required int? draftId,
     required AppLocalizations texts,
+    String? recipientPhone,
+    DeliveryMethod? deliveryMethod,
+    String? coverImageUrl,
+    String? frontMessage,
   }) async {
     final cardAsync = ref.read(cardDetailProvider(cardId));
     final card = cardAsync.valueOrNull;
@@ -93,15 +129,54 @@ class EditCardController extends StateNotifier<EditCardState> {
       addedAt: DateTime.now(),
     );
     ref.read(orderProvider.notifier).addOrder(order);
-    
+
     if (draftId != null) {
       final db = ref.read(appDatabaseProvider);
       await db.draftsTable.deleteWhere((t) => t.id.equals(draftId));
     }
 
-    if (!context.mounted) return;
-    CustomSnackbar.showSuccess(context, texts.orderPlaced);
+    if (recipientPhone != null && recipientPhone.isNotEmpty && deliveryMethod != null) {
+      // Send via SMS/WhatsApp
+      final user = Supabase.instance.client.auth.currentUser;
+      final displayName = from.isNotEmpty
+          ? from
+          : (user?.userMetadata?['display_name'] as String? ?? 'A friend');
 
+      final result = await ref.read(smsRepositoryProvider).sendCard(
+        recipientPhone: recipientPhone,
+        senderName: displayName,
+        coverImageUrl: coverImageUrl ?? card?.coverImageUrl,
+        frontMessage: frontMessage ?? card?.defaultFrontMessage,
+        insideMessage: insideMessage,
+        method: deliveryMethod,
+      );
+
+      if (!mounted) return;
+
+      result.fold(
+        (failure) {
+          final userMessage = failure is SmsFailure
+              ? 'Could not send the card: ${failure.message}'
+              : texts.orderPlaced;
+          if (context.mounted) CustomSnackbar.showError(context, userMessage);
+          if (context.mounted) _navigateAfterOrder(context);
+        },
+        (_) {
+          final channelName = deliveryMethod == DeliveryMethod.whatsApp ? 'WhatsApp' : 'SMS';
+          if (context.mounted) {
+            CustomSnackbar.showSuccess(context, 'Card sent via $channelName! 🎴');
+            _navigateAfterOrder(context);
+          }
+        },
+      );
+    } else {
+      if (!context.mounted) return;
+      CustomSnackbar.showSuccess(context, texts.orderPlaced);
+      _navigateAfterOrder(context);
+    }
+  }
+
+  void _navigateAfterOrder(BuildContext context) {
     Future.delayed(
       const Duration(milliseconds: 1000),
       () {
