@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.greetingcards.invitationmaker.rivon",
+      "sha256_cert_fingerprints": [
+        "77:09:6A:D6:36:32:57:DB:A2:1C:5F:51:32:F7:59:D5:84:96:13:C0:24:13:6A:30:7C:4D:FD:B9:16:56:88:81"
+      ]
+    }
+  }
+]

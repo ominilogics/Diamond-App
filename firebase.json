@@ -1,1 +1,27 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"rivon-62e8a","appId":"1:874123949335:android:f6d1cbc816079be72b3352","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"rivon-62e8a","configurations":{"android":"1:874123949335:android:f6d1cbc816079be72b3352","ios":"1:874123949335:ios:7be09287802da35e2b3352"}}}}}}
+{
+  "hosting": {
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/open-card",
+        "destination": "/open-card/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "/.well-known/assetlinks.json",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      }
+    ]
+  }
+}

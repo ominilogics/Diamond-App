@@ -21,12 +21,16 @@ serve((req) => {
   const url = new URL(req.url);
   const data = url.searchParams.get("data") || "";
 
-  // 2. Build the app's custom scheme URL
-  const appLink = `rivon://open?data=${data}`;
+  // 2. Build the app's custom scheme URL for iOS / generic
+  const appLink = `rivon://app/open?data=\${data}`;
+  
+  // Android intent URL (best for Android Chrome/in-app browsers)
+  // This natively falls back to the Play Store if the app isn't installed.
+  const androidIntent = `intent://app/open?data=\${data}#Intent;scheme=rivon;package=com.greetingcards.invitationmaker.rivon;end`;
 
-  // 3. Define the fallback App Store links
-  const playStoreLink = "https://play.google.com/store/apps/details?id=com.diamond.app";
-  const appStoreLink = "https://apps.apple.com/us/app/rivon/id123456789"; // Replace with actual Apple ID
+  // 3. Define the fallback App Store links (Fixed Android package name)
+  const playStoreLink = "https://play.google.com/store/apps/details?id=com.greetingcards.invitationmaker.rivon";
+  const appStoreLink = "https://apps.apple.com/us/app/rivon/id123456789";
 
   // 4. Return an HTML page that attempts to open the app, with a fallback timer
   const html = `
@@ -35,7 +39,7 @@ serve((req) => {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Opening Rivon Card...</title>
+    <title>Opening Card...</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -71,31 +75,93 @@ serve((req) => {
             text-decoration: none;
             border-radius: 8px;
             font-weight: 600;
+            display: none; /* Hidden until we know it's needed */
+        }
+        /* Visual Debug Logs */
+        #logbox {
+            margin-top: 30px;
+            padding: 10px;
+            background-color: #1e1e1e;
+            color: #4af626;
+            font-family: monospace;
+            font-size: 11px;
+            border-radius: 4px;
+            width: 90%;
+            max-width: 400px;
+            text-align: left;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
         }
     </style>
 </head>
 <body>
-    <div class="spinner"></div>
-    <h2>Opening your card...</h2>
-    <p>If the app doesn't open automatically, tap below.</p>
-    <a href="${appLink}" class="btn">Open App</a>
+    <div class="spinner" id="spinner"></div>
+    <h2 id="statusTitle">Opening your card...</h2>
+    
+    <a href="#" id="openAppBtn" class="btn">Open App Now</a>
+    
+    <div id="logbox">-- SYSTEM DEBUG LOG --\\n</div>
 
     <script>
-        // Attempt to open the app via custom scheme
-        window.location.href = "${appLink}";
+        function log(msg) {
+            console.log(msg);
+            var logbox = document.getElementById("logbox");
+            logbox.innerHTML += msg + "\\n";
+        }
 
-        // If the app doesn't open, redirect to the app store after 2.5 seconds
-        setTimeout(function() {
-            var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-            if (/android/i.test(userAgent)) {
-                window.location.href = "${playStoreLink}";
-            } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-                window.location.href = "${appStoreLink}";
-            } else {
-                // Desktop or unknown: Just show a message
-                document.body.innerHTML = "<h2>Please open this link on your mobile phone to view your card.</h2>";
+        window.onload = function() {
+            try {
+                var appLink = "rivon://app/open?data=\${data}";
+                var androidIntent = "intent://app/open?data=\${data}#Intent;scheme=rivon;package=com.greetingcards.invitationmaker.rivon;end";
+                var playStoreLink = "\${playStoreLink}";
+                var appStoreLink = "\${appStoreLink}";
+
+                var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+                log("UserAgent: " + userAgent);
+                
+                var isAndroid = /android/i.test(userAgent);
+                var isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+                
+                log("Platform: " + (isAndroid ? "Android" : (isIOS ? "iOS" : "Other")));
+
+                var targetUrl = isAndroid ? androidIntent : appLink;
+                
+                // Show button just in case
+                var btn = document.getElementById("openAppBtn");
+                btn.href = targetUrl;
+                btn.style.display = "inline-block";
+                
+                log("Target DeepLink: " + targetUrl);
+                
+                log("Attempting redirect...");
+                
+                // Track if we successfully navigated away
+                var hasRedirected = false;
+                window.addEventListener("pagehide", function() { hasRedirected = true; log("pagehide fired"); });
+                window.addEventListener("visibilitychange", function() { if(document.hidden) hasRedirected = true; });
+
+                // Try to redirect
+                window.location.href = targetUrl;
+                log("Assigned window.location.href (browser handling now)");
+
+                // Fallback Timer
+                setTimeout(function() {
+                    log("Fallback timer (3s) triggered.");
+                    if (!hasRedirected && !document.hidden) {
+                        log("Browser is still visible. Redirect failed or was blocked.");
+                        log("You can try tapping the 'Open App Now' button.");
+                        document.getElementById("spinner").style.display = "none";
+                        document.getElementById("statusTitle").innerText = "Redirect Blocked by Browser";
+                    } else {
+                        log("Browser is hidden, assuming app opened successfully.");
+                    }
+                }, 3000);
+            } catch (err) {
+                log("ERROR: " + err.message);
             }
-        }, 2500);
+        };
     </script>
 </body>
 </html>
@@ -105,7 +171,7 @@ serve((req) => {
     status: 200,
     headers: {
       ...corsHeaders,
-      "Content-Type": "text/html",
+      "Content-Type": "text/html; charset=utf-8",
     },
   });
 });
