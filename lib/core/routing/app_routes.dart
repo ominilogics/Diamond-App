@@ -20,7 +20,7 @@ enum AppRoute {
   subscription('/subscription'),
   myDrafts('/my-drafts'),
   adminDashboard('/admin-dashboard'),
-  openCard('/open');
+  openCard('/open-card');
 
   const AppRoute(this.path);
   final String path;

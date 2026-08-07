@@ -44,62 +44,87 @@ class EditCardController extends StateNotifier<EditCardState> {
     String? coverImageUrl,
     String? frontMessage,
   }) async {
-    if (insideMessage.trim().isEmpty) {
-      CustomSnackbar.showError(context, texts.pleaseEnterMessage);
-      return;
-    }
-    if (from.trim().isEmpty || to.trim().isEmpty) {
-      pageController.animateToPage(2, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-      return;
-    }
+    // TEMPORARY: Bypass early field validation for testing.
+    // To revert: uncomment the two blocks below.
+    //
+    // ── PRODUCTION: insideMessage check (commented out) ──────────────────
+    // if (insideMessage.trim().isEmpty) {
+    //   CustomSnackbar.showError(context, texts.pleaseEnterMessage);
+    //   return;
+    // }
+    // ── PRODUCTION: from/to check (commented out) ─────────────────────────
+    // if (from.trim().isEmpty || to.trim().isEmpty) {
+    //   pageController.animateToPage(2, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+    //   return;
+    // }
 
 
     state = const EditCardState(isLoading: true);
 
+    // TEMPORARY: Bypass payment gate for testing the share/send flow.
+    // To revert: delete the try-finally below and uncomment the
+    // production block marked with PRODUCTION START/END.
     try {
-      final customerInfo = ref.read(customerInfoStreamProvider).valueOrNull;
-      final hasActiveSubscription = customerInfo?.entitlements.active.containsKey('premium') ?? false;
+      // ── BYPASS START ────────────────────────────────────────────────────
+      await _placeOrderAndSend(
+        context: context,
+        cardId: cardId,
+        insideMessage: insideMessage,
+        from: from,
+        draftId: draftId,
+        texts: texts,
+        recipientPhone: recipientPhone,
+        deliveryMethod: deliveryMethod,
+        coverImageUrl: coverImageUrl,
+        frontMessage: frontMessage,
+      );
+      // ── BYPASS END ──────────────────────────────────────────────────────
 
-      if (hasActiveSubscription) {
-        await _placeOrderAndSend(
-          context: context,
-          cardId: cardId,
-          insideMessage: insideMessage,
-          from: from,
-          draftId: draftId,
-          texts: texts,
-          recipientPhone: recipientPhone,
-          deliveryMethod: deliveryMethod,
-          coverImageUrl: coverImageUrl,
-          frontMessage: frontMessage,
-        );
-      } else {
-        final offeringsAsync = ref.read(offeringsProvider);
-        final availablePackages = offeringsAsync.valueOrNull?.current?.availablePackages ?? [];
-        final singleCardPackage = availablePackages.firstWhereOrNull(
-          (p) => p.storeProduct.identifier == 'rivon_single_card' || p.identifier == 'single_card' || p.identifier == 'single-card-purchase'
-        );
-
-        if (singleCardPackage != null) {
-          final success = await ref.read(paymentControllerProvider.notifier).purchase(context, singleCardPackage);
-          if (success) {
-            await _placeOrderAndSend(
-              context: context,
-              cardId: cardId,
-              insideMessage: insideMessage,
-              from: from,
-              draftId: draftId,
-              texts: texts,
-              recipientPhone: recipientPhone,
-              deliveryMethod: deliveryMethod,
-              coverImageUrl: coverImageUrl,
-              frontMessage: frontMessage,
-            );
-          }
-        } else {
-          CustomSnackbar.showError(context, texts.singleCardNotAvailable);
-        }
-      }
+      // ── PRODUCTION START (commented out) ────────────────────────────────
+      // final customerInfo = ref.read(customerInfoStreamProvider).valueOrNull;
+      // final hasActiveSubscription = customerInfo?.entitlements.active.containsKey('premium') ?? false;
+      //
+      // if (hasActiveSubscription) {
+      //   await _placeOrderAndSend(
+      //     context: context,
+      //     cardId: cardId,
+      //     insideMessage: insideMessage,
+      //     from: from,
+      //     draftId: draftId,
+      //     texts: texts,
+      //     recipientPhone: recipientPhone,
+      //     deliveryMethod: deliveryMethod,
+      //     coverImageUrl: coverImageUrl,
+      //     frontMessage: frontMessage,
+      //   );
+      // } else {
+      //   final offeringsAsync = ref.read(offeringsProvider);
+      //   final availablePackages = offeringsAsync.valueOrNull?.current?.availablePackages ?? [];
+      //   final singleCardPackage = availablePackages.firstWhereOrNull(
+      //     (p) => p.storeProduct.identifier == 'rivon_single_card' || p.identifier == 'single_card' || p.identifier == 'single-card-purchase'
+      //   );
+      //
+      //   if (singleCardPackage != null) {
+      //     final success = await ref.read(paymentControllerProvider.notifier).purchase(context, singleCardPackage);
+      //     if (success) {
+      //       await _placeOrderAndSend(
+      //         context: context,
+      //         cardId: cardId,
+      //         insideMessage: insideMessage,
+      //         from: from,
+      //         draftId: draftId,
+      //         texts: texts,
+      //         recipientPhone: recipientPhone,
+      //         deliveryMethod: deliveryMethod,
+      //         coverImageUrl: coverImageUrl,
+      //         frontMessage: frontMessage,
+      //       );
+      //     }
+      //   } else {
+      //     CustomSnackbar.showError(context, texts.singleCardNotAvailable);
+      //   }
+      // }
+      // ── PRODUCTION END ──────────────────────────────────────────────────
     } finally {
       if (mounted) {
         state = const EditCardState(isLoading: false);

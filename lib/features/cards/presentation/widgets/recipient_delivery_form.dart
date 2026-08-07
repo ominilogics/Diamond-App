@@ -106,25 +106,32 @@ class RecipientDeliveryForm extends HookWidget {
         RegExp(r'\D'),
         '',
       );
-      if (phoneText.length != 10) {
-        CustomSnackbar.showError(
-          context,
-          'Please enter a 10-digit phone number.',
-        );
-        return;
-      }
 
-      if (!isConfirmed.value) {
-        CustomSnackbar.showError(
-          context,
-          'Please check the confirmation box before sending.',
-        );
-        return;
-      }
+      // TEMPORARY: Bypass form validation for testing.
+      // To revert: uncomment the two blocks below marked PRODUCTION.
+      //
+      // ── PRODUCTION: 10-digit phone validation (commented out) ────────────
+      // if (phoneText.length != 10) {
+      //   CustomSnackbar.showError(
+      //     context,
+      //     'Please enter a 10-digit phone number.',
+      //   );
+      //   return;
+      // }
+      // ── END PRODUCTION ───────────────────────────────────────────────────
+
+      // ── PRODUCTION: Confirmation checkbox validation (commented out) ──────
+      // if (!isConfirmed.value) {
+      //   CustomSnackbar.showError(
+      //     context,
+      //     'Please check the confirmation box before sending.',
+      //   );
+      //   return;
+      // }
+      // ── END PRODUCTION ───────────────────────────────────────────────────
 
       // Build an E.164 formatted phone number for the backend
-      final e164Phone =
-          '${selectedCountry.value.dialCode}$phoneText';
+      final e164Phone = '${selectedCountry.value.dialCode}$phoneText';
       onSendPressed?.call(e164Phone, selectedMethod.value);
     }
 

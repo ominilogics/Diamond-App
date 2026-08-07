@@ -47,6 +47,8 @@ class AppRouter {
 
       // Deep link: /open is a public route — always allow through regardless of auth state
       if (state.matchedLocation.startsWith(AppRoute.openCard.path)) {
+        debugPrint('\n[DEEP LINK DEBUG] GoRouter received deep link: \${state.uri.toString()}');
+        debugPrint('[DEEP LINK DEBUG] Query parameters: \${state.uri.queryParameters}\n');
         return null;
       }
 
@@ -260,9 +262,17 @@ class AppRouter {
         path: AppRoute.openCard.path,
         builder: (context, state) {
           final base64Data = state.uri.queryParameters['data'];
+          debugPrint('[DEEP LINK] Extracted base64Data: \$base64Data');
           if (base64Data != null && base64Data.isNotEmpty) {
             try {
-              final jsonStr = utf8.decode(base64Url.decode(base64Data));
+              // Ensure proper base64 padding before decoding just in case
+              String normalized = base64Data.replaceAll(' ', '+');
+              while (normalized.length % 4 != 0) {
+                normalized += '=';
+              }
+              debugPrint('[DEEP LINK] Normalized base64Data: \$normalized');
+              final jsonStr = utf8.decode(base64Url.decode(normalized));
+              debugPrint('[DEEP LINK] Decoded JSON: \$jsonStr');
               final Map<String, dynamic> payload =
                   jsonDecode(jsonStr) as Map<String, dynamic>;
               return PreviewCardScreen(
@@ -270,12 +280,20 @@ class AppRouter {
                 frontMessage: payload['frontMessage'] as String?,
                 message: payload['message'] as String?,
               );
-            } catch (_) {
-              // Malformed payload — fall through to main screen
+            } catch (e, st) {
+              debugPrint('[DEEP LINK] Error parsing payload: \$e\\n\$st');
+              return Scaffold(
+                appBar: AppBar(title: const Text('Deep Link Error')),
+                body: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text('Failed to parse card data.\\n\\nError:\\n\$e'),
+                ),
+              );
             }
           }
-          // Fallback: invalid or missing data → go to main
-          return const MainScreen();
+          return const Scaffold(
+            body: Center(child: Text('Invalid or missing card data in link.')),
+          );
         },
       ),
     ],
