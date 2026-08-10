@@ -1,89 +1,409 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>You've Received a Card!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Digital Card - Rivon</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(180deg, #E7FFEC 0%, #FFFFFF 50%, #FDEBFA 100%);
+            min-height: 100vh;
+            width: 100vw;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f8f9fa;
-            color: #333;
-            text-align: center;
-            padding: 20px;
+            overflow-x: hidden;
+            padding: 24px 16px 100px 16px;
+            color: #333333;
         }
-        .icon {
-            width: 80px;
-            height: 80px;
-            background-color: #3498db;
+
+        /* Ambient Glass Container */
+        .preview-container {
+            width: 100%;
+            max-width: 380px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            perspective: 1000px;
+        }
+
+        /* Flip Card Scene */
+        .card-scene {
+            width: 100%;
+            aspect-ratio: 3 / 4;
+            max-height: 480px;
+            position: relative;
+            cursor: pointer;
+            perspective: 1200px;
+        }
+
+        .card-inner {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             border-radius: 20px;
-            margin-bottom: 24px;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-inner.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background-color: #FFFFFF;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        /* Front Face */
+        .card-front {
+            position: relative;
+        }
+
+        .card-image-wrapper {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background-color: #f0f0f0;
+        }
+
+        .card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            /* Rule 4 Compliant: Prevents left/right edge cropping */
+            display: block;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .card-image.loaded {
+            opacity: 1;
+        }
+
+        .front-text-overlay {
+            position: absolute;
+            bottom: 24px;
+            left: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 14px 18px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+            text-align: center;
+        }
+
+        .front-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1A1A1A;
+            line-height: 1.3;
+        }
+
+        /* Inside/Back Face */
+        .card-back {
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, #FFFFFF 0%, #FAF5FF 100%);
+            padding: 32px 24px;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.02);
+        }
+
+        .inside-message {
+            font-size: 17px;
+            font-weight: 400;
+            color: #333333;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 100%;
+            overflow-y: auto;
+        }
+
+        /* Shimmer Loading Skeleton */
+        .skeleton-loader {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e4e4e4 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 20px;
+            z-index: 2;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        /* Tap to Flip Teaser Nudge */
+        .flip-hint {
+            margin-top: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: rgba(0, 0, 0, 0.06);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #525252;
+            user-select: none;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .flip-hint:active {
+            transform: scale(0.96);
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Floating App Store Download CTA Banner */
+        .floating-cta-banner {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 32px);
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 12px 16px;
+            border-radius: 28px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .cta-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cta-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #FF5E60 0%, #FF8B8D 100%);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 32px;
-            font-weight: bold;
+            font-size: 18px;
+            color: #FFFFFF;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(255, 94, 96, 0.3);
         }
-        h2 {
-            margin: 0 0 10px 0;
-            font-size: 24px;
+
+        .cta-text-group {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
         }
-        p {
-            color: #666;
-            margin-bottom: 30px;
-            max-width: 300px;
-            line-height: 1.5;
+
+        .cta-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1A1A1A;
+            line-height: 1.2;
         }
-        .btn {
-            padding: 14px 28px;
-            background-color: #007aff;
-            color: white;
+
+        .cta-subtitle {
+            font-size: 11px;
+            font-weight: 400;
+            color: #666666;
+        }
+
+        .cta-button {
+            padding: 10px 18px;
+            background: linear-gradient(270deg, #FF5E60 0%, #FF8B8D 100%);
+            color: #FFFFFF;
             text-decoration: none;
-            border-radius: 12px;
+            border-radius: 20px;
             font-weight: 600;
-            font-size: 16px;
-            display: inline-block;
-            transition: background-color 0.2s;
+            font-size: 13px;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(255, 94, 96, 0.25);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        .btn:active {
-            background-color: #005bb5;
+
+        .cta-button:active {
+            transform: scale(0.95);
         }
     </style>
 </head>
+
 <body>
-    <div class="icon">✉️</div>
-    <h2>You've Received a Card!</h2>
-    <p>To open your personalized card, please download the Rivon app.</p>
-    
-    <a href="#" id="downloadBtn" class="btn">Download Rivon</a>
+
+    <!-- Main Container -->
+    <main class="preview-container">
+        <!-- 3D Flip Card Scene -->
+        <div class="card-scene" id="cardScene">
+            <div class="card-inner" id="cardInner">
+
+                <!-- Front Side -->
+                <div class="card-face card-front" id="cardFront">
+                    <div class="skeleton-loader" id="skeletonLoader"></div>
+                    <div class="card-image-wrapper">
+                        <img id="cardCoverImg" class="card-image" alt="Greeting Card Artwork" />
+                    </div>
+                    <div class="front-text-overlay" id="frontTextOverlay" style="display: none;">
+                        <p class="front-text" id="frontTextMessage"></p>
+                    </div>
+                </div>
+
+                <!-- Inside Side -->
+                <div class="card-face card-back" id="cardBack">
+                    <p class="inside-message" id="insideTextMessage"></p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Tap to Flip Nudge -->
+        <div class="flip-hint" id="flipHint">
+            <span>🔄</span> Tap card to flip
+        </div>
+    </main>
+
+    <!-- Floating App Install CTA Banner -->
+    <aside class="floating-cta-banner">
+        <div class="cta-info">
+            <div class="cta-icon">🎴</div>
+            <div class="cta-text-group">
+                <span class="cta-title">Rivon Cards</span>
+                <span class="cta-subtitle">Create 3D Cards</span>
+            </div>
+        </div>
+        <a href="#" id="downloadBtn" class="cta-button">Get App</a>
+    </aside>
 
     <script>
-        window.onload = function() {
-            var playStoreLink = "https://play.google.com/store/apps/details?id=com.greetingcards.invitationmaker.rivon";
-            var appStoreLink = "https://apps.apple.com/us/app/rivon/id123456789";
+        document.addEventListener('DOMContentLoaded', function () {
+            const playStoreLink = "https://play.google.com/store/apps/details?id=com.greetingcards.invitationmaker.rivon";
+            const appStoreLink = "https://apps.apple.com/us/app/rivon/id123456789";
 
-            var userAgent = navigator.userAgent || navigator.vendor || window.opera;
-            var isAndroid = /android/i.test(userAgent);
-            var isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
-            
-            var btn = document.getElementById("downloadBtn");
+            // OS Detection
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            const isAndroid = /android/i.test(userAgent);
+            const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+
+            const downloadBtn = document.getElementById("downloadBtn");
             if (isAndroid) {
-                btn.href = playStoreLink;
+                downloadBtn.href = playStoreLink;
             } else if (isIOS) {
-                btn.href = appStoreLink;
+                downloadBtn.href = appStoreLink;
             } else {
-                // Desktop fallback
-                btn.href = playStoreLink; 
-                btn.innerText = "Get it on Google Play";
+                downloadBtn.href = playStoreLink;
             }
-        };
+
+            // Elements
+            const cardInner = document.getElementById('cardInner');
+            const cardScene = document.getElementById('cardScene');
+            const flipHint = document.getElementById('flipHint');
+            const skeletonLoader = document.getElementById('skeletonLoader');
+            const cardCoverImg = document.getElementById('cardCoverImg');
+            const frontTextOverlay = document.getElementById('frontTextOverlay');
+            const frontTextMessage = document.getElementById('frontTextMessage');
+            const insideTextMessage = document.getElementById('insideTextMessage');
+
+            // Card Flip Event
+            function toggleFlip() {
+                cardInner.classList.toggle('is-flipped');
+            }
+            cardScene.addEventListener('click', toggleFlip);
+            flipHint.addEventListener('click', toggleFlip);
+
+            // Extract & Decode Base64 Payload from URL query ?data=...
+            const urlParams = new URLSearchParams(window.location.search);
+            const rawData = urlParams.get('data');
+
+            let coverUrl = '';
+            let frontText = '';
+            let insideMessage = '';
+
+            if (rawData) {
+                try {
+                    const decodedComponent = decodeURIComponent(rawData);
+                    const jsonString = atob(decodedComponent);
+                    const payload = JSON.parse(jsonString);
+                    coverUrl = payload.coverImageUrl || '';
+                    frontText = payload.frontMessage || '';
+                    insideMessage = payload.message || '';
+                } catch (e) {
+                    console.error('Failed to parse card payload:', e);
+                }
+            }
+
+            // Default Fallbacks if payload values are missing
+            if (!coverUrl) {
+                coverUrl = 'https://picsum.photos/400/600'; // High-quality fallback artwork
+            }
+            if (!frontText) {
+                frontText = "A Special Card For You ✨";
+            }
+            if (!insideMessage) {
+                insideMessage = "Wishing you a wonderful day filled with happiness and laughter! 🎴";
+            }
+
+            // Populate Text Elements
+            frontTextMessage.textContent = frontText;
+            frontTextOverlay.style.display = 'block';
+            insideTextMessage.textContent = insideMessage;
+
+            // Load Card Artwork Image with Skeleton Cross-Fade
+            cardCoverImg.src = coverUrl;
+            cardCoverImg.onload = function () {
+                skeletonLoader.style.opacity = '0';
+                setTimeout(function () {
+                    skeletonLoader.style.display = 'none';
+                    cardCoverImg.classList.add('loaded');
+                }, 300);
+            };
+            cardCoverImg.onerror = function () {
+                skeletonLoader.style.display = 'none';
+                cardCoverImg.src = 'https://picsum.photos/400/600';
+                cardCoverImg.classList.add('loaded');
+            };
+        });
     </script>
 </body>
+
 </html>

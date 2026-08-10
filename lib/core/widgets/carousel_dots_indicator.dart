@@ -30,8 +30,7 @@ class CarouselDotsIndicator extends StatelessWidget {
           width: isActive ? activeWidth.w : inactiveWidth.w,
           height: height.h,
           decoration: BoxDecoration(
-            gradient: isActive ? AppColors.primaryButtonGradient : null,
-            color: isActive ? null : const Color(0xFFFF8B8D),
+            gradient: AppColors.primaryButtonGradient,
             borderRadius: BorderRadius.circular((height / 2).r),
           ),
         );
@@ -39,3 +38,4 @@ class CarouselDotsIndicator extends StatelessWidget {
     );
   }
 }
+

@@ -178,298 +178,373 @@ class EditCardScreen extends HookConsumerWidget {
                       ),
                       SizedBox(height: 24.h),
 
-                      if (!isRecipientStep.value) ...[
-                        // Title and Price
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              card?.title ?? '',
-                              style: AppTextStyles.colitez400Italic24(),
-                            ),
-                            Text(
-                              '\$ 5.99', // Keep price hardcoded or use card.price if it exists later
-                              style: AppTextStyles.colitez400Italic24(),
-                            ),
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 250),
+                      switchInCurve: Curves.easeOut,
+                      switchOutCurve: Curves.easeIn,
+                      layoutBuilder: (currentChild, previousChildren) {
+                        return Stack(
+                          alignment: Alignment.topLeft,
+                          children: <Widget>[
+                            ...previousChildren,
+                            if (currentChild != null) currentChild,
                           ],
-                        ),
-                        SizedBox(height: 24.h),
-
-                        // Edit Cover Text
-                        Text(
-                          texts.editCoverText,
-                          style: AppTextStyles.colitez400Italic16(),
-                        ),
-                        SizedBox(height: 8.h),
-                        CustomCardTextField(
-                          controller: coverTextController,
-                          maxLines: 4,
-                          inputFormatters: [
-                            PhysicalBoundsTextInputFormatter(
-                              style: AppTextStyles.bizudMincho400Regular12(
-                                color: Colors.white,
-                              ),
-                              maxWidth: 197.w, // 255.w - 29.w - 29.w
-                              maxHeight: 81.h, // 358.h - 253.h - 24.h
-                              isUpperCase: true,
-                              textScaler: MediaQuery.textScalerOf(context),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 24.h),
-
-                        // Edit Inside Message
-                        Text(
-                          texts.editInsideMessage,
-                          style: AppTextStyles.colitez400Italic16(),
-                        ),
-                        SizedBox(height: 8.h),
-                        CustomCardTextField(
-                          controller: insideMessageController,
-                          maxLines: 5,
-                          inputFormatters: [
-                            PhysicalBoundsTextInputFormatter(
-                              style: AppTextStyles.bizudMincho400Regular12(
-                                color: Colors.black,
-                              ),
-                              maxWidth: 215.w, // 255.w - 20.w - 20.w
-                              maxHeight: 318.h, // 358.h - 20.h - 20.h
-                              isUpperCase: true,
-                              textScaler: MediaQuery.textScalerOf(context),
-                            ),
-                          ],
-                        ),
-
-
-                        SizedBox(height: 32.h),
-
-                        // Buttons
-                        PrimaryButton(
-                          text: texts.continueText,
-                          onPressed: () {
-                            if (coverTextController.text.trim().isEmpty ||
-                                insideMessageController.text.trim().isEmpty) {
-                              CustomSnackbar.showError(
-                                context,
-                                texts.pleaseFillMessageFields,
-                              );
-                              return;
-                            }
-                            if (fromController.text.trim().isEmpty ||
-                                toController.text.trim().isEmpty) {
-                              pageController.animateToPage(
-                                2,
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeInOut,
-                              );
-                              return;
-                            }
-
-                            // Navigate back to the Card Detail Screen with updated data
-                            context.pop({
-                              'coverText': coverTextController.text,
-                              'insideMessage': insideMessageController.text,
-                            });
-                          },
-                        ),
-                        SizedBox(height: 16.h),
-                        OutlinedButton(
-                          onPressed: () async {
-                            final coverText = coverTextController.text.trim();
-                            final insideText = insideMessageController.text
-                                .trim();
-
-                            if (coverText.isEmpty || insideText.isEmpty) {
-                              CustomSnackbar.showError(
-                                context,
-                                texts.fieldsCannotBeEmpty,
-                              );
-                              return;
-                            }
-
-                            final draftNameController = TextEditingController();
-                            final result = await showDialog<String>(
-                              context: context,
-                              builder: (dialogContext) => Dialog(
-                                backgroundColor: Colors.transparent,
-                                elevation: 0,
-                                insetPadding: EdgeInsets.symmetric(
-                                  horizontal: 24.w,
-                                ),
-                                child: Container(
-                                  width: 310.w,
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: 32.h,
-                                    horizontal: 8.w,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFFFFFFF),
-                                    borderRadius: BorderRadius.circular(20.r),
-                                    border: Border.all(
-                                      color: const Color(0xFF000000),
-                                      width: 0.5,
+                        );
+                      },
+                      transitionBuilder: (child, animation) {
+                        return FadeTransition(
+                          opacity: animation,
+                          child: child,
+                        );
+                      },
+                      child: !isRecipientStep.value
+                          ? Column(
+                              key: const ValueKey('edit_step_1_2_content'),
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Title and Price
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      card?.title ?? '',
+                                      style: AppTextStyles.colitez400Italic24(),
                                     ),
-                                  ),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        texts.saveDraft,
-                                        style:
-                                            AppTextStyles.colitez400Italic20(),
+                                    Text(
+                                      '\$ 5.99',
+                                      style: AppTextStyles.colitez400Italic24(),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 24.h),
+
+                                // Edit Cover Text
+                                Text(
+                                  texts.editCoverText,
+                                  style: AppTextStyles.colitez400Italic16(),
+                                ),
+                                SizedBox(height: 8.h),
+                                CustomCardTextField(
+                                  controller: coverTextController,
+                                  maxLines: 4,
+                                  inputFormatters: [
+                                    PhysicalBoundsTextInputFormatter(
+                                      style:
+                                          AppTextStyles.bizudMincho400Regular12(
+                                            color: Colors.white,
+                                          ),
+                                      maxWidth: 197.w,
+                                      maxHeight: 81.h,
+                                      isUpperCase: true,
+                                      textScaler: MediaQuery.textScalerOf(
+                                        context,
                                       ),
-                                      SizedBox(height: 24.h),
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 24.h),
+
+                                // Edit Inside Message
+                                Text(
+                                  texts.editInsideMessage,
+                                  style: AppTextStyles.colitez400Italic16(),
+                                ),
+                                SizedBox(height: 8.h),
+                                CustomCardTextField(
+                                  controller: insideMessageController,
+                                  maxLines: 5,
+                                  inputFormatters: [
+                                    PhysicalBoundsTextInputFormatter(
+                                      style:
+                                          AppTextStyles.bizudMincho400Regular12(
+                                            color: Colors.black,
+                                          ),
+                                      maxWidth: 215.w,
+                                      maxHeight: 318.h,
+                                      isUpperCase: true,
+                                      textScaler: MediaQuery.textScalerOf(
+                                        context,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                SizedBox(height: 32.h),
+
+                                // Buttons
+                                PrimaryButton(
+                                  text: texts.continueText,
+                                  onPressed: () {
+                                    if (coverTextController.text
+                                            .trim()
+                                            .isEmpty ||
+                                        insideMessageController.text
+                                            .trim()
+                                            .isEmpty) {
+                                      CustomSnackbar.showError(
+                                        context,
+                                        texts.pleaseFillMessageFields,
+                                      );
+                                      return;
+                                    }
+                                    if (fromController.text.trim().isEmpty ||
+                                        toController.text.trim().isEmpty) {
+                                      pageController.animateToPage(
+                                        2,
+                                        duration: const Duration(
+                                          milliseconds: 300,
+                                        ),
+                                        curve: Curves.easeInOut,
+                                      );
+                                      return;
+                                    }
+
+                                    context.pop({
+                                      'coverText': coverTextController.text,
+                                      'insideMessage':
+                                          insideMessageController.text,
+                                    });
+                                  },
+                                ),
+                                SizedBox(height: 16.h),
+                                OutlinedButton(
+                                  onPressed: () async {
+                                    final coverText = coverTextController.text
+                                        .trim();
+                                    final insideText =
+                                        insideMessageController.text.trim();
+
+                                    if (coverText.isEmpty ||
+                                        insideText.isEmpty) {
+                                      CustomSnackbar.showError(
+                                        context,
+                                        texts.fieldsCannotBeEmpty,
+                                      );
+                                      return;
+                                    }
+
+                                    final draftNameController =
+                                        TextEditingController();
+                                    final result = await showDialog<String>(
+                                      context: context,
+                                      builder: (dialogContext) => Dialog(
+                                        backgroundColor: Colors.transparent,
+                                        elevation: 0,
+                                        insetPadding: EdgeInsets.symmetric(
                                           horizontal: 24.w,
                                         ),
-                                        child: AppTextField(
-                                          controller: draftNameController,
-                                          hintText: texts.enterDraftName,
-                                          maxLength: 15,
-                                        ),
-                                      ),
-                                      SizedBox(height: 32.h),
-                                      Padding(
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 16.w,
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                              child: GestureDetector(
-                                                onTap: () => Navigator.of(
-                                                  dialogContext,
-                                                ).pop(),
-                                                child: Container(
-                                                  height: 34.h,
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          20.r,
-                                                        ),
-                                                    border: Border.all(
-                                                      color: Colors.black,
-                                                      width: 0.5,
+                                        child: Container(
+                                          width: 310.w,
+                                          padding: EdgeInsets.symmetric(
+                                            vertical: 32.h,
+                                            horizontal: 8.w,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFFFFFFF),
+                                            borderRadius:
+                                                BorderRadius.circular(20.r),
+                                            border: Border.all(
+                                              color: const Color(0xFF000000),
+                                              width: 0.5,
+                                            ),
+                                          ),
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                texts.saveDraft,
+                                                style: AppTextStyles
+                                                    .colitez400Italic20(),
+                                              ),
+                                              SizedBox(height: 24.h),
+                                              Padding(
+                                                padding:
+                                                    EdgeInsets.symmetric(
+                                                      horizontal: 24.w,
                                                     ),
-                                                  ),
-                                                  alignment: Alignment.center,
-                                                  child: Text(
-                                                    texts.cancel,
-                                                    style:
-                                                        AppTextStyles.roboto500Medium14(),
-                                                  ),
+                                                child: AppTextField(
+                                                  controller:
+                                                      draftNameController,
+                                                  hintText:
+                                                      texts.enterDraftName,
+                                                  maxLength: 15,
                                                 ),
                                               ),
-                                            ),
-                                            SizedBox(width: 15.w),
-                                            Expanded(
-                                              child: GestureDetector(
-                                                onTap: () {
-                                                  final name =
-                                                      draftNameController.text
-                                                          .trim();
-                                                  if (name.isEmpty) {
-                                                    CustomSnackbar.showError(
-                                                      dialogContext,
-                                                      texts.pleaseEnterName,
-                                                    );
-                                                    return;
-                                                  }
-                                                  if (name.length > 15) {
-                                                    CustomSnackbar.showError(
-                                                      dialogContext,
-                                                      texts
-                                                          .nameExceeds15Letters,
-                                                    );
-                                                    return;
-                                                  }
-                                                  Navigator.of(
-                                                    dialogContext,
-                                                  ).pop(name);
-                                                },
-                                                child: Container(
-                                                  height: 34.h,
-                                                  decoration: BoxDecoration(
-                                                    gradient: AppColors
-                                                        .primaryButtonGradient,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          20.r,
+                                              SizedBox(height: 32.h),
+                                              Padding(
+                                                padding:
+                                                    EdgeInsets.symmetric(
+                                                      horizontal: 16.w,
+                                                    ),
+                                                child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: GestureDetector(
+                                                        onTap: () =>
+                                                            Navigator.of(
+                                                              dialogContext,
+                                                            ).pop(),
+                                                        child: Container(
+                                                          height: 34.h,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                color: Colors
+                                                                    .white,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                          20.r,
+                                                                        ),
+                                                                border: Border
+                                                                    .all(
+                                                                      color:
+                                                                          Colors
+                                                                              .black,
+                                                                      width:
+                                                                          0.5,
+                                                                    ),
+                                                              ),
+                                                          alignment:
+                                                              Alignment.center,
+                                                          child: Text(
+                                                            texts.cancel,
+                                                            style: AppTextStyles
+                                                                .roboto500Medium14(),
+                                                          ),
                                                         ),
-                                                  ),
-                                                  alignment: Alignment.center,
-                                                  child: Text(
-                                                    texts.save,
-                                                    style:
-                                                        AppTextStyles.roboto500Medium14()
-                                                            .copyWith(
-                                                              color:
-                                                                  Colors.white,
-                                                            ),
-                                                  ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(width: 15.w),
+                                                    Expanded(
+                                                      child: GestureDetector(
+                                                        onTap: () {
+                                                          final name =
+                                                              draftNameController
+                                                                  .text
+                                                                  .trim();
+                                                          if (name.isEmpty) {
+                                                            CustomSnackbar
+                                                                .showError(
+                                                                  dialogContext,
+                                                                  texts
+                                                                      .pleaseEnterName,
+                                                                );
+                                                            return;
+                                                          }
+                                                          if (name.length >
+                                                              15) {
+                                                            CustomSnackbar
+                                                                .showError(
+                                                                  dialogContext,
+                                                                  texts
+                                                                      .nameExceeds15Letters,
+                                                                );
+                                                            return;
+                                                          }
+                                                          Navigator.of(
+                                                            dialogContext,
+                                                          ).pop(name);
+                                                        },
+                                                        child: Container(
+                                                          height: 34.h,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                                gradient:
+                                                                    AppColors
+                                                                        .primaryButtonGradient,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                          20.r,
+                                                                        ),
+                                                              ),
+                                                          alignment:
+                                                              Alignment.center,
+                                                          child: Text(
+                                                            texts.save,
+                                                            style: AppTextStyles
+                                                                .roboto500Medium14()
+                                                                .copyWith(
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ],
+                                    );
+
+                                    if (result != null) {
+                                      if (!context.mounted) return;
+                                      ref
+                                          .read(
+                                            editCardControllerProvider.notifier,
+                                          )
+                                          .saveDraft(
+                                            context: context,
+                                            cardId: cardId,
+                                            coverText: coverTextController.text,
+                                            insideMessage:
+                                                insideMessageController.text,
+                                            draftName: result,
+                                            texts: texts,
+                                          );
+                                    }
+                                  },
+                                  style: OutlinedButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    minimumSize: Size(double.infinity, 44.h),
+                                    side: BorderSide(
+                                      color: Colors.black,
+                                      width: 0.5.w,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                        20.r,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    texts.saveDraft,
+                                    style: AppTextStyles.colitez400Italic22(),
                                   ),
                                 ),
+                              ],
+                            )
+                          : KeyedSubtree(
+                              key: const ValueKey('edit_step_3_content'),
+                              child: RecipientDeliveryForm(
+                                isLoading: editCardState.isLoading,
+                                onSendPressed: (e164Phone, deliveryMethod) {
+                                  ref
+                                      .read(editCardControllerProvider.notifier)
+                                      .handlePurchaseAndOrder(
+                                        context: context,
+                                        cardId: cardId,
+                                        insideMessage:
+                                            insideMessageController.text,
+                                        from: fromController.text,
+                                        to: toController.text,
+                                        draftId: draftId,
+                                        texts: texts,
+                                        pageController: pageController,
+                                        recipientPhone: e164Phone,
+                                        deliveryMethod: deliveryMethod,
+                                        coverImageUrl: coverImageUrl,
+                                        frontMessage: frontMessage,
+                                      );
+                                },
                               ),
-                            );
-
-                            if (result != null) {
-                              if (!context.mounted) return;
-                              ref.read(editCardControllerProvider.notifier).saveDraft(
-                                context: context,
-                                cardId: cardId,
-                                coverText: coverTextController.text,
-                                insideMessage: insideMessageController.text,
-                                draftName: result,
-                                texts: texts,
-                              );
-                            }
-
-                          },
-                          style: OutlinedButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                            minimumSize: Size(double.infinity, 44.h),
-                            side: BorderSide(color: Colors.black, width: 0.5.w),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.r),
                             ),
-                          ),
-                          child: Text(
-                            texts.saveDraft,
-                            style: AppTextStyles.colitez400Italic22(),
-                          ),
-                        ),
-                      ] else ...[
-                        RecipientDeliveryForm(
-                          isLoading: editCardState.isLoading,
-                          onSendPressed: (e164Phone, deliveryMethod) {
-                            ref
-                                .read(editCardControllerProvider.notifier)
-                                .handlePurchaseAndOrder(
-                                  context: context,
-                                  cardId: cardId,
-                                  insideMessage: insideMessageController.text,
-                                  from: fromController.text,
-                                  to: toController.text,
-                                  draftId: draftId,
-                                  texts: texts,
-                                  pageController: pageController,
-                                  recipientPhone: e164Phone,
-                                  deliveryMethod: deliveryMethod,
-                                  coverImageUrl: coverImageUrl,
-                                  frontMessage: frontMessage,
-                                );
-                          },
-                        ),
-                      ],
+                    ),
 
                       SizedBox(height: 40.h),
                     ],

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' show ClientException;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/utils/either.dart';
@@ -12,24 +13,76 @@ class AuthRepositoryImpl implements AuthRepository {
 
   AuthRepositoryImpl(this.remoteDataSource);
 
+  Future<bool> _hasInternetConnection() async {
+    if (kIsWeb) return true;
+    try {
+      final result = await InternetAddress.lookup('google.com')
+          .timeout(const Duration(milliseconds: 1000));
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
+  }
+
   @override
   Future<Either<Failure, void>> signIn(String email, String password) async {
+    if (!await _hasInternetConnection()) {
+      return Either.left(
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
+      );
+    }
     try {
       await remoteDataSource.signIn(email, password);
       return Either.right(null);
     } on TimeoutException {
       return Either.left(
-        AuthFailure('Connection timed out. Please check your internet.'),
+        AuthFailure(
+          'Connection timed out. Please check your internet connection and try again.',
+        ),
       );
     } on SocketException {
       return Either.left(
-        AuthFailure('No internet connection. Please try again.'),
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
+      );
+    } on ClientException {
+      return Either.left(
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
+      );
+    } on HttpException {
+      return Either.left(
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
       );
     } on AuthException catch (e) {
       return Either.left(AuthFailure(_parseErrorMessage(e.message)));
     } on PostgrestException catch (e) {
       return Either.left(AuthFailure(_parseErrorMessage(e.message)));
     } catch (e) {
+      final msg = e.toString().toLowerCase();
+      if (msg.contains('socket') ||
+          msg.contains('host lookup') ||
+          msg.contains('clientexception') ||
+          msg.contains('network')) {
+        return Either.left(
+          AuthFailure(
+            'No internet connection. Please try again.',
+          ),
+        );
+      }
+      if (msg.contains('timeout')) {
+        return Either.left(
+          AuthFailure(
+            'Connection timed out. Please check your internet connection and try again.',
+          ),
+        );
+      }
       return Either.left(
         AuthFailure('An unexpected error occurred during login.'),
       );
@@ -43,6 +96,13 @@ class AuthRepositoryImpl implements AuthRepository {
     String fullName, {
     String? dateOfBirth,
   }) async {
+    if (!await _hasInternetConnection()) {
+      return Either.left(
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
+      );
+    }
     try {
       await remoteDataSource.signUp(
         email,
@@ -53,17 +113,51 @@ class AuthRepositoryImpl implements AuthRepository {
       return Either.right(null);
     } on TimeoutException {
       return Either.left(
-        AuthFailure('Connection timed out. Please check your internet.'),
+        AuthFailure(
+          'Connection timed out. Please check your internet connection and try again.',
+        ),
       );
     } on SocketException {
       return Either.left(
-        AuthFailure('No internet connection. Please try again.'),
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
+      );
+    } on ClientException {
+      return Either.left(
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
+      );
+    } on HttpException {
+      return Either.left(
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
       );
     } on AuthException catch (e) {
       return Either.left(AuthFailure(_parseErrorMessage(e.message)));
     } on PostgrestException catch (e) {
       return Either.left(AuthFailure(_parseErrorMessage(e.message)));
     } catch (e) {
+      final msg = e.toString().toLowerCase();
+      if (msg.contains('socket') ||
+          msg.contains('host lookup') ||
+          msg.contains('clientexception') ||
+          msg.contains('network')) {
+        return Either.left(
+          AuthFailure(
+            'No internet connection. Please try again.',
+          ),
+        );
+      }
+      if (msg.contains('timeout')) {
+        return Either.left(
+          AuthFailure(
+            'Connection timed out. Please check your internet connection and try again.',
+          ),
+        );
+      }
       return Either.left(
         AuthFailure('An unexpected error occurred during sign up.'),
       );
@@ -72,22 +166,63 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Either<Failure, void>> resetPassword(String email) async {
+    if (!await _hasInternetConnection()) {
+      return Either.left(
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
+      );
+    }
     try {
       await remoteDataSource.resetPassword(email);
       return Either.right(null);
     } on TimeoutException {
       return Either.left(
-        AuthFailure('Connection timed out. Please check your internet.'),
+        AuthFailure(
+          'Connection timed out. Please check your internet connection and try again.',
+        ),
       );
     } on SocketException {
       return Either.left(
-        AuthFailure('No internet connection. Please try again.'),
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
+      );
+    } on ClientException {
+      return Either.left(
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
+      );
+    } on HttpException {
+      return Either.left(
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
       );
     } on AuthException catch (e) {
       return Either.left(AuthFailure(_parseErrorMessage(e.message)));
     } on PostgrestException catch (e) {
       return Either.left(AuthFailure(_parseErrorMessage(e.message)));
     } catch (e) {
+      final msg = e.toString().toLowerCase();
+      if (msg.contains('socket') ||
+          msg.contains('host lookup') ||
+          msg.contains('clientexception') ||
+          msg.contains('network')) {
+        return Either.left(
+          AuthFailure(
+            'No internet connection. Please try again.',
+          ),
+        );
+      }
+      if (msg.contains('timeout')) {
+        return Either.left(
+          AuthFailure(
+            'Connection timed out. Please check your internet connection and try again.',
+          ),
+        );
+      }
       return Either.left(
         AuthFailure(
           'An unexpected error occurred while sending the reset link.',
@@ -108,16 +243,39 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Either<Failure, void>> signInWithGoogle() async {
+    if (!await _hasInternetConnection()) {
+      return Either.left(
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
+      );
+    }
     try {
       await remoteDataSource.signInWithGoogle();
       return Either.right(null);
     } on TimeoutException {
       return Either.left(
-        AuthFailure('Connection timed out. Please check your internet.'),
+        AuthFailure(
+          'Connection timed out. Please check your internet connection and try again.',
+        ),
       );
     } on SocketException {
       return Either.left(
-        AuthFailure('No internet connection. Please try again.'),
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
+      );
+    } on ClientException {
+      return Either.left(
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
+      );
+    } on HttpException {
+      return Either.left(
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
       );
     } on AuthException catch (e) {
       return Either.left(AuthFailure(_parseErrorMessage(e.message)));
@@ -126,6 +284,24 @@ class AuthRepositoryImpl implements AuthRepository {
     } catch (e, stack) {
       debugPrint('[Google Sign-In Error]: $e');
       debugPrint('[Google Sign-In StackTrace]: $stack');
+      final msg = e.toString().toLowerCase();
+      if (msg.contains('socket') ||
+          msg.contains('host lookup') ||
+          msg.contains('clientexception') ||
+          msg.contains('network')) {
+        return Either.left(
+          AuthFailure(
+            'No internet connection. Please try again.',
+          ),
+        );
+      }
+      if (msg.contains('timeout')) {
+        return Either.left(
+          AuthFailure(
+            'Connection timed out. Please check your internet connection and try again.',
+          ),
+        );
+      }
       return Either.left(
         AuthFailure('An unexpected error occurred during Google Sign-In.'),
       );
@@ -137,22 +313,63 @@ class AuthRepositoryImpl implements AuthRepository {
     String fullName, {
     String? dateOfBirth,
   }) async {
+    if (!await _hasInternetConnection()) {
+      return Either.left(
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
+      );
+    }
     try {
       await remoteDataSource.updateProfile(fullName, dateOfBirth: dateOfBirth);
       return Either.right(null);
     } on TimeoutException {
       return Either.left(
-        AuthFailure('Connection timed out. Please check your internet.'),
+        AuthFailure(
+          'Connection timed out. Please check your internet connection and try again.',
+        ),
       );
     } on SocketException {
       return Either.left(
-        AuthFailure('No internet connection. Please try again.'),
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
+      );
+    } on ClientException {
+      return Either.left(
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
+      );
+    } on HttpException {
+      return Either.left(
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
       );
     } on AuthException catch (e) {
       return Either.left(AuthFailure(_parseErrorMessage(e.message)));
     } on PostgrestException catch (e) {
       return Either.left(AuthFailure(_parseErrorMessage(e.message)));
     } catch (e) {
+      final msg = e.toString().toLowerCase();
+      if (msg.contains('socket') ||
+          msg.contains('host lookup') ||
+          msg.contains('clientexception') ||
+          msg.contains('network')) {
+        return Either.left(
+          AuthFailure(
+            'No internet connection. Please try again.',
+          ),
+        );
+      }
+      if (msg.contains('timeout')) {
+        return Either.left(
+          AuthFailure(
+            'Connection timed out. Please check your internet connection and try again.',
+          ),
+        );
+      }
       return Either.left(
         AuthFailure('An unexpected error occurred while updating profile.'),
       );
@@ -162,20 +379,37 @@ class AuthRepositoryImpl implements AuthRepository {
   String _parseErrorMessage(String originalMessage) {
     final lowerMessage = originalMessage.toLowerCase();
 
-    // 1. Network / Server 5xx / Connection errors
+    // 0. No internet / network lookup failure
+    if (lowerMessage.contains('failed host lookup') ||
+        lowerMessage.contains('no address associated with hostname') ||
+        lowerMessage.contains('socketexception') ||
+        lowerMessage.contains('clientexception') ||
+        lowerMessage.contains('connection refused') ||
+        lowerMessage.contains('network error') ||
+        lowerMessage.contains('network request failed') ||
+        lowerMessage.contains('failed to fetch') ||
+        lowerMessage.contains('network_error')) {
+      return 'No internet connection. Please try again.';
+    }
+
+    // 1. Timeout errors
+    if (lowerMessage.contains('timeout') ||
+        lowerMessage.contains('timed out')) {
+      return 'Connection timed out. Please check your internet connection and try again.';
+    }
+
+    // 2. Server 5xx / Connection errors
     if (lowerMessage.contains('500') ||
         lowerMessage.contains('501') ||
         lowerMessage.contains('502') ||
         lowerMessage.contains('503') ||
         lowerMessage.contains('504') ||
         lowerMessage.contains('522') ||
-        lowerMessage.contains('error code:') ||
-        lowerMessage.contains('network') ||
-        lowerMessage.contains('timeout')) {
-      return 'Something went wrong. Please check your internet connection or try again later.';
+        lowerMessage.contains('error code:')) {
+      return 'Server error occurred. Please try again later.';
     }
 
-    // 2. Login credentials failure
+    // 3. Login credentials failure
     if (lowerMessage.contains('invalid login credentials') ||
         lowerMessage.contains('invalid credentials') ||
         lowerMessage.contains('wrong password') ||
@@ -183,7 +417,7 @@ class AuthRepositoryImpl implements AuthRepository {
       return 'Invalid email or password. Please try again.';
     }
 
-    // 3. User already registered
+    // 4. User already registered
     if (lowerMessage.contains('user already registered') ||
         lowerMessage.contains('already registered') ||
         lowerMessage.contains('already in use') ||
@@ -191,8 +425,7 @@ class AuthRepositoryImpl implements AuthRepository {
       return 'This email is already registered. Please log in instead.';
     }
 
-    // 4. Rate limiting / Throttling
-
+    // 5. Rate limiting / Throttling
     if (lowerMessage.contains('rate limit') ||
         lowerMessage.contains('too many requests') ||
         lowerMessage.contains('exceeded')) {
@@ -234,4 +467,5 @@ class AuthRepositoryImpl implements AuthRepository {
     return originalMessage;
   }
 }
+
 

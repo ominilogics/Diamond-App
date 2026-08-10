@@ -121,142 +121,184 @@ class CardDetailScreen extends HookConsumerWidget {
                     ),
                     SizedBox(height: 24.h),
 
-                    if (currentPage.value < 2) ...[
-                      // Title and Price Row
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            title,
-                            style: AppTextStyles.colitez400Italic24(),
-                          ),
-                          Text(
-                            '\$ 5.99',
-                            style: AppTextStyles.colitez400Italic24(),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 12.h),
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 250),
+                      switchInCurve: Curves.easeOut,
+                      switchOutCurve: Curves.easeIn,
+                      layoutBuilder: (currentChild, previousChildren) {
+                        return Stack(
+                          alignment: Alignment.topLeft,
+                          children: <Widget>[
+                            ...previousChildren,
+                            if (currentChild != null) currentChild,
+                          ],
+                        );
+                      },
+                      transitionBuilder: (child, animation) {
+                        return FadeTransition(
+                          opacity: animation,
+                          child: child,
+                        );
+                      },
+                      child: currentPage.value < 2
+                          ? Column(
+                              key: const ValueKey('step_1_2_content'),
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Title and Price Row
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      title,
+                                      style: AppTextStyles.colitez400Italic24(),
+                                    ),
+                                    Text(
+                                      '\$ 5.99',
+                                      style: AppTextStyles.colitez400Italic24(),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 12.h),
 
-                      // Description
-                      Text(
-                        texts.defaultCardDescription,
-                        style: AppTextStyles.roboto300Light13(),
-                      ),
-                      SizedBox(height: 24.h),
+                                // Description
+                                Text(
+                                  texts.defaultCardDescription,
+                                  style: AppTextStyles.roboto300Light13(),
+                                ),
+                                SizedBox(height: 24.h),
 
-                      // Continue and Heart Row
-                      Row(
-                        children: [
-
-                          Expanded(
-                            child: PrimaryButton(
-                              text: texts.continueBtn,
-                              isLoading: cardDetailState.isLoading,
-                              onPressed: cardDetailState.isLoading ? null : () {
-                                ref.read(cardDetailControllerProvider.notifier).handlePurchaseAndOrder(
-                                  context: context,
-                                  cardId: cardId,
-                                  title: title,
-                                  message: textController.text,
-                                  from: fromController.text,
-                                  to: toController.text,
-                                  texts: texts,
-                                  pageController: pageController,
-                                );
-                              },
-                            ),
-                          ),
-                          SizedBox(width: 16.w),
-                          // Heart Button
-                          Container(
-                            width: 44.w,
-                            height: 44.h,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.black,
-                                width: 0.5.w,
-                              ),
-                            ),
-                            child: Center(
-                              child: AnimatedLikeButton(
-                                isLiked: isFavorite,
-                                onTap: () {
-                                  ref
-                                      .read(favoritesProvider.notifier)
-                                      .toggleFavorite(
-                                        FavoriteEntity(
-                                          cardId: cardId,
-                                          title: title,
-                                          colorValue:
-                                              cardColorValue ??
-                                              0xFFFFA7A7, // Default to AppColors.card1
-                                          supabaseUserId: 'dummy_user_uid',
-                                          favoritedAt: DateTime.now(),
+                                // Continue and Heart Row
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: PrimaryButton(
+                                        text: texts.continueBtn,
+                                        isLoading: cardDetailState.isLoading,
+                                        onPressed: cardDetailState.isLoading
+                                            ? null
+                                            : () {
+                                                ref
+                                                    .read(
+                                                      cardDetailControllerProvider
+                                                          .notifier,
+                                                    )
+                                                    .handlePurchaseAndOrder(
+                                                      context: context,
+                                                      cardId: cardId,
+                                                      title: title,
+                                                      message:
+                                                          textController.text,
+                                                      from: fromController.text,
+                                                      to: toController.text,
+                                                      texts: texts,
+                                                      pageController:
+                                                          pageController,
+                                                    );
+                                              },
+                                      ),
+                                    ),
+                                    SizedBox(width: 16.w),
+                                    // Heart Button
+                                    Container(
+                                      width: 44.w,
+                                      height: 44.h,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: Colors.black,
+                                          width: 0.5.w,
                                         ),
+                                      ),
+                                      child: Center(
+                                        child: AnimatedLikeButton(
+                                          isLiked: isFavorite,
+                                          onTap: () {
+                                            ref
+                                                .read(favoritesProvider.notifier)
+                                                .toggleFavorite(
+                                                  FavoriteEntity(
+                                                    cardId: cardId,
+                                                    title: title,
+                                                    colorValue:
+                                                        cardColorValue ??
+                                                        0xFFFFA7A7,
+                                                    supabaseUserId:
+                                                        'dummy_user_uid',
+                                                    favoritedAt: DateTime.now(),
+                                                  ),
+                                                );
+                                          },
+                                          size: 22.w,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 10.h),
+
+                                // Row 3: Customize Card
+                                OutlinedButton(
+                                  onPressed: () {
+                                    context.pushNamed(
+                                      AppRoute.editCard.name,
+                                      extra: {
+                                        'cardId': cardId,
+                                        'coverImageUrl': coverImageUrl,
+                                        'frontMessage': frontMessage,
+                                        'initialMessage': initialMessage,
+                                      },
+                                    );
+                                  },
+                                  style: OutlinedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    padding: EdgeInsets.zero,
+                                    minimumSize: Size(double.infinity, 44.h),
+                                    side: BorderSide(
+                                      color: Colors.black,
+                                      width: 0.5.w,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20.r),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    texts.customizeCard,
+                                    style: AppTextStyles.colitez400Italic22(),
+                                  ),
+                                ),
+                              ],
+                            )
+                          : KeyedSubtree(
+                              key: const ValueKey('step_3_content'),
+                              child: RecipientDeliveryForm(
+                                isLoading: cardDetailState.isLoading,
+                                onSendPressed: (e164Phone, deliveryMethod) {
+                                  ref
+                                      .read(
+                                        cardDetailControllerProvider.notifier,
+                                      )
+                                      .handlePurchaseAndOrder(
+                                        context: context,
+                                        cardId: cardId,
+                                        title: title,
+                                        message: textController.text,
+                                        from: fromController.text,
+                                        to: toController.text,
+                                        texts: texts,
+                                        pageController: pageController,
+                                        recipientPhone: e164Phone,
+                                        deliveryMethod: deliveryMethod,
+                                        coverImageUrl: coverImageUrl,
+                                        frontMessage: frontMessage,
                                       );
                                 },
-                                size: 22.w,
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 10.h),
-
-                      // Row 3: Customize Card
-                      OutlinedButton(
-                        onPressed: () {
-                          context.pushNamed(
-                            AppRoute.editCard.name,
-                            extra: {
-                              'cardId': cardId,
-                              'coverImageUrl': coverImageUrl,
-                              'frontMessage': frontMessage,
-                              'initialMessage': initialMessage,
-                            },
-                          );
-                        },
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          padding: EdgeInsets.zero,
-                          minimumSize: Size(double.infinity, 44.h),
-                          side: BorderSide(color: Colors.black, width: 0.5.w),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.r),
-                          ),
-                        ),
-                        child: Text(
-                          texts.customizeCard,
-                          style: AppTextStyles.colitez400Italic22(),
-                        ),
-                      ),
-                    ] else ...[
-                      RecipientDeliveryForm(
-                        isLoading: cardDetailState.isLoading,
-                        onSendPressed: (e164Phone, deliveryMethod) {
-                          ref
-                              .read(cardDetailControllerProvider.notifier)
-                              .handlePurchaseAndOrder(
-                                context: context,
-                                cardId: cardId,
-                                title: title,
-                                message: textController.text,
-                                from: fromController.text,
-                                to: toController.text,
-                                texts: texts,
-                                pageController: pageController,
-                                recipientPhone: e164Phone,
-                                deliveryMethod: deliveryMethod,
-                                coverImageUrl: coverImageUrl,
-                                frontMessage: frontMessage,
-                              );
-                        },
-                      ),
-                    ],
+                    ),
 
                     SizedBox(height: 40.h),
                   ],

@@ -11,6 +11,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/custom_snackbar.dart';
+import '../../../../core/widgets/confirmation_dialog.dart';
 import '../../domain/entities/country_code.dart';
 import '../../domain/entities/delivery_method.dart';
 import 'country_picker_bottom_sheet.dart';
@@ -45,7 +46,7 @@ class RecipientDeliveryForm extends HookWidget {
     useEffect(() {
       void listener() {
         final text = effectivePhoneController.text;
-        if (text.startsWith('+') || text.startsWith('03')) {
+        if (text.isNotEmpty) {
           final result = CountryCode.detectFromInput(
             text,
             currentFallback: selectedCountry.value,
@@ -71,6 +72,27 @@ class RecipientDeliveryForm extends HookWidget {
 
     // Native Contacts Picker
     Future<void> pickNativeContact() async {
+      final status = await Permission.contacts.status;
+      if (status.isPermanentlyDenied) {
+        if (!context.mounted) return;
+        showDialog(
+          context: context,
+          builder: (dialogCtx) => ConfirmationDialog(
+            title: 'Contacts Access Disabled',
+            message:
+                'Contacts permission is disabled in your device settings. Please enable contacts permission in your phone settings to select a recipient from your contacts.',
+            confirmText: 'Settings',
+            cancelText: texts.cancel,
+            onConfirm: () async {
+              Navigator.pop(dialogCtx);
+              await openAppSettings();
+            },
+            onCancel: () => Navigator.pop(dialogCtx),
+          ),
+        );
+        return;
+      }
+
       final permission = await Permission.contacts.request();
       if (permission.isGranted) {
         try {
@@ -91,6 +113,23 @@ class RecipientDeliveryForm extends HookWidget {
           if (!context.mounted) return;
           CustomSnackbar.showError(context, 'Unable to open contacts picker.');
         }
+      } else if (permission.isPermanentlyDenied) {
+        if (!context.mounted) return;
+        showDialog(
+          context: context,
+          builder: (dialogCtx) => ConfirmationDialog(
+            title: 'Contacts Access Disabled',
+            message:
+                'Contacts permission is disabled in your device settings. Please enable contacts permission in your phone settings to select a recipient from your contacts.',
+            confirmText: 'Settings',
+            cancelText: texts.cancel,
+            onConfirm: () async {
+              Navigator.pop(dialogCtx);
+              await openAppSettings();
+            },
+            onCancel: () => Navigator.pop(dialogCtx),
+          ),
+        );
       } else {
         if (!context.mounted) return;
         CustomSnackbar.showError(
@@ -139,63 +178,77 @@ class RecipientDeliveryForm extends HookWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // ── 1. SMS & WhatsApp Selector Container ─────────────────────────
-        Container(
-          width: double.infinity,
-          height: 48.h,
-          padding: EdgeInsets.all(4.w),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20.r),
-            border: Border.all(color: Colors.black, width: 0.5.w),
-          ),
-          child: Row(
-            children: [
-              // SMS Chip
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => selectedMethod.value = DeliveryMethod.sms,
-                  child: Container(
-                    height: double.infinity,
-                    decoration: BoxDecoration(
-                      color: selectedMethod.value == DeliveryMethod.sms
-                          ? const Color(0xFFFF5E60)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(16.r),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'SMS',
-                      style: AppTextStyles.colitez400Italic16(
-                        color: Colors.black,
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final pillWidth = (constraints.maxWidth - 8.w) / 2;
+            final isSms = selectedMethod.value == DeliveryMethod.sms;
+            return Container(
+              width: double.infinity,
+              height: 48.h,
+              padding: EdgeInsets.all(4.w),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20.r),
+                border: Border.all(color: Colors.black, width: 0.5.w),
+              ),
+              child: Stack(
+                children: [
+                  AnimatedPositioned(
+                    duration: const Duration(milliseconds: 250),
+                    curve: Curves.easeInOutCubic,
+                    left: isSms ? 0 : pillWidth,
+                    top: 0,
+                    bottom: 0,
+                    width: pillWidth,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFF5E60),
+                        borderRadius: BorderRadius.circular(16.r),
                       ),
                     ),
                   ),
-                ),
-              ),
-              // WhatsApp Chip
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => selectedMethod.value = DeliveryMethod.whatsApp,
-                  child: Container(
-                    height: double.infinity,
-                    decoration: BoxDecoration(
-                      color: selectedMethod.value == DeliveryMethod.whatsApp
-                          ? const Color(0xFFFF5E60)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(16.r),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'WhatsApp',
-                      style: AppTextStyles.colitez400Italic16(
-                        color: Colors.black,
+                  Row(
+                    children: [
+                      // SMS Chip
+                      Expanded(
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () => selectedMethod.value = DeliveryMethod.sms,
+                          child: Container(
+                            height: double.infinity,
+                            alignment: Alignment.center,
+                            child: Text(
+                              'SMS',
+                              style: AppTextStyles.colitez400Italic16(
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                      // WhatsApp Chip
+                      Expanded(
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () => selectedMethod.value = DeliveryMethod.whatsApp,
+                          child: Container(
+                            height: double.infinity,
+                            alignment: Alignment.center,
+                            child: Text(
+                              'WhatsApp',
+                              style: AppTextStyles.colitez400Italic16(
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
+            );
+          },
         ),
 
         SizedBox(height: 24.h),
@@ -208,17 +261,16 @@ class RecipientDeliveryForm extends HookWidget {
         // ── 3. Phone Number Input Field ──────────────────────────────────
         Container(
           height: 48.h,
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20.r),
             border: Border.all(color: Colors.black, width: 0.5.w),
           ),
-
           child: Row(
             children: [
-              // Flag & Country Code (Interactive Picker Trigger)
+              // Flag & Country Code (Whole area tapable)
               GestureDetector(
+                behavior: HitTestBehavior.opaque,
                 onTap: () async {
                   final picked = await CountryPickerBottomSheet.show(
                     context,
@@ -228,56 +280,70 @@ class RecipientDeliveryForm extends HookWidget {
                     selectedCountry.value = picked;
                   }
                 },
-                child: Row(
-                  children: [
-                    Text(
-                      '${selectedCountry.value.flag}  ${selectedCountry.value.dialCode}',
-                      style: AppTextStyles.roboto300Light12(
+                child: Container(
+                  height: double.infinity,
+                  padding: EdgeInsets.symmetric(horizontal: 14.w),
+                  alignment: Alignment.center,
+                  child: Row(
+                    children: [
+                      Text(
+                        '${selectedCountry.value.flag}  ${selectedCountry.value.dialCode}',
+                        style: AppTextStyles.roboto300Light12(
+                          color: Colors.black,
+                        ),
+                      ),
+                      SizedBox(width: 4.w),
+                      const Icon(
+                        Icons.arrow_drop_down,
+                        size: 18,
                         color: Colors.black,
                       ),
-                    ),
-                    SizedBox(width: 4.w),
-                    const Icon(
-                      Icons.arrow_drop_down,
-                      size: 18,
-                      color: Colors.black,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-              SizedBox(width: 10.w),
               // Vertical Divider line
               Container(width: 0.5.w, height: 20.h, color: Colors.black),
               SizedBox(width: 10.w),
-              // Phone Input Field
+              // Phone Input Field (easily clickable across full height)
               Expanded(
-                child: TextField(
-                  controller: effectivePhoneController,
-                  keyboardType: TextInputType.phone,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                    LengthLimitingTextInputFormatter(10),
-                  ],
-                  style: AppTextStyles.roboto300Light12(color: Colors.black),
-                  decoration: InputDecoration(
-                    hintText: 'Enter 10-digit phone number',
-                    hintStyle: AppTextStyles.roboto300Light12(
-                      color: Colors.black54,
+                child: Container(
+                  height: double.infinity,
+                  alignment: Alignment.centerLeft,
+                  child: TextField(
+                    controller: effectivePhoneController,
+                    keyboardType: TextInputType.phone,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(10),
+                    ],
+                    style: AppTextStyles.roboto300Light12(color: Colors.black),
+                    decoration: InputDecoration(
+                      hintText: 'Enter 10-digit phone number',
+                      hintStyle: AppTextStyles.roboto300Light12(
+                        color: Colors.black54,
+                      ),
+                      border: InputBorder.none,
+                      isDense: true,
+                      contentPadding: EdgeInsets.symmetric(vertical: 12.h),
                     ),
-                    border: InputBorder.none,
-                    isDense: true,
-                    contentPadding: EdgeInsets.zero,
                   ),
                 ),
               ),
 
               // Trailing Contacts Icon (Native Contacts OS Picker)
               GestureDetector(
+                behavior: HitTestBehavior.opaque,
                 onTap: pickNativeContact,
-                child: SvgPicture.asset(
-                  'assets/icons/contacts.svg',
-                  width: 24.w,
-                  height: 24.h,
+                child: Container(
+                  height: double.infinity,
+                  padding: EdgeInsets.symmetric(horizontal: 14.w),
+                  alignment: Alignment.center,
+                  child: SvgPicture.asset(
+                    'assets/icons/contacts.svg',
+                    width: 24.w,
+                    height: 24.h,
+                  ),
                 ),
               ),
             ],
