@@ -376,6 +376,73 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, void>> deleteAccount({
+    Function(String)? onProgress,
+  }) async {
+    if (!await _hasInternetConnection()) {
+      return Either.left(
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
+      );
+    }
+    try {
+      await remoteDataSource.deleteAccount(onProgress: onProgress);
+      return Either.right(null);
+    } on TimeoutException {
+      return Either.left(
+        AuthFailure(
+          'Connection timed out. Please check your internet connection and try again.',
+        ),
+      );
+    } on SocketException {
+      return Either.left(
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
+      );
+    } on ClientException {
+      return Either.left(
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
+      );
+    } on HttpException {
+      return Either.left(
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
+      );
+    } on AuthException catch (e) {
+      return Either.left(AuthFailure(_parseErrorMessage(e.message)));
+    } on PostgrestException catch (e) {
+      return Either.left(AuthFailure(_parseErrorMessage(e.message)));
+    } catch (e) {
+      final msg = e.toString().toLowerCase();
+      if (msg.contains('socket') ||
+          msg.contains('host lookup') ||
+          msg.contains('clientexception') ||
+          msg.contains('network')) {
+        return Either.left(
+          AuthFailure(
+            'No internet connection. Please try again.',
+          ),
+        );
+      }
+      if (msg.contains('timeout')) {
+        return Either.left(
+          AuthFailure(
+            'Connection timed out. Please check your internet connection and try again.',
+          ),
+        );
+      }
+      return Either.left(
+        AuthFailure('Failed to delete account. Please try again.'),
+      );
+    }
+  }
+
   String _parseErrorMessage(String originalMessage) {
     final lowerMessage = originalMessage.toLowerCase();
 
@@ -451,7 +518,7 @@ class AuthRepositoryImpl implements AuthRepository {
       return 'Please enter a valid email address.';
     }
 
-    // 9. Protect against raw technical database / backend exceptions
+    // 9. Protect against raw technical database / backend / schema / permission exceptions
     if (lowerMessage.contains('postgrest') ||
         lowerMessage.contains('database') ||
         lowerMessage.contains('sql') ||
@@ -460,7 +527,13 @@ class AuthRepositoryImpl implements AuthRepository {
         lowerMessage.contains('null') ||
         lowerMessage.contains('column') ||
         lowerMessage.contains('table') ||
-        lowerMessage.contains('syntax')) {
+        lowerMessage.contains('syntax') ||
+        lowerMessage.contains('pgrst') ||
+        lowerMessage.contains('schema') ||
+        lowerMessage.contains('function') ||
+        lowerMessage.contains('permission denied') ||
+        lowerMessage.contains('forbidden') ||
+        lowerMessage.contains('delete_user_account')) {
       return 'An unexpected error occurred. Please try again.';
     }
 

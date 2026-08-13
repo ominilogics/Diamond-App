@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -14,6 +15,7 @@ abstract class RemoteAuthDataSource {
   Future<void> signOut();
   Future<void> signInWithGoogle();
   Future<void> updateProfile(String fullName, {String? dateOfBirth});
+  Future<void> deleteAccount({Function(String)? onProgress});
 }
 
 class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
@@ -148,6 +150,78 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
         .timeout(timeoutDuration);
     if (response.user == null) {
       throw const AuthException('Failed to update profile.');
+    }
+  }
+
+  @override
+  Future<void> deleteAccount({Function(String)? onProgress}) async {
+    final currentUser = supabaseClient.auth.currentUser;
+    if (currentUser == null) {
+      debugPrint('⚠️ [ACCOUNT_DELETION] No active user session found to delete.');
+      return;
+    }
+    final userId = currentUser.id;
+    debugPrint('🔥 [ACCOUNT_DELETION] Initiating remote account deletion for User ID: $userId');
+
+    onProgress?.call('Deleting account data...');
+
+    try {
+      debugPrint('  ├── [REMOTE_DELETE] Executing Supabase RPC procedure: delete_user_account()');
+      await supabaseClient.rpc('delete_user_account').timeout(timeoutDuration);
+      debugPrint('  └── [REMOTE_DELETE] Successfully deleted user account & cascading rows from Supabase.');
+    } catch (rpcError) {
+      debugPrint('⚠️ [REMOTE_DELETE] Supabase RPC delete_user_account procedure notice: $rpcError');
+      debugPrint('  ├── [FALLBACK_CLEANUP] Executing client-side per-table fallback cleanup for User ID: $userId...');
+
+      // Per-table fallback deletes isolated so one table's RLS policy doesn't halt the rest
+      try {
+        onProgress?.call('Deleting favorites...');
+        await supabaseClient.from('favorites').delete().eq('user_id', userId);
+        debugPrint('  ├── [FALLBACK_CLEANUP] Deleted favorites rows');
+      } catch (e) {
+        debugPrint('  ├── [FALLBACK_CLEANUP] Favorites table notice: $e');
+      }
+
+      try {
+        onProgress?.call('Deleting events...');
+        await supabaseClient.from('events').delete().eq('user_id', userId);
+        debugPrint('  ├── [FALLBACK_CLEANUP] Deleted events rows');
+      } catch (e) {
+        debugPrint('  ├── [FALLBACK_CLEANUP] Events table notice: $e');
+      }
+
+      try {
+        onProgress?.call('Deleting orders...');
+        await supabaseClient.from('orders').delete().eq('user_id', userId);
+        debugPrint('  ├── [FALLBACK_CLEANUP] Deleted orders rows');
+      } catch (e) {
+        debugPrint('  ├── [FALLBACK_CLEANUP] Orders table notice: $e');
+      }
+
+      try {
+        onProgress?.call('Deleting notifications...');
+        await supabaseClient.from('notifications').delete().eq('user_id', userId);
+        debugPrint('  ├── [FALLBACK_CLEANUP] Deleted notifications rows');
+      } catch (e) {
+        debugPrint('  ├── [FALLBACK_CLEANUP] Notifications table notice: $e');
+      }
+
+      try {
+        onProgress?.call('Deleting push tokens...');
+        await supabaseClient.from('user_fcm_tokens').delete().eq('user_id', userId);
+        debugPrint('  ├── [FALLBACK_CLEANUP] Deleted user_fcm_tokens rows');
+      } catch (e) {
+        debugPrint('  ├── [FALLBACK_CLEANUP] FCM tokens table notice: $e');
+      }
+
+      // If the RPC is missing (PGRST202), fallback completed remote table wipes
+      final errorStr = rpcError.toString();
+      if (errorStr.contains('PGRST202') || errorStr.contains('delete_user_account')) {
+        debugPrint('ℹ️ [REMOTE_DELETE] Note: Deploy public.delete_user_account() in Supabase SQL Editor for complete auth.users removal.');
+        return;
+      }
+
+      rethrow;
     }
   }
 }

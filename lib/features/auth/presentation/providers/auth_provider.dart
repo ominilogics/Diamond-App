@@ -158,6 +158,76 @@ class AuthNotifier extends StateNotifier<bool> {
     state = false;
   }
 
+  Future<void> deleteAccount(
+    Function(String) onError,
+    Function() onSuccess, {
+    Function(String)? onProgress,
+  }) async {
+    state = true;
+    final currentUserId = Supabase.instance.client.auth.currentUser?.id;
+    debugPrint('🚨 [ACCOUNT_DELETION] User requested permanent account deletion!');
+    debugPrint('  ├── User ID: $currentUserId');
+    debugPrint('  ├── Step 1/5: Calling remote deletion (Supabase auth.users & database tables)...');
+
+    onProgress?.call('Deleting account data...');
+
+    final result = await repository.deleteAccount(onProgress: onProgress);
+
+    await result.fold(
+      (failure) async {
+        state = false;
+        debugPrint('❌ [ACCOUNT_DELETION] Remote deletion failed: ${failure.message}');
+        onError(failure.message);
+      },
+      (_) async {
+        debugPrint('  ├── Step 2/5: Revoking FCM token & push notification registration...');
+        onProgress?.call('Revoking push tokens...');
+        try {
+          final fcmToken = await FirebaseMessaging.instance.getToken();
+          if (fcmToken != null && currentUserId != null) {
+            await Supabase.instance.client
+                .from('user_fcm_tokens')
+                .delete()
+                .eq('token', fcmToken);
+            debugPrint('  │   └── Revoked FCM Token: $fcmToken');
+          }
+        } catch (e) {
+          debugPrint('  │   └── FCM token revoke notice: $e');
+        }
+
+        debugPrint('  ├── Step 3/5: Logging out of Payment Provider (RevenueCat)...');
+        onProgress?.call('Clearing payment data...');
+        try {
+          await paymentRepository.logoutUser();
+          debugPrint('  │   └── RevenueCat payment session cleared.');
+        } catch (e) {
+          debugPrint('  │   └── Payment provider logout notice: $e');
+        }
+
+        debugPrint('  ├── Step 4/5: Terminating Supabase Auth session...');
+        onProgress?.call('Signing out session...');
+        try {
+          await repository.signOut();
+          debugPrint('  │   └── Auth session signed out.');
+        } catch (e) {
+          debugPrint('  │   └── Auth signout notice: $e');
+        }
+
+        debugPrint('  ├── Step 5/5: Wiping local device database (Favorites, Events, Drafts, Orders, Notifications)...');
+        onProgress?.call('Wiping local database...');
+        try {
+          await database.clearUserData();
+        } catch (e) {
+          debugPrint('  │   └── Local database wipe notice: $e');
+        }
+
+        debugPrint('🎉 [ACCOUNT_DELETION] Account and all associated data permanently deleted successfully!');
+        state = false;
+        onSuccess();
+      },
+    );
+  }
+
   Future<void> signInWithGoogle(
     Function(String) onError,
     Function() onSuccess,

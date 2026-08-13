@@ -18,6 +18,7 @@ import '../../../../core/utils/app_assets.dart';
 import '../../../../core/widgets/app_bar1.dart';
 import '../../../../core/widgets/confirmation_dialog.dart';
 import '../../../../core/widgets/custom_snackbar.dart';
+import '../../../../core/widgets/loading_progress_dialog.dart';
 import '../../../../core/widgets/primary_button.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -247,60 +248,24 @@ class SettingsScreen extends ConsumerWidget {
                           AppRoute.notificationSettings.name,
                         ),
                       ),
+                      // _buildDivider(),
+                      // _buildPreferenceItem(
+                      //   texts.language,
+                      //   onTap: () {
+                      //     // Navigate to Language settings or show bottom sheet
+                      //   },
+                      // ),
                       _buildDivider(),
                       _buildPreferenceItem(
-                        texts.language,
-                        onTap: () {
-                          // Navigate to Language settings or show bottom sheet
-                        },
+                        texts.privacyPolicy,
+                        onTap: () =>
+                            context.pushNamed(AppRoute.privacyPolicy.name),
                       ),
                       _buildDivider(),
                       _buildPreferenceItem(
-                        texts.legalAndPrivacy,
-                        onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            backgroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-                            ),
-                            builder: (context) => SafeArea(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  SizedBox(height: 16.h),
-                                  Container(
-                                    width: 40.w,
-                                    height: 4.h,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[300],
-                                      borderRadius: BorderRadius.circular(2.r),
-                                    ),
-                                  ),
-                                  SizedBox(height: 16.h),
-                                  ListTile(
-                                    title: Text(texts.privacyPolicy, style: AppTextStyles.roboto400Regular16()),
-                                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                                    onTap: () {
-                                      Navigator.pop(context);
-                                      context.pushNamed(AppRoute.privacyPolicy.name);
-                                    },
-                                  ),
-                                  _buildDivider(),
-                                  ListTile(
-                                    title: Text(texts.termsAndConditions, style: AppTextStyles.roboto400Regular16()),
-                                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                                    onTap: () {
-                                      Navigator.pop(context);
-                                      context.pushNamed(AppRoute.termsAndConditions.name);
-                                    },
-                                  ),
-                                  SizedBox(height: 16.h),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
+                        texts.termsAndConditions,
+                        onTap: () => context
+                            .pushNamed(AppRoute.termsAndConditions.name),
                       ),
                       _buildDivider(),
                       _buildPreferenceItem(
@@ -315,20 +280,40 @@ class SettingsScreen extends ConsumerWidget {
                               cancelText: texts.no,
                               onConfirm: () async {
                                 Navigator.of(dialogContext).pop();
-                                
-                                // Reset to Home tab so they don't see Settings when logging back in
-                                ref.read(bottomNavIndexProvider.notifier).state = 0;
-                                
+
+                                BuildContext? loaderContext;
+
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (c) {
+                                    loaderContext = c;
+                                    return LoadingProgressDialog(
+                                      text: 'Logging out...',
+                                    );
+                                  },
+                                );
+
+                                void dismissLoader() {
+                                  if (loaderContext != null && loaderContext!.mounted) {
+                                    Navigator.of(loaderContext!).pop();
+                                    loaderContext = null;
+                                  } else if (AppRouter.rootNavigatorKey.currentState?.canPop() == true) {
+                                    AppRouter.rootNavigatorKey.currentState?.pop();
+                                  }
+                                }
+
                                 await ref.read(authProvider.notifier).signOut();
-                                
+
+                                dismissLoader();
+                                ref.read(bottomNavIndexProvider.notifier).state = 0;
+
                                 if (context.mounted) {
                                   CustomSnackbar.showSuccess(
                                     context,
                                     texts.logoutSuccess,
                                   );
                                 }
-                                
-                                // Use root router to guarantee navigation even if context changes
                                 AppRouter.router.goNamed(AppRoute.login.name);
                               },
                             ),
@@ -348,9 +333,65 @@ class SettingsScreen extends ConsumerWidget {
                               message: texts.deleteAccountMessage,
                               confirmText: texts.yes,
                               cancelText: texts.no,
-                              onConfirm: () {
+                              onConfirm: () async {
                                 Navigator.of(dialogContext).pop();
-                                // Handle delete logic
+
+                                final deletionStatusNotifier =
+                                    ValueNotifier<String>('Deleting account data...');
+
+                                BuildContext? loaderContext;
+
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (c) {
+                                    loaderContext = c;
+                                    return LoadingProgressDialog.dynamic(
+                                      statusNotifier: deletionStatusNotifier,
+                                    );
+                                  },
+                                );
+
+                                void dismissLoader() {
+                                  if (loaderContext != null && loaderContext!.mounted) {
+                                    Navigator.of(loaderContext!).pop();
+                                    loaderContext = null;
+                                  } else if (AppRouter.rootNavigatorKey.currentState?.canPop() == true) {
+                                    AppRouter.rootNavigatorKey.currentState?.pop();
+                                  }
+                                }
+
+                                await ref
+                                    .read(authProvider.notifier)
+                                    .deleteAccount(
+                                  (errorMessage) {
+                                    dismissLoader();
+                                    if (context.mounted) {
+                                      CustomSnackbar.showError(
+                                        context,
+                                        errorMessage,
+                                      );
+                                    }
+                                  },
+                                  () {
+                                    dismissLoader();
+                                    ref
+                                        .read(bottomNavIndexProvider.notifier)
+                                        .state = 0;
+                                    if (context.mounted) {
+                                      CustomSnackbar.showSuccess(
+                                        context,
+                                        'Your account and associated data have been permanently deleted.',
+                                      );
+                                    }
+                                    AppRouter.router.goNamed(
+                                      AppRoute.login.name,
+                                    );
+                                  },
+                                  onProgress: (stepText) {
+                                    deletionStatusNotifier.value = stepText;
+                                  },
+                                );
                               },
                             ),
                           );

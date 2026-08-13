@@ -228,7 +228,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get subscriptions => 'Subscriptions';
 
   @override
-  String get privacyPolicy => 'Privacy';
+  String get privacyPolicy => 'Privacy Policy';
 
   @override
   String get termsAndConditions => 'Terms and Conditions';

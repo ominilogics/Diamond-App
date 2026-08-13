@@ -17,6 +17,7 @@ import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/or_divider.dart';
 import '../../../../core/widgets/social_auth_button.dart';
 import '../../../../core/widgets/custom_snackbar.dart';
+import '../../../../core/widgets/loading_progress_dialog.dart';
 import '../../../../core/utils/app_assets.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/routing/app_routes.dart';
@@ -34,13 +35,20 @@ class LoginScreen extends HookConsumerWidget {
     final passwordFocus = useFocusNode();
     final texts = AppLocalizations.of(context)!;
 
-    final isLoading = ref.watch(authProvider);
-
     void onLoginPressed() {
       if (formKey.currentState!.validate()) {
         debugPrint(
           'Login process started for email: ${emailController.text.trim()}',
         );
+
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (c) => LoadingProgressDialog(
+            text: 'Logging in...',
+          ),
+        );
+
         ref
             .read(authProvider.notifier)
             .signIn(
@@ -49,6 +57,7 @@ class LoginScreen extends HookConsumerWidget {
               (errorMessage) {
                 debugPrint('Login failed: $errorMessage');
                 if (context.mounted) {
+                  Navigator.of(context, rootNavigator: true).pop();
                   CustomSnackbar.showError(context, errorMessage);
                 }
               },
@@ -58,6 +67,7 @@ class LoginScreen extends HookConsumerWidget {
                 );
 
                 if (context.mounted) {
+                  Navigator.of(context, rootNavigator: true).pop();
                   CustomSnackbar.showSuccess(context, texts.loginSuccess);
                   if (kIsWeb) {
                     context.goNamed(AppRoute.adminDashboard.name);
@@ -74,13 +84,10 @@ class LoginScreen extends HookConsumerWidget {
                     final sdkInt = androidInfo.version.sdkInt;
 
                     if (sdkInt < 29) {
-                      // Android below 10
                       await Permission.notification.request();
                     } else if (sdkInt >= 29 && sdkInt < 33) {
-                      // Android 10 to 12
                       await Permission.notification.request();
                     } else {
-                      // Android 13+ (12+)
                       await Permission.notification.request();
                     }
                   } else {
@@ -176,7 +183,7 @@ class LoginScreen extends HookConsumerWidget {
                         PrimaryButton(
                           text: texts.logIn,
                           onPressed: onLoginPressed,
-                          isLoading: isLoading,
+                          isLoading: false,
                         ),
 
                         if (!kIsWeb) ...[
@@ -188,11 +195,20 @@ class LoginScreen extends HookConsumerWidget {
                             text: 'Continue with Google',
                             iconPath: AppAssets.google,
                             onPressed: () {
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (c) => LoadingProgressDialog(
+                                  text: 'Signing in...',
+                                ),
+                              );
+
                               ref
                                   .read(authProvider.notifier)
                                   .signInWithGoogle(
                                     (errorMessage) {
                                       if (context.mounted) {
+                                        Navigator.of(context, rootNavigator: true).pop();
                                         CustomSnackbar.showError(
                                           context,
                                           errorMessage,
@@ -201,6 +217,7 @@ class LoginScreen extends HookConsumerWidget {
                                     },
                                     () {
                                       if (context.mounted) {
+                                        Navigator.of(context, rootNavigator: true).pop();
                                         CustomSnackbar.showSuccess(
                                           context,
                                           texts.loginSuccess,

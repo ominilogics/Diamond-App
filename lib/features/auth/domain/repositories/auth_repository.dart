@@ -16,4 +16,5 @@ abstract class AuthRepository {
     String fullName, {
     String? dateOfBirth,
   });
+  Future<Either<Failure, void>> deleteAccount({Function(String)? onProgress});
 }

@@ -17,6 +17,7 @@ import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/or_divider.dart';
 import '../../../../core/widgets/social_auth_button.dart';
 import '../../../../core/widgets/custom_snackbar.dart';
+import '../../../../core/widgets/loading_progress_dialog.dart';
 import '../../../../core/utils/app_assets.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/routing/app_routes.dart';
@@ -41,13 +42,20 @@ class SignUpScreen extends HookConsumerWidget {
     final confirmPasswordFocus = useFocusNode();
     final texts = AppLocalizations.of(context)!;
 
-    final isLoading = ref.watch(authProvider);
-
     void onSignUpPressed() {
       if (formKey.currentState!.validate()) {
         debugPrint(
           'Sign Up process started for email: ${emailController.text.trim()}',
         );
+
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (c) => LoadingProgressDialog(
+            text: 'Creating account...',
+          ),
+        );
+
         ref
             .read(authProvider.notifier)
             .signUp(
@@ -60,6 +68,7 @@ class SignUpScreen extends HookConsumerWidget {
               (errorMessage) {
                 debugPrint('Sign Up failed: $errorMessage');
                 if (context.mounted) {
+                  Navigator.of(context, rootNavigator: true).pop();
                   CustomSnackbar.showError(context, errorMessage);
                 }
               },
@@ -68,6 +77,7 @@ class SignUpScreen extends HookConsumerWidget {
                   'Sign Up successful for email: ${emailController.text.trim()}',
                 );
                 if (context.mounted) {
+                  Navigator.of(context, rootNavigator: true).pop();
                   CustomSnackbar.showSuccess(context, texts.signUpSuccess);
                   context.goNamed(AppRoute.login.name);
                 }
@@ -186,7 +196,7 @@ class SignUpScreen extends HookConsumerWidget {
                     PrimaryButton(
                       text: texts.signUpText,
                       onPressed: onSignUpPressed,
-                      isLoading: isLoading,
+                      isLoading: false,
                     ),
 
                     SizedBox(height: 32.h),
@@ -197,11 +207,20 @@ class SignUpScreen extends HookConsumerWidget {
                       text: 'Continue with Google',
                       iconPath: AppAssets.google,
                       onPressed: () {
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (c) => LoadingProgressDialog(
+                            text: 'Signing in...',
+                          ),
+                        );
+
                         ref
                             .read(authProvider.notifier)
                             .signInWithGoogle(
                               (errorMessage) {
                                 if (context.mounted) {
+                                  Navigator.of(context, rootNavigator: true).pop();
                                   CustomSnackbar.showError(
                                     context,
                                     errorMessage,
@@ -210,6 +229,7 @@ class SignUpScreen extends HookConsumerWidget {
                               },
                               () {
                                 if (context.mounted) {
+                                  Navigator.of(context, rootNavigator: true).pop();
                                   CustomSnackbar.showSuccess(
                                     context,
                                     texts.signUpSuccess,

@@ -56,18 +56,23 @@ class AppDatabase extends _$AppDatabase {
     );
   }
 
-  /// Clears user-specific data from local cache upon logout.
+  /// Clears user-specific data from local cache upon logout or account deletion.
   /// Remote structural data like categories and cards are retained to avoid redownloading gigabytes of content.
   Future<void> clearUserData() async {
-    debugPrint('[DB] Wiping user-specific local data (Favorites, Events, Drafts, Orders, Notifications)...');
+    debugPrint('🗑️ [DB_CLEANUP] Starting local database wipe...');
     await transaction(() async {
-      await delete(favoritesTable).go();
-      await delete(eventsTable).go();
-      await delete(draftsTable).go();
-      await delete(ordersTable).go();
-      await delete(notificationsTable).go();
+      final favs = await delete(favoritesTable).go();
+      debugPrint('  ├── [DB_CLEANUP] Cleared Favorites table ($favs rows)');
+      final evts = await delete(eventsTable).go();
+      debugPrint('  ├── [DB_CLEANUP] Cleared Events/Reminders table ($evts rows)');
+      final dfts = await delete(draftsTable).go();
+      debugPrint('  ├── [DB_CLEANUP] Cleared Drafts table ($dfts rows)');
+      final ords = await delete(ordersTable).go();
+      debugPrint('  ├── [DB_CLEANUP] Cleared Orders table ($ords rows)');
+      final ntfs = await delete(notificationsTable).go();
+      debugPrint('  └── [DB_CLEANUP] Cleared Notifications table ($ntfs rows)');
     });
-    debugPrint('[DB] User data wipe complete.');
+    debugPrint('✅ [DB_CLEANUP] Local user database wipe complete.');
   }
 
   /// Claims anonymous data by assigning it to the newly authenticated user.

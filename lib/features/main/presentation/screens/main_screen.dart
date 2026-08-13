@@ -41,6 +41,7 @@ class MainScreen extends HookConsumerWidget {
       onPopInvokedWithResult: (didPop, result) {
         if (!didPop) {
           ref.read(bottomNavIndexProvider.notifier).state = 0;
+          context.go('/main?tab=0');
         }
       },
       child: GradientScaffold(

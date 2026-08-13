@@ -14,6 +14,7 @@ import '../../../../core/widgets/app_labelled_text_field.dart';
 import '../../../../core/widgets/gradient_scaffold.dart';
 import '../../../../core/widgets/primary_button.dart';
 import '../../../../core/widgets/custom_snackbar.dart';
+import '../../../../core/widgets/loading_progress_dialog.dart';
 
 class ForgotPasswordScreen extends HookConsumerWidget {
   const ForgotPasswordScreen({super.key});
@@ -25,12 +26,18 @@ class ForgotPasswordScreen extends HookConsumerWidget {
     final emailFocus = useFocusNode();
     final texts = AppLocalizations.of(context)!;
 
-    final isLoading = ref.watch(authProvider);
-
     void onSendPressed() {
       if (formKey.currentState!.validate()) {
         final email = emailController.text.trim();
         debugPrint('Forgot Password reset link requested for email: $email');
+
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (c) => LoadingProgressDialog(
+            text: 'Sending link...',
+          ),
+        );
 
         ref
             .read(authProvider.notifier)
@@ -39,6 +46,7 @@ class ForgotPasswordScreen extends HookConsumerWidget {
               (errorMessage) {
                 debugPrint('Forgot Password reset link failed: $errorMessage');
                 if (context.mounted) {
+                  Navigator.of(context, rootNavigator: true).pop();
                   CustomSnackbar.showError(context, errorMessage);
                 }
               },
@@ -47,6 +55,7 @@ class ForgotPasswordScreen extends HookConsumerWidget {
                   'Forgot Password reset link sent successfully to email: $email',
                 );
                 if (context.mounted) {
+                  Navigator.of(context, rootNavigator: true).pop();
                   CustomSnackbar.showSuccess(
                     context,
                     texts.forgotPasswordSuccess,
@@ -100,7 +109,7 @@ class ForgotPasswordScreen extends HookConsumerWidget {
                     PrimaryButton(
                       text: texts.sendButton,
                       onPressed: onSendPressed,
-                      isLoading: isLoading,
+                      isLoading: false,
                     ),
 
                     SizedBox(height: 16.h),

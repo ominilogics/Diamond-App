@@ -517,7 +517,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacyPolicy.
   ///
   /// In en, this message translates to:
-  /// **'Privacy'**
+  /// **'Privacy Policy'**
   String get privacyPolicy;
 
   /// No description provided for @termsAndConditions.
