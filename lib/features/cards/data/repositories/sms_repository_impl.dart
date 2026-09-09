@@ -1,9 +1,10 @@
 import 'dart:convert';
+import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../../../../core/error/failures.dart';
 import '../../../../core/utils/either.dart';
@@ -18,10 +19,13 @@ const _shareChannel = MethodChannel(
   'com.greetingcards.invitationmaker.rivon/share',
 );
 
+String _generateShortCode([int length = 6]) {
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  final random = Random.secure();
+  return List.generate(length, (_) => chars[random.nextInt(chars.length)]).join();
+}
+
 class SmsRepositoryImpl implements SmsRepository {
-  // BYPASS TESTING: _client is kept to preserve the full production signature
-  // but is not used while the MethodChannel bypass is active.
-  // ignore: unused_field
   final SupabaseClient _client;
 
   SmsRepositoryImpl(this._client);
@@ -36,15 +40,30 @@ class SmsRepositoryImpl implements SmsRepository {
     required DeliveryMethod method,
   }) async {
     try {
-      // ── 1. Build the Base64 encoded deep link payload ────────────────────
-      final payload = {
-        'coverImageUrl': coverImageUrl ?? '',
-        'frontMessage': frontMessage ?? '',
-        'message': insideMessage ?? '',
-      };
-      // base64Url encodes safely for URLs, but we URL encode just in case to avoid any issues with Intents
-      final encoded = Uri.encodeComponent(base64Url.encode(utf8.encode(jsonEncode(payload))));
-      final url = 'https://rivon-62e8a.web.app/open-card?data=$encoded';
+      // ── 1. Attempt to generate short URL via Supabase shared_cards ──────────
+      String url;
+      try {
+        final shortCode = _generateShortCode(6);
+        await _client.from('shared_cards').insert({
+          'code': shortCode,
+          'cover_image_url': coverImageUrl ?? '',
+          'front_message': frontMessage ?? '',
+          'inside_message': insideMessage ?? '',
+        }).timeout(const Duration(seconds: 3));
+
+        url = 'https://rivon-62e8a.web.app/open-card?c=$shortCode';
+        debugPrint('[SMS REPO] Successfully generated short URL: $url');
+      } catch (e) {
+        debugPrint('[SMS REPO] Short URL generation failed/timed out, using Base64 fallback: $e');
+        // Fallback to legacy Base64 URL format if DB insert fails or device is offline
+        final payload = {
+          'coverImageUrl': coverImageUrl ?? '',
+          'frontMessage': frontMessage ?? '',
+          'message': insideMessage ?? '',
+        };
+        final encoded = Uri.encodeComponent(base64Url.encode(utf8.encode(jsonEncode(payload))));
+        url = 'https://rivon-62e8a.web.app/open-card?data=$encoded';
+      }
 
       // ── 2. BYPASS: Open Android native share sheet ────────────────────────
       // ── BYPASS START ──────────────────────────────────────────────────────
@@ -61,27 +80,6 @@ class SmsRepositoryImpl implements SmsRepository {
 
       return Either.right(null);
       // ── BYPASS END ────────────────────────────────────────────────────────
-
-      // ── PRODUCTION: Invoke the Supabase Edge Function (commented out) ─────
-      // final response = await _client.functions.invoke(
-      //   'send-sms',
-      //   body: {
-      //     'toPhoneNumber': recipientPhone,
-      //     'senderName': senderName,
-      //     'deepLinkUrl': deepLinkUrl,
-      //     'method': method == DeliveryMethod.whatsApp ? 'whatsApp' : 'sms',
-      //   },
-      // );
-      //
-      // final responseData = response.data;
-      // if (responseData is Map && responseData.containsKey('error')) {
-      //   return Either.left(
-      //     SmsFailure(
-      //         responseData['error'] as String? ?? 'Failed to send message.'),
-      //   );
-      // }
-      //
-      // return Either.right(null);
     } on PlatformException catch (e) {
       return Either.left(
         SmsFailure('Could not open share sheet: ${e.message}'),
@@ -102,3 +100,4 @@ class SmsRepositoryImpl implements SmsRepository {
 final smsRepositoryProvider = Provider<SmsRepository>((ref) {
   return SmsRepositoryImpl(Supabase.instance.client);
 });
+

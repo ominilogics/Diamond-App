@@ -253,16 +253,24 @@ class AppRouter {
         builder: (context, state) => const AdminDashboardScreen(),
       ),
 
-      // ── Deep Link: /open?data=<base64> ─────────────────────────────────────
+      // ── Deep Link: /open?c=<code> OR /open?data=<base64> ─────────────────
       // This route is triggered when a recipient taps the SMS/WhatsApp link.
-      // It decodes the Base64 payload and launches PreviewCardScreen directly,
-      // bypassing the splash/auth flow intentionally (the link is public).
+      // It handles both 6-character short codes (?c=) and legacy Base64 payloads (?data=).
       GoRoute(
         name: AppRoute.openCard.name,
         path: AppRoute.openCard.path,
         builder: (context, state) {
+          final shortCode = state.uri.queryParameters['c'];
           final base64Data = state.uri.queryParameters['data'];
-          debugPrint('[DEEP LINK] Extracted base64Data: \$base64Data');
+          debugPrint('[DEEP LINK] Extracted shortCode: $shortCode, base64Data: $base64Data');
+
+          if (shortCode != null && shortCode.isNotEmpty) {
+            return _ShortCardResolverWidget(
+              code: shortCode,
+              fallbackBase64Data: base64Data,
+            );
+          }
+
           if (base64Data != null && base64Data.isNotEmpty) {
             try {
               // Ensure proper base64 padding before decoding just in case
@@ -270,9 +278,9 @@ class AppRouter {
               while (normalized.length % 4 != 0) {
                 normalized += '=';
               }
-              debugPrint('[DEEP LINK] Normalized base64Data: \$normalized');
+              debugPrint('[DEEP LINK] Normalized base64Data: $normalized');
               final jsonStr = utf8.decode(base64Url.decode(normalized));
-              debugPrint('[DEEP LINK] Decoded JSON: \$jsonStr');
+              debugPrint('[DEEP LINK] Decoded JSON: $jsonStr');
               final Map<String, dynamic> payload =
                   jsonDecode(jsonStr) as Map<String, dynamic>;
               return PreviewCardScreen(
@@ -281,12 +289,12 @@ class AppRouter {
                 message: payload['message'] as String?,
               );
             } catch (e, st) {
-              debugPrint('[DEEP LINK] Error parsing payload: \$e\\n\$st');
+              debugPrint('[DEEP LINK] Error parsing payload: $e\n$st');
               return Scaffold(
                 appBar: AppBar(title: const Text('Deep Link Error')),
                 body: Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Text('Failed to parse card data.\\n\\nError:\\n\$e'),
+                  child: Text('Failed to parse card data.\n\nError:\n$e'),
                 ),
               );
             }
@@ -298,4 +306,99 @@ class AppRouter {
       ),
     ],
   );
+}
+
+/// Async resolver widget for fetching short card details from Supabase shared_cards table.
+class _ShortCardResolverWidget extends StatefulWidget {
+  final String code;
+  final String? fallbackBase64Data;
+
+  const _ShortCardResolverWidget({
+    required this.code,
+    this.fallbackBase64Data,
+  });
+
+  @override
+  State<_ShortCardResolverWidget> createState() => _ShortCardResolverWidgetState();
+}
+
+class _ShortCardResolverWidgetState extends State<_ShortCardResolverWidget> {
+  late Future<Map<String, dynamic>?> _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = _fetchCardData();
+  }
+
+  Future<Map<String, dynamic>?> _fetchCardData() async {
+    try {
+      final response = await Supabase.instance.client
+          .from('shared_cards')
+          .select()
+          .eq('code', widget.code)
+          .maybeSingle()
+          .timeout(const Duration(seconds: 4));
+      return response;
+    } catch (e) {
+      debugPrint('[SHORT CARD RESOLVER] Error fetching short card: $e');
+      return null;
+    }
+  }
+
+  Widget _buildFromBase64(String base64Data) {
+    try {
+      String normalized = base64Data.replaceAll(' ', '+');
+      while (normalized.length % 4 != 0) {
+        normalized += '=';
+      }
+      final jsonStr = utf8.decode(base64Url.decode(normalized));
+      final Map<String, dynamic> payload = jsonDecode(jsonStr) as Map<String, dynamic>;
+      return PreviewCardScreen(
+        coverImageUrl: payload['coverImageUrl'] as String?,
+        frontMessage: payload['frontMessage'] as String?,
+        message: payload['message'] as String?,
+      );
+    } catch (e) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Deep Link Error')),
+        body: Center(child: Text('Failed to parse card data: $e')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Map<String, dynamic>?>(
+      future: _future,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        final data = snapshot.data;
+        if (data != null) {
+          return PreviewCardScreen(
+            coverImageUrl: data['cover_image_url'] as String?,
+            frontMessage: data['front_message'] as String?,
+            message: data['inside_message'] as String?,
+          );
+        }
+
+        if (widget.fallbackBase64Data != null && widget.fallbackBase64Data!.isNotEmpty) {
+          return _buildFromBase64(widget.fallbackBase64Data!);
+        }
+
+        return const Scaffold(
+          body: Center(
+            child: Text('Card not found or link has expired.'),
+          ),
+        );
+      },
+    );
+  }
 }

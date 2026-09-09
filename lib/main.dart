@@ -18,6 +18,7 @@ import 'package:daimond/features/notifications/presentation/providers/notificati
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:app_links/app_links.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,6 +33,46 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+  }
+
+  // Initialize AppLinks for deep link handling
+  if (!kIsWeb) {
+    final appLinks = AppLinks();
+
+    String? parseDeepLinkRoute(Uri uri) {
+      final path = uri.path;
+      final host = uri.host;
+      final query = uri.hasQuery ? '?${uri.query}' : '';
+
+      if (path.contains('/open-card') || host == 'open-card') {
+        return '/open-card$query';
+      }
+      if (path.isNotEmpty && path != '/') {
+        return '$path$query';
+      }
+      return null;
+    }
+
+    try {
+      final initialUri = await appLinks.getInitialLink();
+      if (initialUri != null) {
+        debugPrint('[DEEP LINK DEBUG] Main caught cold link: $initialUri');
+        AppRouter.initialDeepLink = parseDeepLinkRoute(initialUri);
+      }
+    } catch (e) {
+      debugPrint('[DEEP LINK DEBUG] Error fetching initial deep link: $e');
+    }
+
+    appLinks.uriLinkStream.listen((uri) {
+      debugPrint('[DEEP LINK DEBUG] Main caught warm stream link: $uri');
+      final route = parseDeepLinkRoute(uri);
+      if (route != null) {
+        debugPrint('[DEEP LINK DEBUG] Navigating to normalized route: $route');
+        AppRouter.router.push(route);
+      }
+    }, onError: (err) {
+      debugPrint('[DEEP LINK DEBUG] Stream error: $err');
+    });
   }
 
   // Load user preferences

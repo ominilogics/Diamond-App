@@ -5,7 +5,8 @@
       "namespace": "android_app",
       "package_name": "com.greetingcards.invitationmaker.rivon",
       "sha256_cert_fingerprints": [
-        "77:09:6A:D6:36:32:57:DB:A2:1C:5F:51:32:F7:59:D5:84:96:13:C0:24:13:6A:30:7C:4D:FD:B9:16:56:88:81"
+        "77:09:6A:D6:36:32:57:DB:A2:1C:5F:51:32:F7:59:D5:84:96:13:C0:24:13:6A:30:7C:4D:FD:B9:16:56:88:81",
+        "7B:81:38:E1:93:F3:DA:37:FE:91:2D:67:3B:CA:70:08:65:BB:1B:11:0B:4C:23:26:E9:A9:45:A6:D5:42:94:CD"
       ]
     }
   }

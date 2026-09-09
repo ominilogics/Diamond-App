@@ -46,6 +46,19 @@
                     android:scheme="https"
                     android:host="rivon-62e8a.web.app"
                     android:pathPrefix="/open-card" />
+                <data
+                    android:scheme="http"
+                    android:host="rivon-62e8a.web.app"
+                    android:pathPrefix="/open-card" />
+            </intent-filter>
+
+            <!-- Deep Links: Custom Scheme Fallbacks (rivon:// and greetingcards://) -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="rivon" />
+                <data android:scheme="greetingcards" />
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
