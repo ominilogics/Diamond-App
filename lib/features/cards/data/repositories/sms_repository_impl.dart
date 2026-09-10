@@ -11,14 +11,12 @@ import '../../../../core/utils/either.dart';
 import '../../domain/entities/delivery_method.dart';
 import '../../domain/repositories/sms_repository.dart';
 
-// BYPASS TESTING: Native Android share sheet via MethodChannel.
-// No new packages — uses a platform channel wired in MainActivity.kt.
-// To revert: delete the _shareChannel constant and the bypass block,
-// uncomment the PRODUCTION block, and revert MainActivity.kt.
+/// Platform channel for native Android/iOS share sheet fallback
 const _shareChannel = MethodChannel(
   'com.greetingcards.invitationmaker.rivon/share',
 );
 
+/// Helper: Generate random 6-character short code for Supabase shared_cards table
 String _generateShortCode([int length = 6]) {
   const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   final random = Random.secure();
@@ -28,7 +26,11 @@ String _generateShortCode([int length = 6]) {
 class SmsRepositoryImpl implements SmsRepository {
   final SupabaseClient _client;
 
-  SmsRepositoryImpl(this._client);
+  /// Toggle between direct Twilio Edge Function dispatch and Native OS Share Sheet.
+  /// Set to `false` for zero-cost local testing via Share Sheet, or `true` for direct Twilio SMS/WhatsApp dispatches.
+  final bool useTwilioBackend;
+
+  SmsRepositoryImpl(this._client, {this.useTwilioBackend = false});
 
   @override
   Future<Either<Failure, void>> sendCard({
@@ -40,7 +42,7 @@ class SmsRepositoryImpl implements SmsRepository {
     required DeliveryMethod method,
   }) async {
     try {
-      // ── 1. Attempt to generate short URL via Supabase shared_cards ──────────
+      // ── 1. Generate short URL via Supabase shared_cards ─────────────────────
       String url;
       try {
         final shortCode = _generateShortCode(6);
@@ -65,21 +67,42 @@ class SmsRepositoryImpl implements SmsRepository {
         url = 'https://rivon-62e8a.web.app/open-card?data=$encoded';
       }
 
-      // ── 2. BYPASS: Open Android native share sheet ────────────────────────
-      // ── BYPASS START ──────────────────────────────────────────────────────
-      final channelLabel =
-          method == DeliveryMethod.whatsApp ? 'WhatsApp' : 'SMS';
-      final messageBody =
-          '✉️ $senderName sent you a digital card via $channelLabel! '
-          'Tap the link below to open it 🎴\n\n$url';
+      // ── 2. Dispatch via Twilio Edge Function OR Native Share Sheet ─────────
+      if (useTwilioBackend) {
+        // Direct Server-Side Dispatch via Supabase Edge Function `send-sms`
+        final response = await _client.functions.invoke(
+          'send-sms',
+          body: {
+            'toPhoneNumber': recipientPhone,
+            'senderName': senderName,
+            'deepLinkUrl': url,
+            'method': method == DeliveryMethod.whatsApp ? 'whatsApp' : 'sms',
+          },
+        );
 
-      await _shareChannel.invokeMethod<void>(
-        'shareText',
-        {'text': messageBody},
-      );
+        if (response.status != 200) {
+          final data = response.data;
+          final errorMsg = (data is Map && data.containsKey('error'))
+              ? data['error'].toString()
+              : 'Failed to send message via Twilio (HTTP ${response.status})';
+          return Either.left(SmsFailure(errorMsg));
+        }
 
-      return Either.right(null);
-      // ── BYPASS END ────────────────────────────────────────────────────────
+        return Either.right(null);
+      } else {
+        // Zero-Cost Local Testing Fallback: Native OS Share Sheet (Intent.ACTION_SEND)
+        final channelLabel = method == DeliveryMethod.whatsApp ? 'WhatsApp' : 'SMS';
+        final messageBody =
+            '✉️ $senderName sent you a digital card via $channelLabel! '
+            'Tap the link below to open it 🎴\n\n$url';
+
+        await _shareChannel.invokeMethod<void>(
+          'shareText',
+          {'text': messageBody},
+        );
+
+        return Either.right(null);
+      }
     } on PlatformException catch (e) {
       return Either.left(
         SmsFailure('Could not open share sheet: ${e.message}'),
@@ -90,7 +113,7 @@ class SmsRepositoryImpl implements SmsRepository {
       );
     } catch (e) {
       return Either.left(
-        SmsFailure('An unexpected error occurred while sending the card.'),
+        SmsFailure('An unexpected error occurred while sending the card: $e'),
       );
     }
   }
@@ -98,6 +121,5 @@ class SmsRepositoryImpl implements SmsRepository {
 
 /// Riverpod provider for dependency injection.
 final smsRepositoryProvider = Provider<SmsRepository>((ref) {
-  return SmsRepositoryImpl(Supabase.instance.client);
+  return SmsRepositoryImpl(Supabase.instance.client, useTwilioBackend: false);
 });
-
