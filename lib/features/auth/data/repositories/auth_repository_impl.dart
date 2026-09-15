@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' show ClientException;
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/utils/either.dart';
 import '../../domain/repositories/auth_repository.dart';
@@ -304,6 +305,78 @@ class AuthRepositoryImpl implements AuthRepository {
       }
       return Either.left(
         AuthFailure('An unexpected error occurred during Google Sign-In.'),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> signInWithApple() async {
+    if (!await _hasInternetConnection()) {
+      return Either.left(
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
+      );
+    }
+    try {
+      await remoteDataSource.signInWithApple();
+      return Either.right(null);
+    } on SignInWithAppleAuthorizationException catch (e) {
+      if (e.code == AuthorizationErrorCode.canceled) {
+        return Either.left(AuthFailure('Apple Sign-In was cancelled.'));
+      }
+      return Either.left(AuthFailure('Apple Sign-In authorization failed: ${e.message}'));
+    } on TimeoutException {
+      return Either.left(
+        AuthFailure(
+          'Connection timed out. Please check your internet connection and try again.',
+        ),
+      );
+    } on SocketException {
+      return Either.left(
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
+      );
+    } on ClientException {
+      return Either.left(
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
+      );
+    } on HttpException {
+      return Either.left(
+        AuthFailure(
+          'No internet connection. Please try again.',
+        ),
+      );
+    } on AuthException catch (e) {
+      return Either.left(AuthFailure(_parseErrorMessage(e.message)));
+    } on PostgrestException catch (e) {
+      return Either.left(AuthFailure(_parseErrorMessage(e.message)));
+    } catch (e, stack) {
+      debugPrint('[Apple Sign-In Error]: $e');
+      debugPrint('[Apple Sign-In StackTrace]: $stack');
+      final msg = e.toString().toLowerCase();
+      if (msg.contains('socket') ||
+          msg.contains('host lookup') ||
+          msg.contains('clientexception') ||
+          msg.contains('network')) {
+        return Either.left(
+          AuthFailure(
+            'No internet connection. Please try again.',
+          ),
+        );
+      }
+      if (msg.contains('timeout')) {
+        return Either.left(
+          AuthFailure(
+            'Connection timed out. Please check your internet connection and try again.',
+          ),
+        );
+      }
+      return Either.left(
+        AuthFailure('An unexpected error occurred during Apple Sign-In.'),
       );
     }
   }

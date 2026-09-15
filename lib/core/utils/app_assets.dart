@@ -35,6 +35,7 @@ class AppAssets {
   static const String settingsFilled = '$_iconsPath/settings_filed.svg';
   static const String forwardArrow = '$_iconsPath/forward_arrow.svg';
   static const String google = '$_iconsPath/google.svg';
+  static const String apple = '$_iconsPath/apple.svg';
   static const String warning = '$_iconsPath/warning.svg';
   static const String cancel = '$_iconsPath/cancel.svg';
   static const String cart = '$_iconsPath/cart.svg';

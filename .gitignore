@@ -44,5 +44,11 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Secrets
+# Secrets & Certificates
 .env
+*.p12
+*.cer
+*.certSigningRequest
+*.key
+*.mobileprovision
+ios_certificates/

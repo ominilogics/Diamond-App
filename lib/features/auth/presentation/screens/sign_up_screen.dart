@@ -203,6 +203,54 @@ class SignUpScreen extends HookConsumerWidget {
                     const OrDivider(),
                     SizedBox(height: 29.h),
 
+                    if (Platform.isIOS) ...[
+                      SocialAuthButton(
+                        text: 'Continue with Apple',
+                        iconPath: AppAssets.apple,
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (c) => LoadingProgressDialog(
+                              text: 'Signing in...',
+                            ),
+                          );
+
+                          ref
+                              .read(authProvider.notifier)
+                              .signInWithApple(
+                                (errorMessage) {
+                                  if (context.mounted) {
+                                    Navigator.of(context, rootNavigator: true).pop();
+                                    if (errorMessage != 'Apple Sign-In was cancelled.') {
+                                      CustomSnackbar.showError(
+                                        context,
+                                        errorMessage,
+                                      );
+                                    }
+                                  }
+                                },
+                                () {
+                                  if (context.mounted) {
+                                    Navigator.of(context, rootNavigator: true).pop();
+                                    CustomSnackbar.showSuccess(
+                                      context,
+                                      texts.signUpSuccess,
+                                    );
+                                    context.goNamed(AppRoute.main.name);
+                                  }
+
+                                  // Request Notification Permission based on OS in background
+                                  Future.microtask(() async {
+                                    await Permission.notification.request();
+                                  });
+                                },
+                              );
+                        },
+                      ),
+                      SizedBox(height: 12.h),
+                    ],
+
                     SocialAuthButton(
                       text: 'Continue with Google',
                       iconPath: AppAssets.google,

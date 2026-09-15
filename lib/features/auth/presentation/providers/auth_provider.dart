@@ -271,6 +271,49 @@ class AuthNotifier extends StateNotifier<bool> {
     );
   }
 
+  Future<void> signInWithApple(
+    Function(String) onError,
+    Function() onSuccess,
+  ) async {
+    state = true;
+    final oldUser = Supabase.instance.client.auth.currentUser;
+    final oldUserId = oldUser?.id;
+    final wasAnonymous = oldUser?.isAnonymous ?? false;
+    debugPrint('[AUTH] Attempting Apple Sign-In. Current User ID: $oldUserId (Anonymous: $wasAnonymous)');
+
+    final result = await repository.signInWithApple();
+
+    result.fold(
+      (failure) {
+        state = false;
+        onError(failure.message);
+      },
+      (_) async {
+        final newUser = Supabase.instance.client.auth.currentUser;
+        debugPrint('[AUTH] Apple Sign-In successful. New User ID: ${newUser?.id}');
+
+        if (oldUserId != null && newUser != null && oldUserId != newUser.id) {
+          if (wasAnonymous) {
+            debugPrint('[AUTH] Identity changed from Anonymous to Authenticated via Apple. Migrating guest data...');
+            await _migrateGuestDataToSupabase(newUser.id);
+            await database.claimAnonymousData(newUser.id);
+          } else {
+            debugPrint('[AUTH] Identity changed between Authenticated accounts. Wiping local data.');
+            await database.clearUserData();
+          }
+        } else {
+          debugPrint('[AUTH] Identity unchanged or new login. Local data preserved.');
+        }
+
+        if (newUser != null) {
+          paymentRepository.loginUser(newUser.id);
+        }
+        state = false;
+        onSuccess();
+      },
+    );
+  }
+
   Future<void> updateProfile(
     String fullName,
     String? dateOfBirth,

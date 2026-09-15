@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 abstract class RemoteAuthDataSource {
   Future<void> signIn(String email, String password);
@@ -14,6 +17,7 @@ abstract class RemoteAuthDataSource {
   Future<void> resetPassword(String email);
   Future<void> signOut();
   Future<void> signInWithGoogle();
+  Future<void> signInWithApple();
   Future<void> updateProfile(String fullName, {String? dateOfBirth});
   Future<void> deleteAccount({Function(String)? onProgress});
 }
@@ -136,6 +140,58 @@ class RemoteAuthDataSourceImpl implements RemoteAuthDataSource {
             accessToken: accessToken,
           )
           .timeout(timeoutDuration);
+    }
+  }
+
+  @override
+  Future<void> signInWithApple() async {
+    final rawNonce = supabaseClient.auth.generateRawNonce();
+    final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
+
+    final credential = await SignInWithApple.getAppleIDCredential(
+      scopes: [
+        AppleIDAuthorizationScopes.email,
+        AppleIDAuthorizationScopes.fullName,
+      ],
+      nonce: hashedNonce,
+    );
+
+    final idToken = credential.identityToken;
+    if (idToken == null) {
+      throw const AuthException('No ID Token found from Apple Sign In.');
+    }
+
+    String? fullName;
+    if (credential.givenName != null || credential.familyName != null) {
+      final parts = [credential.givenName, credential.familyName]
+          .where((p) => p != null && p.trim().isNotEmpty)
+          .map((p) => p!.trim())
+          .toList();
+      if (parts.isNotEmpty) {
+        fullName = parts.join(' ');
+      }
+    }
+
+    await supabaseClient.auth
+        .signInWithIdToken(
+          provider: OAuthProvider.apple,
+          idToken: idToken,
+          nonce: rawNonce,
+        )
+        .timeout(timeoutDuration);
+
+    if (fullName != null && fullName.isNotEmpty) {
+      try {
+        await supabaseClient.auth
+            .updateUser(
+              UserAttributes(
+                data: {'custom_name': fullName, 'full_name': fullName},
+              ),
+            )
+            .timeout(timeoutDuration);
+      } catch (e) {
+        debugPrint('⚠️ [Apple Sign-In] Notice updating user metadata name: $e');
+      }
     }
   }
 
