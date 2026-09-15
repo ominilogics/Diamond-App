@@ -115,8 +115,11 @@ jobs:
           echo "Found IPA at: $IPA_PATH"
           if [ -n "$APP_STORE_CONNECT_KEY_ID" ]; then
             echo "Uploading using App Store Connect API Key..."
-            mkdir -p ~/.appstoreconnect/private_keys
+            mkdir -p ~/.appstoreconnect/private_keys ~/.private_keys
             echo "$APP_STORE_CONNECT_PRIVATE_KEY" > ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_KEY_ID}.p8
+            cp ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_KEY_ID}.p8 ~/.private_keys/
+            chmod 600 ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_KEY_ID}.p8 ~/.private_keys/AuthKey_${APP_STORE_CONNECT_KEY_ID}.p8
+
             xcrun altool --upload-app --type ios \
               -f "$IPA_PATH" \
               --apiKey "$APP_STORE_CONNECT_KEY_ID" \
