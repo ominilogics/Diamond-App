@@ -76,11 +76,17 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp "$PP_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/f2da7508-9c02-4004-bf4c-4b8f33a5a35e.mobileprovision
 
-      - name: Install Dependencies
-        run: flutter pub get
+      - name: Install Dependencies & Setup CocoaPods
+        run: |
+          flutter pub get
+          mkdir -p build/ios/SourcePackages
+          cd ios
+          pod install --repo-update
+          cd ..
 
       - name: Build iOS IPA
         run: |
+          mkdir -p build/ios/SourcePackages
           flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
 
       - name: Upload IPA Artifact to GitHub
