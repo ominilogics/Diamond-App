@@ -67,6 +67,15 @@ class LocalNotificationServiceImpl implements NotificationService {
     // Setup Firebase Messaging background handler
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
+    // On iOS, enable foreground presentation options (alert banner, badge, and sound)
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
+      await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+    }
+
     String resolvePayload(Map<String, dynamic> data) {
       // 1. If payload is explicitly provided by modern functions, use it
       if (data['payload'] != null && data['payload'].toString().isNotEmpty) {
@@ -110,8 +119,9 @@ class LocalNotificationServiceImpl implements NotificationService {
       if (type == 'event reminder' && !(prefs.getBool('eventReminders') ?? true)) return;
       if (type == 'special offer' && !(prefs.getBool('specialOffers') ?? true)) return;
 
-      // We can use flutter_local_notifications to show a heads-up display while app is open!
-      if (message.notification != null) {
+      // On Android, show a heads-up display while app is open.
+      // On iOS, setForegroundNotificationPresentationOptions already renders the native Apple banner.
+      if (message.notification != null && defaultTargetPlatform == TargetPlatform.android) {
         _flutterLocalNotificationsPlugin.show(
           id: message.hashCode,
           title: message.notification!.title,
@@ -214,6 +224,18 @@ class LocalNotificationServiceImpl implements NotificationService {
       final newCardAlerts = prefs.getBool('newCardAlerts') ?? true;
       final eventReminders = prefs.getBool('eventReminders') ?? true;
       final specialOffers = prefs.getBool('specialOffers') ?? false;
+
+      // On iOS, wait for APNs token before requesting FCM token
+      if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
+        String? apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+        int retry = 0;
+        while (apnsToken == null && retry < 6) {
+          await Future.delayed(const Duration(milliseconds: 500));
+          apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+          retry++;
+        }
+        debugPrint('[NOTIFICATIONS] 🍏 iOS APNs Token: $apnsToken');
+      }
 
       // Get the token
       final fcmToken = await FirebaseMessaging.instance.getToken();

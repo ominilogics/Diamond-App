@@ -79,6 +79,16 @@ class NotificationSettingsNotifier
     if (session == null) return;
 
     try {
+      if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
+        String? apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+        int retry = 0;
+        while (apnsToken == null && retry < 6) {
+          await Future.delayed(const Duration(milliseconds: 500));
+          apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+          retry++;
+        }
+      }
+
       final token = await FirebaseMessaging.instance.getToken();
       if (token != null) {
         await Supabase.instance.client.from('user_fcm_tokens').upsert({

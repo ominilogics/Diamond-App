@@ -52,3 +52,4 @@ app.*.map.json
 *.key
 *.mobileprovision
 ios_certificates/
+supabase/.temp/
