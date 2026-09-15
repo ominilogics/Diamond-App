@@ -103,7 +103,6 @@ jobs:
           path: build/ios/ipa/*.ipa
 
       - name: Upload to App Store Connect
-        if: ${{ secrets.APP_STORE_CONNECT_KEY_ID != '' || secrets.APP_SPECIFIC_PASSWORD != '' }}
         env:
           APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
@@ -111,10 +110,20 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APP_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
         run: |
-          IPA_PATH=$(ls build/ios/ipa/*.ipa | head -n 1)
+          if [ -z "$APP_STORE_CONNECT_KEY_ID" ] && [ -z "$APP_SPECIFIC_PASSWORD" ]; then
+            echo "No App Store Connect credentials configured in secrets. Skipping upload."
+            exit 0
+          fi
+
+          IPA_PATH=$(ls build/ios/ipa/*.ipa 2>/dev/null | head -n 1)
+          if [ -z "$IPA_PATH" ]; then
+            echo "Error: No .ipa file found in build/ios/ipa/"
+            exit 1
+          fi
           echo "Found IPA at: $IPA_PATH"
+
           if [ -n "$APP_STORE_CONNECT_KEY_ID" ]; then
-            echo "Uploading using App Store Connect API Key..."
+            echo "Uploading using App Store Connect API Key ($APP_STORE_CONNECT_KEY_ID)..."
             mkdir -p ~/.appstoreconnect/private_keys ~/.private_keys
             echo "$APP_STORE_CONNECT_PRIVATE_KEY" > ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_KEY_ID}.p8
             cp ~/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_KEY_ID}.p8 ~/.private_keys/
@@ -125,13 +134,11 @@ jobs:
               --apiKey "$APP_STORE_CONNECT_KEY_ID" \
               --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID"
           elif [ -n "$APP_SPECIFIC_PASSWORD" ]; then
-            echo "Uploading using App-Specific Password..."
+            echo "Uploading using App-Specific Password for $APPLE_ID..."
             xcrun altool --upload-app --type ios \
               -f "$IPA_PATH" \
               --username "$APPLE_ID" \
               --password "$APP_SPECIFIC_PASSWORD"
-          else
-            echo "No App Store Connect credentials found."
-            exit 1
           fi
+
 
