@@ -8,6 +8,12 @@
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>NSContactsUsageDescription</key>
 		<string>We need access to your contacts so you can pick a recipient for sending digital cards.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Rivon needs access to your photo library so you can select and add photos to your custom cards and invitations.</string>
+		<key>NSPhotoLibraryAddUsageDescription</key>
+		<string>Rivon needs permission to save created cards and invitations directly to your photo library.</string>
+		<key>NSCameraUsageDescription</key>
+		<string>Rivon needs access to your camera so you can take photos to include on your greeting cards and invitations.</string>
 		<key>CFBundleDisplayName</key>
 		<string>Rivon</string>
 		<key>CFBundleExecutable</key>
