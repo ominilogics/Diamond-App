@@ -80,9 +80,11 @@ jobs:
 
       - name: Install Dependencies
         run: |
+          mkdir -p build/ios/SourcePackages
+          flutter config --no-enable-swift-package-manager
           flutter pub get
           flutter precache --ios
-          mkdir -p build/ios/SourcePackages
+
 
       - name: Build iOS IPA
         run: |
