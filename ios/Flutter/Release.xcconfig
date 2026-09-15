@@ -1,1 +1,8 @@
 #include "Generated.xcconfig"
+
+CODE_SIGN_STYLE = Manual
+DEVELOPMENT_TEAM = C48YJWY386
+PROVISIONING_PROFILE_SPECIFIER = Rivon AppStore Profile
+CODE_SIGN_IDENTITY = Apple Distribution
+CODE_SIGN_IDENTITY[sdk=iphoneos*] = Apple Distribution
+

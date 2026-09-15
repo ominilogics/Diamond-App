@@ -62,21 +62,26 @@ jobs:
           openssl pkcs12 -in "$CERTIFICATE_RAW" -nodes -passin "pass:$P12_PASSWORD" -out "$PEM_TEMP"
           openssl pkcs12 -export -in "$PEM_TEMP" -inkey "$PEM_TEMP" -out "$CERTIFICATE_CLEAN" -passout "pass:$P12_PASSWORD"
 
-          # 4. Create temporary keychain
+          # 4. Create temporary keychain and set as default
           security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security default-keychain -s "$KEYCHAIN_PATH"
+          security list-keychains -d user -s "$KEYCHAIN_PATH" $(security list-keychains -d user | tr -d '"')
 
           # 5. Import clean certificate to keychain
           security import "$CERTIFICATE_CLEAN" -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
-          security list-keychain -d user -s "$KEYCHAIN_PATH"
 
-          # 6. Apply code signing partition list
-          security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          # 6. Apply code signing partition list so codesign can access private key non-interactively
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
 
-          # 7. Install provisioning profile
+          # 7. Verify code signing identity is registered and valid
+          security find-identity -v -p codesigning "$KEYCHAIN_PATH"
+
+          # 8. Install provisioning profile
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp "$PP_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/f2da7508-9c02-4004-bf4c-4b8f33a5a35e.mobileprovision
+
 
       - name: Install Dependencies
         run: |
