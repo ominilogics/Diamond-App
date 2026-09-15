@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Java 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
@@ -45,27 +45,33 @@ jobs:
           KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD || 'temporary-build-password-123' }}
         run: |
           # 1. Variables
-          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+          CERTIFICATE_RAW=$RUNNER_TEMP/raw_certificate.p12
+          CERTIFICATE_LEGACY=$RUNNER_TEMP/legacy_certificate.p12
+          PEM_TEMP=$RUNNER_TEMP/temp_cert_key.pem
           PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
 
-          # 2. Decode secrets to files
-          echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o "$CERTIFICATE_PATH"
-          echo -n "$BUILD_PROVISION_PROFILE_BASE64" | base64 --decode -o "$PP_PATH"
+          # 2. Decode secrets to files using standard redirection
+          echo "$BUILD_CERTIFICATE_BASE64" | base64 --decode > "$CERTIFICATE_RAW"
+          echo "$BUILD_PROVISION_PROFILE_BASE64" | base64 --decode > "$PP_PATH"
 
-          # 3. Create temporary keychain
+          # 3. Convert OpenSSL 3 PKCS12 to macOS-compatible legacy format
+          openssl pkcs12 -in "$CERTIFICATE_RAW" -nodes -passin "pass:$P12_PASSWORD" -out "$PEM_TEMP"
+          openssl pkcs12 -export -legacy -in "$PEM_TEMP" -inkey "$PEM_TEMP" -out "$CERTIFICATE_LEGACY" -passout "pass:$P12_PASSWORD"
+
+          # 4. Create temporary keychain
           security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
 
-          # 4. Import certificate to keychain
-          security import "$CERTIFICATE_PATH" -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          # 5. Import legacy certificate to keychain
+          security import "$CERTIFICATE_LEGACY" -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
           security list-keychain -d user -s "$KEYCHAIN_PATH"
 
-          # 5. Apply code signing partition list
+          # 6. Apply code signing partition list
           security set-key-partition-list -S apple-tool:,apple: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
 
-          # 6. Install provisioning profile
+          # 7. Install provisioning profile
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp "$PP_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/f2da7508-9c02-4004-bf4c-4b8f33a5a35e.mobileprovision
 
