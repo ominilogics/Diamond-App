@@ -129,17 +129,21 @@ jobs:
             echo "Verifying private key structure..."
             openssl pkey -in ~/.private_keys/AuthKey_${APP_STORE_CONNECT_KEY_ID}.p8 -noout
 
-            echo "Uploading IPA to App Store Connect..."
+            echo "Uploading IPA to App Store Connect via HTTPS/DAV transport..."
             xcrun altool --upload-app --type ios \
               -f "$IPA_PATH" \
               --apiKey "$APP_STORE_CONNECT_KEY_ID" \
-              --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID"
+              --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID" \
+              --transport DAV \
+              --show-progress
           elif [ -n "$APP_SPECIFIC_PASSWORD" ]; then
-            echo "Uploading using App-Specific Password for $APPLE_ID..."
+            echo "Uploading using App-Specific Password for $APPLE_ID via HTTPS/DAV transport..."
             xcrun altool --upload-app --type ios \
               -f "$IPA_PATH" \
               --username "$APPLE_ID" \
-              --password "$APP_SPECIFIC_PASSWORD"
+              --password "$APP_SPECIFIC_PASSWORD" \
+              --transport DAV \
+              --show-progress
           fi
 
 
