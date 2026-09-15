@@ -46,26 +46,27 @@ jobs:
         run: |
           # 1. Variables
           CERTIFICATE_RAW=$RUNNER_TEMP/raw_certificate.p12
-          CERTIFICATE_LEGACY=$RUNNER_TEMP/legacy_certificate.p12
+          CERTIFICATE_CLEAN=$RUNNER_TEMP/clean_certificate.p12
           PEM_TEMP=$RUNNER_TEMP/temp_cert_key.pem
-          PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
+          export PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
+          export CERTIFICATE_RAW
           KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
 
-          # 2. Decode secrets to files using standard redirection
-          echo "$BUILD_CERTIFICATE_BASE64" | base64 --decode > "$CERTIFICATE_RAW"
-          echo "$BUILD_PROVISION_PROFILE_BASE64" | base64 --decode > "$PP_PATH"
+          # 2. Decode secrets using Python (bulletproof against OS newline & BSD base64 quirks)
+          python3 -c "import base64, os; open(os.environ['CERTIFICATE_RAW'], 'wb').write(base64.b64decode(os.environ['BUILD_CERTIFICATE_BASE64']))"
+          python3 -c "import base64, os; open(os.environ['PP_PATH'], 'wb').write(base64.b64decode(os.environ['BUILD_PROVISION_PROFILE_BASE64']))"
 
-          # 3. Convert OpenSSL 3 PKCS12 to macOS-compatible legacy format
+          # 3. Re-export via macOS LibreSSL to ensure 100% Apple Security keychain compatibility
           openssl pkcs12 -in "$CERTIFICATE_RAW" -nodes -passin "pass:$P12_PASSWORD" -out "$PEM_TEMP"
-          openssl pkcs12 -export -legacy -in "$PEM_TEMP" -inkey "$PEM_TEMP" -out "$CERTIFICATE_LEGACY" -passout "pass:$P12_PASSWORD"
+          openssl pkcs12 -export -in "$PEM_TEMP" -inkey "$PEM_TEMP" -out "$CERTIFICATE_CLEAN" -passout "pass:$P12_PASSWORD"
 
           # 4. Create temporary keychain
           security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
           security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
 
-          # 5. Import legacy certificate to keychain
-          security import "$CERTIFICATE_LEGACY" -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          # 5. Import clean certificate to keychain
+          security import "$CERTIFICATE_CLEAN" -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
           security list-keychain -d user -s "$KEYCHAIN_PATH"
 
           # 6. Apply code signing partition list
