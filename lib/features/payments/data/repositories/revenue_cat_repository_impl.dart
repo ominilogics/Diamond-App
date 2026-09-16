@@ -89,9 +89,9 @@ class RevenueCatRepositoryImpl implements PaymentRepository {
   }
 
   @override
-  Future<Either<Failure, bool>> purchase(Package package) async {
+  Future<Either<Failure, bool>> purchasePackage(Package package) async {
     try {
-      CustomerInfo purchaseResult;
+      final PurchaseResult purchaseResult;
 
       // Google Play Subscription upgrade/downgrade proration logic
       if (Platform.isAndroid &&
@@ -129,7 +129,7 @@ class RevenueCatRepositoryImpl implements PaymentRepository {
         purchaseResult = await Purchases.purchasePackage(package);
       }
 
-      _customerInfoController.add(purchaseResult);
+      _customerInfoController.add(purchaseResult.customerInfo);
       return Either.right(true);
     } on PlatformException catch (e) {
       debugPrint('[PaymentRepo] PlatformException during purchase: Code: ${e.code}, Message: ${e.message}, Details: ${e.details}');
@@ -158,16 +158,6 @@ class RevenueCatRepositoryImpl implements PaymentRepository {
   @override
   Future<Either<Failure, void>> manageSubscriptions() async {
     try {
-      // On iOS 15+, trigger native StoreKit 2 in-app subscription sheet
-      if (Platform.isIOS) {
-        try {
-          await Purchases.showManageSubscriptions();
-          return Either.right(null);
-        } catch (e) {
-          debugPrint('[PaymentRepo] Purchases.showManageSubscriptions fallback: $e');
-        }
-      }
-
       final customerInfo = await Purchases.getCustomerInfo();
       final managementURL = customerInfo.managementURL;
 
