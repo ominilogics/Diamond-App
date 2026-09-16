@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:collection/collection.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -9,8 +10,10 @@ import 'package:daimond/core/utils/either.dart';
 import 'package:daimond/features/payments/domain/repositories/payment_repository.dart';
 
 class RevenueCatRepositoryImpl implements PaymentRepository {
-  /// TODO: Replace these with your actual RevenueCat API keys
-  static const _appleApiKey = 'appl_api_key_here';
+  static const _appleApiKey = String.fromEnvironment(
+    'REVENUECAT_APPLE_API_KEY',
+    defaultValue: 'appl_vFUZVyiLHNutpKkTijxKtarljun',
+  );
   static const _googleApiKey = 'goog_TURcJjGEgzGKRgInkfBLNxXsjvh';
 
   final StreamController<CustomerInfo> _customerInfoController = StreamController<CustomerInfo>.broadcast();
@@ -67,7 +70,7 @@ class RevenueCatRepositoryImpl implements PaymentRepository {
       _customerInfoController.add(customerInfo);
       return Either.right(null);
     } on PlatformException catch (e) {
-      return Either.left(PaymentFailure(e.message ?? 'Failed to logout from payments.'));
+      return Either.left(PaymentFailure(e.message ?? 'Failed to logout user from payments.'));
     } catch (e) {
       return Either.left(PaymentFailure(e.toString()));
     }
@@ -79,41 +82,54 @@ class RevenueCatRepositoryImpl implements PaymentRepository {
       final offerings = await Purchases.getOfferings();
       return Either.right(offerings);
     } on PlatformException catch (e) {
-      return Either.left(PaymentFailure(e.message ?? 'Failed to fetch store offerings.'));
+      return Either.left(PaymentFailure(e.message ?? 'Failed to fetch offerings.'));
     } catch (e) {
       return Either.left(PaymentFailure(e.toString()));
     }
   }
 
   @override
-  Future<Either<Failure, bool>> purchasePackage(Package package) async {
+  Future<Either<Failure, bool>> purchase(Package package) async {
     try {
-      debugPrint('[PaymentRepo] Starting purchase for package: ${package.identifier}');
-      final customerInfo = await Purchases.getCustomerInfo();
-      final activeSubscriptions = customerInfo.activeSubscriptions;
-      debugPrint('[PaymentRepo] Current active subscriptions: $activeSubscriptions');
+      CustomerInfo purchaseResult;
 
-      GoogleProductChangeInfo? changeInfo;
-      // If the user already has an active subscription, and they are buying a different subscription package
-      // we must provide the old product ID to Google Play so it performs an upgrade/downgrade instead of throwing an error.
-      if (Platform.isAndroid && activeSubscriptions.isNotEmpty) {
-        final oldProduct = activeSubscriptions.first;
-        if (oldProduct != package.storeProduct.identifier) {
-          debugPrint('[PaymentRepo] Detected upgrade/downgrade from $oldProduct to ${package.storeProduct.identifier}');
-          changeInfo = GoogleProductChangeInfo(
-            oldProduct,
-            prorationMode: GoogleProrationMode.immediateWithTimeProration,
-          );
+      // Google Play Subscription upgrade/downgrade proration logic
+      if (Platform.isAndroid &&
+          package.packageType != PackageType.unknown &&
+          package.packageType != PackageType.custom) {
+        CustomerInfo? currentInfo;
+        try {
+          currentInfo = await Purchases.getCustomerInfo();
+        } catch (_) {}
+
+        GoogleProductChangeInfo? changeInfo;
+        final activeSubs = currentInfo?.activeSubscriptions ?? [];
+        if (activeSubs.isNotEmpty) {
+          final targetBaseId = package.storeProduct.identifier.split(':').first;
+          final currentActiveSub = activeSubs.firstWhereOrNull((sub) {
+            final activeBaseId = sub.split(':').first;
+            return activeBaseId != targetBaseId;
+          });
+
+          if (currentActiveSub != null) {
+            final oldProductBaseId = currentActiveSub.split(':').first;
+            changeInfo = GoogleProductChangeInfo(
+              oldProductBaseId,
+              prorationMode: GoogleProrationMode.immediateWithTimeProration,
+            );
+          }
         }
+
+        purchaseResult = await Purchases.purchasePackage(
+          package,
+          googleProductChangeInfo: changeInfo,
+        );
+      } else {
+        // iOS StoreKit (handles Subscription Groups upgrades natively) or non-subscription package
+        purchaseResult = await Purchases.purchasePackage(package);
       }
 
-      debugPrint('[PaymentRepo] Calling Purchases.purchasePackage...');
-      final purchaseResult = await Purchases.purchasePackage(
-        package,
-        googleProductChangeInfo: changeInfo,
-      );
-      debugPrint('[PaymentRepo] Purchase successful for package: ${package.identifier}');
-      _customerInfoController.add(purchaseResult.customerInfo);
+      _customerInfoController.add(purchaseResult);
       return Either.right(true);
     } on PlatformException catch (e) {
       debugPrint('[PaymentRepo] PlatformException during purchase: Code: ${e.code}, Message: ${e.message}, Details: ${e.details}');
@@ -130,7 +146,8 @@ class RevenueCatRepositoryImpl implements PaymentRepository {
     try {
       final customerInfo = await Purchases.restorePurchases();
       _customerInfoController.add(customerInfo);
-      return Either.right(true);
+      final hasActiveEntitlements = customerInfo.entitlements.active.isNotEmpty;
+      return Either.right(hasActiveEntitlements);
     } on PlatformException catch (e) {
       return Either.left(PaymentFailure(e.message ?? 'Failed to restore purchases.'));
     } catch (e) {
@@ -141,6 +158,16 @@ class RevenueCatRepositoryImpl implements PaymentRepository {
   @override
   Future<Either<Failure, void>> manageSubscriptions() async {
     try {
+      // On iOS 15+, trigger native StoreKit 2 in-app subscription sheet
+      if (Platform.isIOS) {
+        try {
+          await Purchases.showManageSubscriptions();
+          return Either.right(null);
+        } catch (e) {
+          debugPrint('[PaymentRepo] Purchases.showManageSubscriptions fallback: $e');
+        }
+      }
+
       final customerInfo = await Purchases.getCustomerInfo();
       final managementURL = customerInfo.managementURL;
 
@@ -148,18 +175,18 @@ class RevenueCatRepositoryImpl implements PaymentRepository {
         final uri = Uri.parse(managementURL);
         if (await canLaunchUrl(uri)) {
           await launchUrl(uri, mode: LaunchMode.externalApplication);
-          return  Either.right(null);
+          return Either.right(null);
         }
       }
 
-      // Fallback URLs if RevenueCat doesn't have it
+      // Fallback URLs if RevenueCat managementURL is not provided
       final fallbackUrl = Platform.isAndroid 
           ? Uri.parse("https://play.google.com/store/account/subscriptions")
           : Uri.parse("https://apps.apple.com/account/subscriptions");
           
       if (await canLaunchUrl(fallbackUrl)) {
         await launchUrl(fallbackUrl, mode: LaunchMode.externalApplication);
-        return  Either.right(null);
+        return Either.right(null);
       }
       
       return Either.left(PaymentFailure('Could not open subscription manager.'));

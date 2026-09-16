@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:collection/collection.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:daimond/l10n/app_localizations.dart';
 
 import '../../../../core/routing/app_routes.dart';
 import '../../../../core/widgets/custom_snackbar.dart';
+import '../../../../core/widgets/confirmation_dialog.dart';
 import '../../../../core/error/failures.dart';
 import '../../../orders/domain/entities/order_entity.dart';
 import '../../../orders/presentation/providers/order_provider.dart';
@@ -41,97 +42,129 @@ class CardDetailController extends StateNotifier<CardDetailState> {
     String? coverImageUrl,
     String? frontMessage,
   }) async {
-    // TEMPORARY: Bypass early field validation for testing.
-    // To revert: uncomment the two blocks below.
-    //
-    // ── PRODUCTION: message check (commented out) ─────────────────────────
-    // if (message.trim().isEmpty) {
-    //   CustomSnackbar.showError(context, texts.pleaseEnterMessage);
-    //   return;
-    // }
-    // ── PRODUCTION: from/to check (commented out) ─────────────────────────
-    // if (from.trim().isEmpty || to.trim().isEmpty) {
-    //   pageController.animateToPage(
-    //     2,
-    //     duration: const Duration(milliseconds: 300),
-    //     curve: Curves.easeInOut,
-    //   );
-    //   return;
-    // }
+    if (message.trim().isEmpty) {
+      CustomSnackbar.showError(context, texts.pleaseEnterMessage);
+      return;
+    }
+
+    if (recipientPhone == null || deliveryMethod == null) {
+      if (pageController.hasClients) {
+        pageController.animateToPage(
+          2,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
+      return;
+    }
 
     state = const CardDetailState(isLoading: true);
 
-    // TEMPORARY: Bypass payment gate for testing the share/send flow.
-    // To revert: delete the try-finally below and uncomment the
-    // production block marked with PRODUCTION START/END.
     try {
-      // ── BYPASS START ────────────────────────────────────────────────────
-      await _placeOrderAndSend(
-        context: context,
-        cardId: cardId,
-        title: title,
-        message: message,
-        texts: texts,
-        recipientPhone: recipientPhone,
-        deliveryMethod: deliveryMethod,
-        coverImageUrl: coverImageUrl,
-        frontMessage: frontMessage,
-        from: from,
-      );
-      // ── BYPASS END ──────────────────────────────────────────────────────
+      CustomerInfo? customerInfo =
+          ref.read(customerInfoStreamProvider).valueOrNull;
+      if (customerInfo == null) {
+        try {
+          customerInfo = await Purchases.getCustomerInfo();
+        } catch (_) {}
+      }
+      final hasActiveSubscription =
+          customerInfo?.entitlements.active.containsKey('premium') ?? false;
 
-      // ── PRODUCTION START (commented out) ────────────────────────────────
-      // final customerInfo = ref.read(customerInfoStreamProvider).valueOrNull;
-      // final hasActiveSubscription =
-      //     customerInfo?.entitlements.active.containsKey('premium') ?? false;
-      //
-      // if (hasActiveSubscription) {
-      //   await _placeOrderAndSend(
-      //     context: context,
-      //     cardId: cardId,
-      //     title: title,
-      //     message: message,
-      //     texts: texts,
-      //     recipientPhone: recipientPhone,
-      //     deliveryMethod: deliveryMethod,
-      //     coverImageUrl: coverImageUrl,
-      //     frontMessage: frontMessage,
-      //     from: from,
-      //   );
-      // } else {
-      //   final offeringsAsync = ref.read(offeringsProvider);
-      //   final availablePackages =
-      //       offeringsAsync.valueOrNull?.current?.availablePackages ?? [];
-      //   final singleCardPackage = availablePackages.firstWhereOrNull(
-      //     (p) =>
-      //         p.storeProduct.identifier == 'rivon_single_card' ||
-      //         p.identifier == 'single_card' ||
-      //         p.identifier == 'single-card-purchase',
-      //   );
-      //
-      //   if (singleCardPackage != null) {
-      //     final success = await ref
-      //         .read(paymentControllerProvider.notifier)
-      //         .purchase(context, singleCardPackage);
-      //     if (success) {
-      //       await _placeOrderAndSend(
-      //         context: context,
-      //         cardId: cardId,
-      //         title: title,
-      //         message: message,
-      //         texts: texts,
-      //         recipientPhone: recipientPhone,
-      //         deliveryMethod: deliveryMethod,
-      //         coverImageUrl: coverImageUrl,
-      //         frontMessage: frontMessage,
-      //         from: from,
-      //       );
-      //     }
-      //   } else {
-      //     CustomSnackbar.showError(context, texts.singleCardNotAvailable);
-      //   }
-      // }
-      // ── PRODUCTION END ──────────────────────────────────────────────────
+      if (!context.mounted) return;
+
+      if (hasActiveSubscription) {
+        await _placeOrderAndSend(
+          context: context,
+          cardId: cardId,
+          title: title,
+          message: message,
+          texts: texts,
+          recipientPhone: recipientPhone,
+          deliveryMethod: deliveryMethod,
+          coverImageUrl: coverImageUrl,
+          frontMessage: frontMessage,
+          from: from,
+        );
+      } else {
+        Offerings? offerings = ref.read(offeringsProvider).valueOrNull;
+        if (offerings == null) {
+          try {
+            final res =
+                await ref.read(paymentRepositoryProvider).fetchOfferings();
+            offerings = res.fold((_) => null, (o) => o);
+          } catch (_) {}
+        }
+        final availablePackages = offerings?.current?.availablePackages ?? [];
+        final singleCardPackage = availablePackages.firstWhereOrNull(
+          (p) =>
+              p.storeProduct.identifier == 'rivon_single_card' ||
+              p.storeProduct.identifier.startsWith('rivon_single_card') ||
+              p.identifier == 'single_card' ||
+              p.identifier == 'single-card-purchase',
+        );
+
+        if (!context.mounted) return;
+
+        if (singleCardPackage != null) {
+          final action = await showDialog<String>(
+            context: context,
+            barrierDismissible: true,
+            builder: (dialogCtx) => ConfirmationDialog(
+              title: texts.cardDetails,
+              message:
+                  'A subscription or single-card purchase is required to send this card.',
+              confirmText: 'Pay ${singleCardPackage.storeProduct.priceString}',
+              cancelText: 'View Plans',
+              onConfirm: () => Navigator.pop(dialogCtx, 'buy_single'),
+              onCancel: () => Navigator.pop(dialogCtx, 'view_plans'),
+            ),
+          );
+
+          if (!context.mounted) return;
+
+          if (action == 'buy_single') {
+            final success = await ref
+                .read(paymentControllerProvider.notifier)
+                .purchase(context, singleCardPackage);
+            if (!context.mounted) return;
+            if (success) {
+              await _placeOrderAndSend(
+                context: context,
+                cardId: cardId,
+                title: title,
+                message: message,
+                texts: texts,
+                recipientPhone: recipientPhone,
+                deliveryMethod: deliveryMethod,
+                coverImageUrl: coverImageUrl,
+                frontMessage: frontMessage,
+                from: from,
+              );
+            }
+          } else if (action == 'view_plans') {
+            context.pushNamed(AppRoute.subscription.name);
+          }
+        } else {
+          final goToPlans = await showDialog<bool>(
+            context: context,
+            barrierDismissible: true,
+            builder: (dialogCtx) => ConfirmationDialog(
+              title: 'Subscription Required',
+              message:
+                  'Subscribe to Rivon to send unlimited cards to your loved ones.',
+              confirmText: 'View Plans',
+              cancelText: 'Cancel',
+              onConfirm: () => Navigator.pop(dialogCtx, true),
+              onCancel: () => Navigator.pop(dialogCtx, false),
+            ),
+          );
+          if (!context.mounted) return;
+          if (goToPlans == true) {
+            context.pushNamed(AppRoute.subscription.name);
+          }
+        }
+      }
     } finally {
       if (mounted) {
         state = const CardDetailState(isLoading: false);

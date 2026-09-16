@@ -2,7 +2,7 @@ name: daimond
 description: "A new Flutter project."
 publish_to: 'none'
 
-version: 1.0.0+3
+version: 1.0.0+4
 
 environment:
   sdk: ^3.11.5
@@ -47,6 +47,7 @@ dependencies:
   app_links: ^6.3.0
   sign_in_with_apple: ^8.2.0
   crypto: ^3.0.7
+  collection: ^1.18.0
 
 dev_dependencies:
   flutter_test:

@@ -47,9 +47,20 @@ class PaymentController extends StateNotifier<AsyncValue<void>> {
         state = const AsyncValue.data(null);
         CustomSnackbar.showError(context, failure.message);
       },
-      (success) {
+      (hasActiveEntitlements) {
         state = const AsyncValue.data(null);
-        CustomSnackbar.showSuccess(context, AppLocalizations.of(context)!.restoreSuccessful);
+        if (hasActiveEntitlements) {
+          CustomSnackbar.showSuccess(
+            context,
+            AppLocalizations.of(context)!.restoreSuccessful,
+          );
+        } else {
+          CustomSnackbar.show(
+            context,
+            'No active subscriptions found to restore.',
+            icon: Icons.info_outline,
+          );
+        }
       },
     );
   }

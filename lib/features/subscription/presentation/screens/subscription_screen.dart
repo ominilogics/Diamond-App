@@ -38,9 +38,17 @@ class SubscriptionScreen extends HookConsumerWidget {
     final standardProductId = standardPackage?.storeProduct.identifier;
     final proProductId = proPackage?.storeProduct.identifier;
 
-    final hasStandard = standardProductId != null && activeSubscriptions.contains(standardProductId);
-    final hasPro = proProductId != null && activeSubscriptions.contains(proProductId);
-    final isSubscribed = hasStandard || hasPro;
+    bool isSubscribedTo(String? productId) {
+      if (productId == null) return false;
+      final baseId = productId.split(':').first;
+      return activeSubscriptions.any(
+        (sub) => sub == productId || sub.split(':').first == baseId,
+      );
+    }
+
+    final hasStandard = isSubscribedTo(standardProductId);
+    final hasPro = isSubscribedTo(proProductId);
+    final isSubscribed = hasStandard || hasPro || (customerInfo?.entitlements.active.isNotEmpty ?? false);
 
     useEffect(() {
       if (hasPro) {
