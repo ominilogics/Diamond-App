@@ -46,6 +46,7 @@ app.*.map.json
 
 # Secrets & Certificates
 .env
+.env.*
 *.p12
 *.cer
 *.certSigningRequest
@@ -53,3 +54,5 @@ app.*.map.json
 *.mobileprovision
 ios_certificates/
 supabase/.temp/
+scripts/test_*
+

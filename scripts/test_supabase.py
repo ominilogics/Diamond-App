@@ -1,8 +1,19 @@
-import json
+import os
 import urllib.request
 
-SUPABASE_URL = "https://jlfgigvfmxuvlixohzli.supabase.co"
-SERVICE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpsZmdpZ3ZmbXh1dmxpeG9oemxpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MjM0NTMzMCwiZXhwIjoyMDk3OTIxMzMwfQ.HIJd0uoxUXaRfPCWP0NNmWOAk0njM-8ZfzTC3k60Md0"
+def load_env():
+    env = {}
+    if os.path.exists('.env'):
+        with open('.env') as f:
+            for line in f:
+                if '=' in line and not line.startswith('#'):
+                    k, v = line.strip().split('=', 1)
+                    env[k] = v
+    return env
+
+env = load_env()
+SUPABASE_URL = env.get("SUPABASE_URL", "https://jlfgigvfmxuvlixohzli.supabase.co")
+SERVICE_KEY = env.get("SUPABASE_SERVICE_ROLE_KEY", "")
 
 req = urllib.request.Request(
     f"{SUPABASE_URL}/rest/v1/",

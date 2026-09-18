@@ -2,8 +2,19 @@ import 'package:supabase/supabase.dart';
 import 'dart:io';
 
 void main() async {
-  final url = 'https://jlfgigvfmxuvlixohzli.supabase.co';
-  final serviceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpsZmdpZ3ZmbXh1dmxpeG9oemxpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MjM0NTMzMCwiZXhwIjoyMDk3OTIxMzMwfQ.HIJd0uoxUXaRfPCWP0NNmWOAk0njM-8ZfzTC3k60Md0';
+  final envFile = File('.env');
+  final envLines = await envFile.readAsLines();
+  String? url;
+  String? serviceKey;
+  for (var line in envLines) {
+    if (line.startsWith('SUPABASE_URL=')) url = line.split('=')[1].trim();
+    if (line.startsWith('SUPABASE_SERVICE_ROLE_KEY=')) serviceKey = line.split('=')[1].trim();
+  }
+
+  if (url == null || serviceKey == null) {
+    print('Error: Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in .env');
+    exit(1);
+  }
 
   final client = SupabaseClient(url, serviceKey);
 

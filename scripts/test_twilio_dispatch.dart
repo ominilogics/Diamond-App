@@ -3,12 +3,24 @@ import 'dart:io';
 import 'dart:convert';
 
 void main() async {
-  final url = 'https://jlfgigvfmxuvlixohzli.supabase.co';
-  final anonKey = 'sb_publishable_MJdCHQEtNID8KIEPnstRkw_8-7iqxKG';
-  final serviceRoleKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpsZmdpZ3ZmbXh1dmxpeG9oemxpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MjM0NTMzMCwiZXhwIjoyMDk3OTIxMzMwfQ.HIJd0uoxUXaRfPCWP0NNmWOAk0njM-8ZfzTC3k60Md0';
+  final envFile = File('.env');
+  final envLines = await envFile.readAsLines();
+  String? url;
+  String? anonKey;
+  String? serviceRoleKey;
+  for (var line in envLines) {
+    if (line.startsWith('SUPABASE_URL=')) url = line.split('=')[1].trim();
+    if (line.startsWith('SUPABASE_ANON_KEY=')) anonKey = line.split('=')[1].trim();
+    if (line.startsWith('SUPABASE_SERVICE_ROLE_KEY=')) serviceRoleKey = line.split('=')[1].trim();
+  }
+
+  if (url == null || serviceRoleKey == null) {
+    print('Error: Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in .env');
+    exit(1);
+  }
 
   // Use anon client for standard function calls
-  final anonClient = SupabaseClient(url, anonKey);
+  final anonClient = SupabaseClient(url, anonKey ?? serviceRoleKey);
   final adminClient = SupabaseClient(url, serviceRoleKey);
 
   final userPhone = '+923121946942';
