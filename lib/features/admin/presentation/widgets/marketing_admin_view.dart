@@ -2,13 +2,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../admin_theme.dart';
 import '../providers/admin_provider.dart';
 import '../../data/repositories/admin_repository.dart';
 import 'broadcast_dialog.dart';
 
-const _primaryAccent = Color(0xFF3B82F6);
-const _success = Color(0xFF10B981);
-const _warning = Color(0xFFF59E0B);
+const _primaryAccent = kPrimary;
+const _success = kSuccess;
+const _warning = kWarning;
 const int _itemsPerPage = 15;
 
 enum CustomerCohort {
@@ -242,8 +243,9 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                 final isMobile = constraints.maxWidth < 650;
                 final isTablet = constraints.maxWidth < 1000;
 
+                Widget cardsGrid;
                 if (isMobile) {
-                  return Column(
+                  cardsGrid = Column(
                     children: [
                       Row(
                         children: [
@@ -253,7 +255,7 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                               '$champions',
                               'Active VIPs',
                               Icons.star_rounded,
-                              _success,
+                              kPurple,
                             ),
                           ),
                           const SizedBox(width: 10),
@@ -287,17 +289,15 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                               '$hibernating',
                               'Reactivate',
                               Icons.bedtime_rounded,
-                              const Color(0xFF64748B),
+                              kMutedColor,
                             ),
                           ),
                         ],
                       ),
                     ],
                   );
-                }
-
-                if (isTablet) {
-                  return Column(
+                } else if (isTablet) {
+                  cardsGrid = Column(
                     children: [
                       Row(
                         children: [
@@ -307,10 +307,10 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                               '$champions',
                               'High spend & active',
                               Icons.star_rounded,
-                              _success,
+                              kPurple,
                             ),
                           ),
-                          const SizedBox(width: 16),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: _buildCohortCard(
                               'New Buyers',
@@ -322,7 +322,7 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
                       Row(
                         children: [
                           Expanded(
@@ -334,62 +334,75 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                               _warning,
                             ),
                           ),
-                          const SizedBox(width: 16),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: _buildCohortCard(
                               'Hibernating',
                               '$hibernating',
                               'Reactivation targets',
                               Icons.bedtime_rounded,
-                              const Color(0xFF64748B),
+                              kMutedColor,
                             ),
                           ),
                         ],
                       ),
                     ],
                   );
+                } else {
+                  cardsGrid = Row(
+                    children: [
+                      Expanded(
+                        child: _buildCohortCard(
+                          'Champions',
+                          '$champions',
+                          'High spend & active',
+                          Icons.star_rounded,
+                          kPurple,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildCohortCard(
+                          'New Buyers',
+                          '$newBuyers',
+                          '1st order <14 days',
+                          Icons.rocket_launch_rounded,
+                          _primaryAccent,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildCohortCard(
+                          'At-Risk',
+                          '$atRisk',
+                          'High value, idle >45d',
+                          Icons.warning_amber_rounded,
+                          _warning,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _buildCohortCard(
+                          'Hibernating',
+                          '$hibernating',
+                          'Reactivation targets',
+                          Icons.bedtime_rounded,
+                          kMutedColor,
+                        ),
+                      ),
+                    ],
+                  );
                 }
 
-                return Row(
+                return Column(
                   children: [
-                    Expanded(
-                      child: _buildCohortCard(
-                        'Champions',
-                        '$champions',
-                        'High spend & active',
-                        Icons.star_rounded,
-                        _success,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _buildCohortCard(
-                        'New Buyers',
-                        '$newBuyers',
-                        '1st order <14 days',
-                        Icons.rocket_launch_rounded,
-                        _primaryAccent,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _buildCohortCard(
-                        'At-Risk',
-                        '$atRisk',
-                        'High value, idle >45d',
-                        Icons.warning_amber_rounded,
-                        _warning,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _buildCohortCard(
-                        'Hibernating',
-                        '$hibernating',
-                        'Reactivation targets',
-                        Icons.bedtime_rounded,
-                        const Color(0xFF64748B),
-                      ),
+                    cardsGrid,
+                    const SizedBox(height: 12),
+                    _buildCohortDistributionCard(
+                      champions: champions,
+                      newBuyers: newBuyers,
+                      atRisk: atRisk,
+                      hibernating: hibernating,
                     ),
                   ],
                 );
@@ -406,88 +419,86 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
         );
 
         Widget toolbar = Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: kCardDecoration,
           child: Wrap(
             alignment: WrapAlignment.spaceBetween,
             crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 16,
-            runSpacing: 16,
+            spacing: 12,
+            runSpacing: 10,
             children: [
               Wrap(
-                spacing: 12,
-                runSpacing: 12,
+                spacing: 10,
+                runSpacing: 10,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Container(
-                    width: 220,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 2,
-                    ),
+                    width: 200,
+                    height: 36,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                      color: kDashBg,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: kDashBorder),
                     ),
-                    child: TextField(
-                      controller: _searchController,
-                      onChanged: _onSearchChanged,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        icon: const Icon(
+                    child: Row(
+                      children: [
+                        const Icon(
                           Icons.search_rounded,
-                          color: Color(0xFF94A3B8),
+                          color: kMutedColor,
+                          size: 16,
                         ),
-                        hintText: 'Search profile...',
-                        hintStyle: const TextStyle(
-                          color: Color(0xFF94A3B8),
-                          fontSize: 14,
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: TextField(
+                            controller: _searchController,
+                            onChanged: _onSearchChanged,
+                            style: const TextStyle(fontSize: 12.5, color: kTitleColor),
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              isDense: true,
+                              contentPadding: EdgeInsets.zero,
+                              hintText: 'Search profile...',
+                              hintStyle: TextStyle(
+                                color: kMutedColor,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
                         ),
-                        suffixIcon: _searchController.text.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(
-                                  Icons.clear_rounded,
-                                  size: 18,
-                                  color: Color(0xFF94A3B8),
-                                ),
-                                onPressed: () {
-                                  _searchController.clear();
-                                  _onSearchChanged('');
-                                },
-                              )
-                            : null,
-                      ),
+                        if (_searchController.text.isNotEmpty)
+                          IconButton(
+                            icon: const Icon(
+                              Icons.clear_rounded,
+                              size: 16,
+                              color: kMutedColor,
+                            ),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
+                            onPressed: () {
+                              _searchController.clear();
+                              _onSearchChanged('');
+                            },
+                          ),
+                      ],
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 2,
-                    ),
+                    height: 36,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                      color: kDashBg,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: kDashBorder),
                     ),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<CustomerCohort>(
                         value: _selectedCohort,
+                        style: const TextStyle(fontSize: 12.5, color: kTitleColor),
                         items: CustomerCohort.values.map((c) {
                           return DropdownMenuItem(
                             value: c,
-                            child: Text(c.label),
+                            child: Text(c.label, style: const TextStyle(fontSize: 12.5)),
                           );
                         }).toList(),
                         onChanged: (val) {
@@ -502,31 +513,30 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 2,
-                    ),
+                    height: 36,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                      color: kDashBg,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: kDashBorder),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Icon(
                           Icons.date_range_rounded,
-                          color: Color(0xFF64748B),
-                          size: 18,
+                          color: kLabelColor,
+                          size: 16,
                         ),
                         const SizedBox(width: 6),
                         DropdownButtonHideUnderline(
                           child: DropdownButton<DateFilterRange>(
                             value: _selectedDateFilter,
+                            style: const TextStyle(fontSize: 12.5, color: kTitleColor),
                             items: DateFilterRange.values.map((d) {
                               return DropdownMenuItem(
                                 value: d,
-                                child: Text(d.label),
+                                child: Text(d.label, style: const TextStyle(fontSize: 12.5)),
                               );
                             }).toList(),
                             onChanged: (val) {
@@ -545,8 +555,8 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                 ],
               ),
               Wrap(
-                spacing: 12,
-                runSpacing: 12,
+                spacing: 8,
+                runSpacing: 8,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   OutlinedButton.icon(
@@ -554,46 +564,61 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                     icon: const Icon(
                       Icons.campaign_rounded,
                       color: _primaryAccent,
-                      size: 18,
+                      size: 15,
                     ),
                     label: const Text(
-                      'Targeted Push Alert',
+                      'Push Alert',
                       style: TextStyle(
                         color: _primaryAccent,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
                       ),
                     ),
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color(0xFFBFDBFE)),
+                      side: const BorderSide(color: kDashBorder),
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 12,
+                        horizontal: 12,
+                        vertical: 8,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                   ),
-                  ElevatedButton.icon(
-                    onPressed: purchasesAsync.valueOrNull != null
-                        ? () => _exportMetaAdsCSV(
-                            _buildCustomerProfiles(purchasesAsync.valueOrNull!),
-                          )
-                        : null,
-                    icon: const Icon(Icons.share_rounded, size: 18),
-                    label: const Text(
-                      'Export Meta Ads CSV',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: AppColors.primaryButtonGradient,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: _primaryAccent.withValues(alpha: 0.25),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _primaryAccent,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 12,
+                    child: ElevatedButton.icon(
+                      onPressed: purchasesAsync.valueOrNull != null
+                          ? () => _exportMetaAdsCSV(
+                              _buildCustomerProfiles(purchasesAsync.valueOrNull!),
+                            )
+                          : null,
+                      icon: const Icon(Icons.share_rounded, size: 15, color: Colors.white),
+                      label: const Text(
+                        'Meta Ads CSV',
+                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Colors.white),
                       ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.transparent,
+                        shadowColor: Colors.transparent,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 9,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        elevation: 0,
                       ),
                     ),
                   ),
@@ -603,21 +628,22 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                             _buildCustomerProfiles(purchasesAsync.valueOrNull!),
                           )
                         : null,
-                    icon: const Icon(Icons.email_outlined, size: 18),
+                    icon: const Icon(Icons.email_outlined, size: 15),
                     label: const Text(
-                      'Copy Mailchimp List',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      'Copy Mailchimp',
+                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _success,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 12,
+                        horizontal: 12,
+                        vertical: 9,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(8),
                       ),
+                      elevation: 0,
                     ),
                   ),
                 ],
@@ -634,26 +660,22 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
             if (filtered.isEmpty) {
               return Container(
                 width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                ),
+                decoration: kCardDecoration,
                 child: const Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
                       Icons.people_outline_rounded,
-                      size: 56,
-                      color: Color(0xFFCBD5E1),
+                      size: 40,
+                      color: kMutedColor,
                     ),
-                    SizedBox(height: 16),
+                    SizedBox(height: 12),
                     Text(
                       'No Customer Profiles Match Filter',
                       style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1E293B),
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: kTitleColor,
                       ),
                     ),
                   ],
@@ -678,25 +700,14 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                 : <CustomerMarketingProfile>[];
 
             return Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.02),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
+              decoration: kCardDecoration,
               child: Column(
                 children: [
                   Expanded(
                     child: ClipRRect(
                       borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(16),
-                        topRight: Radius.circular(16),
+                        topLeft: Radius.circular(kCardRadius),
+                        topRight: Radius.circular(kCardRadius),
                       ),
                       child: LayoutBuilder(
                         builder: (context, constraints) {
@@ -707,20 +718,21 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                               child: ConstrainedBox(
                                 constraints: BoxConstraints(minWidth: constraints.maxWidth),
                                 child: DataTable(
-                                  headingRowHeight: 52,
-                                  dataRowMinHeight: 64,
-                                  dataRowMaxHeight: 64,
+                                  headingRowHeight: 38,
+                                  dataRowMinHeight: 46,
+                                  dataRowMaxHeight: 46,
                                   headingRowColor: WidgetStateProperty.all(
-                                    const Color(0xFFF8FAFC),
+                                    kDashBg,
                                   ),
                                   columns: const [
                                     DataColumn(
                                       label: Text(
                                         'CUSTOMER PROFILE',
                                         style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,
-                                          color: Color(0xFF475569),
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 10.5,
+                                          color: kMutedColor,
+                                          letterSpacing: 0.8,
                                         ),
                                       ),
                                     ),
@@ -728,9 +740,10 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                                       label: Text(
                                         'RFM COHORT',
                                         style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,
-                                          color: Color(0xFF475569),
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 10.5,
+                                          color: kMutedColor,
+                                          letterSpacing: 0.8,
                                         ),
                                       ),
                                     ),
@@ -738,9 +751,10 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                                       label: Text(
                                         'ORDERS SENT',
                                         style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,
-                                          color: Color(0xFF475569),
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 10.5,
+                                          color: kMutedColor,
+                                          letterSpacing: 0.8,
                                         ),
                                       ),
                                     ),
@@ -748,9 +762,10 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                                       label: Text(
                                         'LIFETIME SPEND',
                                         style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,
-                                          color: Color(0xFF475569),
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 10.5,
+                                          color: kMutedColor,
+                                          letterSpacing: 0.8,
                                         ),
                                       ),
                                     ),
@@ -758,9 +773,10 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                                       label: Text(
                                         'RECIPIENTS REACHED',
                                         style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,
-                                          color: Color(0xFF475569),
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 10.5,
+                                          color: kMutedColor,
+                                          letterSpacing: 0.8,
                                         ),
                                       ),
                                     ),
@@ -768,9 +784,10 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                                       label: Text(
                                         'LAST ACTIVE',
                                         style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,
-                                          color: Color(0xFF475569),
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 10.5,
+                                          color: kMutedColor,
+                                          letterSpacing: 0.8,
                                         ),
                                       ),
                                     ),
@@ -790,9 +807,9 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                                                   Text(
                                                     p.name,
                                                     style: const TextStyle(
-                                                      fontWeight: FontWeight.bold,
-                                                      fontSize: 14,
-                                                      color: Color(0xFF0F172A),
+                                                      fontWeight: FontWeight.w600,
+                                                      fontSize: 13,
+                                                      color: kTitleColor,
                                                     ),
                                                   ),
                                                   if (p.age != null) ...[
@@ -800,25 +817,24 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                                                     Container(
                                                       padding:
                                                           const EdgeInsets.symmetric(
-                                                            horizontal: 6,
-                                                            vertical: 2,
+                                                            horizontal: 5,
+                                                            vertical: 1.5,
                                                           ),
                                                       decoration: BoxDecoration(
-                                                        color: const Color(
-                                                          0xFFE2E8F0,
-                                                        ),
+                                                        color: kDashBg,
                                                         borderRadius:
                                                             BorderRadius.circular(
-                                                              6,
+                                                              4,
                                                             ),
+                                                        border: Border.all(color: kDashBorder),
                                                       ),
                                                       child: Text(
                                                         '${p.age} yrs',
                                                         style: const TextStyle(
-                                                          fontSize: 11,
+                                                          fontSize: 10.5,
                                                           fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Color(0xFF334155),
+                                                              FontWeight.w600,
+                                                          color: kBodyColor,
                                                         ),
                                                       ),
                                                     ),
@@ -828,8 +844,8 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                                               Text(
                                                 p.email,
                                                 style: const TextStyle(
-                                                  fontSize: 12,
-                                                  color: Color(0xFF64748B),
+                                                  fontSize: 11,
+                                                  color: kLabelColor,
                                                 ),
                                               ),
                                             ],
@@ -841,8 +857,8 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                                             '${p.totalOrders} cards',
                                             style: const TextStyle(
                                               fontWeight: FontWeight.w600,
-                                              fontSize: 14,
-                                              color: Color(0xFF1E293B),
+                                              fontSize: 12.5,
+                                              color: kTitleColor,
                                             ),
                                           ),
                                         ),
@@ -850,8 +866,8 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                                           Text(
                                             '\$${p.totalSpent.toStringAsFixed(2)}',
                                             style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 14,
+                                              fontWeight: FontWeight.w700,
+                                              fontSize: 13,
                                               color: _success,
                                             ),
                                           ),
@@ -860,8 +876,8 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                                           Text(
                                             '${p.recipientsReached} people',
                                             style: const TextStyle(
-                                              color: Color(0xFF64748B),
-                                              fontSize: 13,
+                                              color: kLabelColor,
+                                              fontSize: 12,
                                             ),
                                           ),
                                         ),
@@ -869,8 +885,8 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                                           Text(
                                             '${p.lastActive.day}/${p.lastActive.month}/${p.lastActive.year}',
                                             style: const TextStyle(
-                                              color: Color(0xFF64748B),
-                                              fontSize: 13,
+                                              color: kLabelColor,
+                                              fontSize: 12,
                                             ),
                                           ),
                                         ),
@@ -890,17 +906,17 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                   if (totalPages > 1)
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
+                        horizontal: 16,
+                        vertical: 8,
                       ),
                       decoration: const BoxDecoration(
-                        color: Color(0xFFF8FAFC),
+                        color: kDashBg,
                         borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(16),
-                          bottomRight: Radius.circular(16),
+                          bottomLeft: Radius.circular(kCardRadius),
+                          bottomRight: Radius.circular(kCardRadius),
                         ),
                         border: Border(
-                          top: BorderSide(color: Color(0xFFE2E8F0)),
+                          top: BorderSide(color: kDashBorder),
                         ),
                       ),
                       child: Row(
@@ -909,8 +925,8 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                           Text(
                             'Showing ${startIndex + 1} - $endIndex of ${filtered.length} customer profiles',
                             style: const TextStyle(
-                              color: Color(0xFF64748B),
-                              fontSize: 13,
+                              color: kLabelColor,
+                              fontSize: 12,
                             ),
                           ),
                           Row(
@@ -919,21 +935,34 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
                                 onPressed: _currentPage > 0
                                     ? () => setState(() => _currentPage--)
                                     : null,
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                  textStyle: const TextStyle(fontSize: 12),
+                                  side: const BorderSide(color: kDashBorder),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                ),
                                 child: const Text('Previous'),
                               ),
-                              const SizedBox(width: 12),
+                              const SizedBox(width: 10),
                               Text(
                                 'Page ${_currentPage + 1} of $totalPages',
                                 style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
+                                  color: kTitleColor,
                                 ),
                               ),
-                              const SizedBox(width: 12),
+                              const SizedBox(width: 10),
                               OutlinedButton(
                                 onPressed: _currentPage < totalPages - 1
                                     ? () => setState(() => _currentPage++)
                                     : null,
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                  textStyle: const TextStyle(fontSize: 12),
+                                  side: const BorderSide(color: kDashBorder),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                ),
                                 child: const Text('Next'),
                               ),
                             ],
@@ -957,9 +986,9 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
           mainAxisSize: isNarrow ? MainAxisSize.min : MainAxisSize.max,
           children: [
             kpiBar,
-            const SizedBox(height: 24),
+            const SizedBox(height: 14),
             toolbar,
-            const SizedBox(height: 24),
+            const SizedBox(height: 14),
             isNarrow
                 ? SizedBox(height: 520, child: tableWidget)
                 : Expanded(child: tableWidget),
@@ -978,6 +1007,160 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
     );
   }
 
+  Widget _buildCohortDistributionCard({
+    required int champions,
+    required int newBuyers,
+    required int atRisk,
+    required int hibernating,
+  }) {
+    final total = champions + newBuyers + atRisk + hibernating;
+    final champPct = total > 0 ? (champions / total) : 0.35;
+    final newPct = total > 0 ? (newBuyers / total) : 0.28;
+    final riskPct = total > 0 ? (atRisk / total) : 0.18;
+    final hiberPct = total > 0 ? (hibernating / total) : 0.19;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: kCardDecoration,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Cohort Lifecycle & Retention Flow',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: kTitleColor,
+                    ),
+                  ),
+                  SizedBox(height: 2),
+                  Text(
+                    'Distribution of active vs idle customers based on spending and purchase recency',
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      color: kMutedColor,
+                    ),
+                  ),
+                ],
+              ),
+              OutlinedButton.icon(
+                onPressed: () => BroadcastDialog.show(context),
+                icon: const Icon(Icons.campaign_rounded, size: 14, color: _primaryAccent),
+                label: const Text(
+                  'Broadcast Campaign',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _primaryAccent),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: kDashBorder),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Horizontal Segmented Bar
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: SizedBox(
+              height: 10,
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: (champPct * 100).round().clamp(1, 100),
+                    child: Container(color: kPurple),
+                  ),
+                  const SizedBox(width: 2),
+                  Expanded(
+                    flex: (newPct * 100).round().clamp(1, 100),
+                    child: Container(color: _primaryAccent),
+                  ),
+                  const SizedBox(width: 2),
+                  Expanded(
+                    flex: (riskPct * 100).round().clamp(1, 100),
+                    child: Container(color: _warning),
+                  ),
+                  const SizedBox(width: 2),
+                  Expanded(
+                    flex: (hiberPct * 100).round().clamp(1, 100),
+                    child: Container(color: kMutedColor),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Legend Row
+          Wrap(
+            spacing: 16,
+            runSpacing: 6,
+            children: [
+              _buildLegendItem(
+                'Champions',
+                '${(champPct * 100).toStringAsFixed(0)}% ($champions)',
+                kPurple,
+              ),
+              _buildLegendItem(
+                'New Buyers',
+                '${(newPct * 100).toStringAsFixed(0)}% ($newBuyers)',
+                _primaryAccent,
+              ),
+              _buildLegendItem(
+                'At-Risk',
+                '${(riskPct * 100).toStringAsFixed(0)}% ($atRisk)',
+                _warning,
+              ),
+              _buildLegendItem(
+                'Hibernating',
+                '${(hiberPct * 100).toStringAsFixed(0)}% ($hibernating)',
+                kMutedColor,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLegendItem(String label, String value, Color color) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(width: 5),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 11.5,
+            fontWeight: FontWeight.w600,
+            color: kTitleColor,
+          ),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 11.5,
+            color: kMutedColor,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildCohortCard(
     String title,
     String value,
@@ -986,55 +1169,54 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
     Color color,
   ) {
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: kCardDecoration,
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(7),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, color: color, size: 24),
+            child: Icon(icon, color: color, size: 18),
           ),
-          const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  color: Color(0xFF64748B),
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: kLabelColor,
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF0F172A),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: kTitleColor,
+                    letterSpacing: -0.3,
+                  ),
                 ),
-              ),
-              Text(
-                subtitle,
-                style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
-              ),
-            ],
+                Text(
+                  subtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 10.5, color: kMutedColor),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -1047,35 +1229,35 @@ class _MarketingAdminViewState extends ConsumerState<MarketingAdminView> {
 
     switch (cohort) {
       case CustomerCohort.champions:
-        bg = _success.withValues(alpha: 0.1);
-        fg = _success;
+        bg = kPurple.withValues(alpha: 0.12);
+        fg = kPurple;
         break;
       case CustomerCohort.newBuyers:
-        bg = _primaryAccent.withValues(alpha: 0.1);
+        bg = _primaryAccent.withValues(alpha: 0.12);
         fg = _primaryAccent;
         break;
       case CustomerCohort.atRisk:
-        bg = _warning.withValues(alpha: 0.1);
+        bg = _warning.withValues(alpha: 0.12);
         fg = _warning;
         break;
       case CustomerCohort.hibernating:
-        bg = const Color(0xFF64748B).withValues(alpha: 0.1);
-        fg = const Color(0xFF64748B);
+        bg = kMutedColor.withValues(alpha: 0.15);
+        fg = kLabelColor;
         break;
       default:
-        bg = const Color(0xFFF1F5F9);
-        fg = const Color(0xFF0F172A);
+        bg = kDashBg;
+        fg = kBodyColor;
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
         cohort.label,
-        style: TextStyle(color: fg, fontWeight: FontWeight.bold, fontSize: 12),
+        style: TextStyle(color: fg, fontWeight: FontWeight.w600, fontSize: 11),
       ),
     );
   }

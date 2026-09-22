@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../admin_theme.dart';
 import '../providers/admin_provider.dart';
 
-const _primaryAccent = Color(0xFF3B82F6);
-const _success = Color(0xFF10B981);
-const _warning = Color(0xFFF59E0B);
+const _primaryAccent = kPrimary;
+const _success = kSuccess;
+const _warning = kWarning;
 
 class SystemHealthAdminView extends ConsumerWidget {
   const SystemHealthAdminView({super.key});
@@ -26,15 +27,16 @@ class SystemHealthAdminView extends ConsumerWidget {
                 Text(
                   'Infrastructure & Push Engine Diagnostics',
                   style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF0F172A),
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: kTitleColor,
+                    letterSpacing: -0.2,
                   ),
                 ),
                 SizedBox(height: 4),
                 Text(
                   'Real-time health monitoring of Firebase Cloud Messaging, Supabase database, and RevenueCat webhooks.',
-                  style: TextStyle(color: Color(0xFF64748B), fontSize: 14),
+                  style: TextStyle(color: kLabelColor, fontSize: 13.5),
                 ),
               ],
             ),
@@ -196,7 +198,7 @@ class SystemHealthAdminView extends ConsumerWidget {
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         color: const Color(0xFF0F172A),
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(kCardRadius),
                         border: Border.all(color: const Color(0xFF1E293B)),
                       ),
                       child: Column(
@@ -264,55 +266,53 @@ class SystemHealthAdminView extends ConsumerWidget {
     Color color,
   ) {
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+      padding: const EdgeInsets.all(18),
+      decoration: kCardDecoration,
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: color, size: 26),
+            child: Icon(icon, color: color, size: 22),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    color: Color(0xFF64748B),
-                    fontSize: 13,
+                    color: kLabelColor,
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   status,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF0F172A),
+                    fontWeight: FontWeight.w800,
+                    color: kTitleColor,
+                    letterSpacing: -0.3,
                   ),
                 ),
                 Text(
                   subtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF94A3B8),
+                    fontSize: 11.5,
+                    color: kMutedColor,
                   ),
                 ),
               ],

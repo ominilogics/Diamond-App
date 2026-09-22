@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../admin_theme.dart';
 
-const _primaryAccent = Color(0xFF3B82F6);
+const _primaryAccent = kPrimary;
 
 class BroadcastDialog extends StatefulWidget {
   const BroadcastDialog({super.key});
@@ -40,7 +41,7 @@ class _BroadcastDialogState extends State<BroadcastDialog> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please fill in both title and body'),
-          backgroundColor: Colors.redAccent,
+          backgroundColor: kDanger,
         ),
       );
       return;
@@ -74,7 +75,7 @@ class _BroadcastDialogState extends State<BroadcastDialog> {
             content: Text(
               'Broadcast sent successfully! Response: ${response.data}',
             ),
-            backgroundColor: const Color(0xFF10B981),
+            backgroundColor: kSuccess,
           ),
         );
       }
@@ -87,7 +88,7 @@ class _BroadcastDialogState extends State<BroadcastDialog> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to send broadcast: $e'),
-            backgroundColor: Colors.redAccent,
+            backgroundColor: kDanger,
           ),
         );
       }
@@ -96,258 +97,142 @@ class _BroadcastDialogState extends State<BroadcastDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      child: Container(
-        width: 480,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.15),
-              blurRadius: 30,
-              offset: const Offset(0, 10),
+    return buildAdminDialog(
+      context: context,
+      title: 'Broadcast Push Notification',
+      icon: Icons.campaign_rounded,
+      iconColor: _primaryAccent,
+      width: 440,
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'Notification Title',
+            style: TextStyle(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w600,
+              color: kTitleColor,
             ),
-          ],
+          ),
+          const SizedBox(height: 6),
+          TextField(
+            controller: _titleController,
+            style: const TextStyle(fontSize: 13, color: kTitleColor),
+            decoration: const InputDecoration(
+              hintText: 'e.g., Special Holiday Offer!',
+            ),
+          ),
+          const SizedBox(height: 14),
+          const Text(
+            'Notification Message',
+            style: TextStyle(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w600,
+              color: kTitleColor,
+            ),
+          ),
+          const SizedBox(height: 6),
+          TextField(
+            controller: _bodyController,
+            maxLines: 3,
+            style: const TextStyle(fontSize: 13, color: kTitleColor),
+            decoration: const InputDecoration(
+              hintText: 'e.g., Express your love with our new premium card collections!',
+            ),
+          ),
+          const SizedBox(height: 14),
+          const Text(
+            'Notification Category Type',
+            style: TextStyle(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w600,
+              color: kTitleColor,
+            ),
+          ),
+          const SizedBox(height: 6),
+          DropdownButtonFormField<String>(
+            initialValue: _selectedType,
+            style: const TextStyle(fontSize: 13, color: kTitleColor),
+            decoration: const InputDecoration(),
+            items: const [
+              DropdownMenuItem(
+                value: 'special offer',
+                child: Text('Special Offer'),
+              ),
+              DropdownMenuItem(
+                value: 'system alert',
+                child: Text('System Alert'),
+              ),
+              DropdownMenuItem(
+                value: 'event reminder',
+                child: Text('Event Reminder'),
+              ),
+            ],
+            onChanged: (val) {
+              if (val != null) setState(() => _selectedType = val);
+            },
+          ),
+        ],
+      ),
+      actions: [
+        OutlinedButton(
+          onPressed: _isSending ? null : () => Navigator.pop(context),
+          style: OutlinedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+            side: const BorderSide(color: kDashBorder),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          child: const Text('Cancel', style: TextStyle(fontSize: 12.5)),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Header Area
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: const BoxDecoration(
-                color: Color(0xFFF8FAFC),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(24),
-                  topRight: Radius.circular(24),
-                ),
-                border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0))),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: _primaryAccent.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
+        const SizedBox(width: 8),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: _isSending ? null : AppColors.primaryButtonGradient,
+            color: _isSending ? kMutedColor : null,
+            borderRadius: BorderRadius.circular(8),
+            boxShadow: _isSending
+                ? null
+                : [
+                    BoxShadow(
+                      color: _primaryAccent.withValues(alpha: 0.25),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     ),
-                    child: const Icon(
-                      Icons.campaign_rounded,
-                      color: _primaryAccent,
-                      size: 28,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Broadcast Push Notification',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF0F172A),
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Send a push notification alert to all registered users.',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Color(0xFF64748B),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, color: Color(0xFF94A3B8)),
-                  ),
-                ],
-              ),
+                  ],
+          ),
+          child: ElevatedButton(
+            onPressed: _isSending ? null : _sendBroadcast,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              elevation: 0,
             ),
-
-            // Form Body
-            Flexible(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(28),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            child: _isSending
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                : const Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
-                        'Notification Title',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF1E293B),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      TextField(
-                        controller: _titleController,
-                        decoration: InputDecoration(
-                          hintText: 'e.g., Special Holiday Offer!',
-                          filled: true,
-                          fillColor: const Color(0xFFF8FAFC),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 14,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(
-                              color: Color(0xFFE2E8F0),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        'Notification Message',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF1E293B),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      TextField(
-                        controller: _bodyController,
-                        maxLines: 3,
-                        decoration: InputDecoration(
-                          hintText:
-                              'e.g., Express your love with our new premium card collections!',
-                          filled: true,
-                          fillColor: const Color(0xFFF8FAFC),
-                          contentPadding: const EdgeInsets.all(16),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(
-                              color: Color(0xFFE2E8F0),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        'Notification Category Type',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF1E293B),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      DropdownButtonFormField<String>(
-                        value: _selectedType,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: const Color(0xFFF8FAFC),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 14,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(
-                              color: Color(0xFFE2E8F0),
-                            ),
-                          ),
-                        ),
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'special offer',
-                            child: Text('Special Offer'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'system alert',
-                            child: Text('System Alert'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'event reminder',
-                            child: Text('Event Reminder'),
-                          ),
-                        ],
-                        onChanged: (val) {
-                          if (val != null) setState(() => _selectedType = val);
-                        },
+                      Icon(Icons.send_rounded, size: 15, color: Colors.white),
+                      SizedBox(width: 6),
+                      Text(
+                        'Send Broadcast',
+                        style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: Colors.white),
                       ),
                     ],
                   ),
-                ),
-              ),
-            ),
-
-            // Footer Actions
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: const BoxDecoration(
-                color: Color(0xFFF8FAFC),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(24),
-                  bottomRight: Radius.circular(24),
-                ),
-                border: Border(top: BorderSide(color: Color(0xFFE2E8F0))),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  OutlinedButton(
-                    onPressed: _isSending ? null : () => Navigator.pop(context),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 14,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text('Cancel'),
-                  ),
-                  const SizedBox(width: 12),
-                  ElevatedButton(
-                    onPressed: _isSending ? null : _sendBroadcast,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _primaryAccent,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 14,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: _isSending
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2.5,
-                            ),
-                          )
-                        : const Row(
-                            children: [
-                              Icon(Icons.send_rounded, size: 18),
-                              SizedBox(width: 8),
-                              Text('Send Broadcast'),
-                            ],
-                          ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }

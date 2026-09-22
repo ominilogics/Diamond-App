@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../admin_theme.dart';
 import '../providers/admin_provider.dart';
 import '../../data/repositories/admin_repository.dart';
 import 'broadcast_dialog.dart';
 
-const _primaryAccent = Color(0xFF3B82F6);
-const _success = Color(0xFF10B981);
+const _primaryAccent = kPrimary;
+const _success = kSuccess;
 
 class OccasionsAdminView extends ConsumerStatefulWidget {
   const OccasionsAdminView({super.key});
@@ -32,19 +33,20 @@ class _OccasionsAdminViewState extends ConsumerState<OccasionsAdminView> {
             final isMobile = constraints.maxWidth < 650;
 
             return Container(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
+                  colors: [kSidebarBg, kSidebarHoverBg],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(kCardRadius),
+                border: Border.all(color: kDashBorder),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    blurRadius: 15,
-                    offset: const Offset(0, 5),
+                    color: Colors.black.withValues(alpha: 0.06),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
@@ -56,48 +58,61 @@ class _OccasionsAdminViewState extends ConsumerState<OccasionsAdminView> {
                           children: [
                             Icon(
                               Icons.calendar_month_rounded,
-                              color: Color(0xFF60A5FA),
-                              size: 24,
+                              color: kPrimary,
+                              size: 20,
                             ),
-                            SizedBox(width: 10),
+                            SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 'Seasonal Occasions Manager',
                                 style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
                                   color: Colors.white,
                                 ),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 6),
                         const Text(
                           'Schedule automated push notifications for upcoming holidays, anniversaries, and global events.',
                           style: TextStyle(
-                            color: Color(0xFF94A3B8),
-                            fontSize: 13,
+                            color: kMutedColor,
+                            fontSize: 12,
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 12),
                         SizedBox(
                           width: double.infinity,
-                          child: ElevatedButton.icon(
-                            onPressed: () => BroadcastDialog.show(context),
-                            icon: const Icon(Icons.campaign_rounded, size: 20),
-                            label: const Text(
-                              'Broadcast Instant Alert',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: AppColors.primaryButtonGradient,
+                              borderRadius: BorderRadius.circular(8),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: _primaryAccent.withValues(alpha: 0.25),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
                             ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: _primaryAccent,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                            child: ElevatedButton.icon(
+                              onPressed: () => BroadcastDialog.show(context),
+                              icon: const Icon(Icons.campaign_rounded, size: 16, color: Colors.white),
+                              label: const Text(
+                                'Broadcast Instant Alert',
+                                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12.5, color: Colors.white),
                               ),
-                              elevation: 0,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                shadowColor: Colors.transparent,
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                elevation: 0,
+                              ),
                             ),
                           ),
                         ),
@@ -114,50 +129,63 @@ class _OccasionsAdminViewState extends ConsumerState<OccasionsAdminView> {
                                 children: [
                                   Icon(
                                     Icons.calendar_month_rounded,
-                                    color: Color(0xFF60A5FA),
-                                    size: 28,
+                                    color: kPrimary,
+                                    size: 22,
                                   ),
-                                  SizedBox(width: 12),
+                                  SizedBox(width: 10),
                                   Text(
                                     'Seasonal Occasions Campaign Manager',
                                     style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w700,
                                       color: Colors.white,
                                     ),
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 8),
+                              SizedBox(height: 4),
                               Text(
                                 'Schedule automated push notifications for upcoming holidays, anniversaries, and global events.',
                                 style: TextStyle(
-                                  color: Color(0xFF94A3B8),
-                                  fontSize: 14,
+                                  color: kMutedColor,
+                                  fontSize: 12.5,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(width: 16),
-                        ElevatedButton.icon(
-                          onPressed: () => BroadcastDialog.show(context),
-                          icon: const Icon(Icons.campaign_rounded, size: 20),
-                          label: const Text(
-                            'Broadcast Instant Alert',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                        const SizedBox(width: 14),
+                        DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: AppColors.primaryButtonGradient,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: _primaryAccent.withValues(alpha: 0.25),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: _primaryAccent,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 14,
+                          child: ElevatedButton.icon(
+                            onPressed: () => BroadcastDialog.show(context),
+                            icon: const Icon(Icons.campaign_rounded, size: 16, color: Colors.white),
+                            label: const Text(
+                              'Broadcast Instant Alert',
+                              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12.5, color: Colors.white),
                             ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 10,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              elevation: 0,
                             ),
-                            elevation: 0,
                           ),
                         ),
                       ],
@@ -165,27 +193,91 @@ class _OccasionsAdminViewState extends ConsumerState<OccasionsAdminView> {
             );
           },
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 14),
+
+        // Occasions Metric Overview Cards
+        occasionsAsync.when(
+          data: (occasions) {
+            final totalOccasions = occasions.length;
+            final autoPushCount = occasions.where((o) => o.autoPushEnabled).length;
+            final categoriesCount =
+                occasions.map((o) => o.targetCategoryName).toSet().length;
+
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                final isDesktop = constraints.maxWidth >= 900;
+                final isTablet = constraints.maxWidth >= 600;
+
+                final cards = [
+                  _buildKpiCard(
+                    'Scheduled Occasions',
+                    '$totalOccasions',
+                    'Active seasonal triggers',
+                    Icons.event_available_rounded,
+                    _primaryAccent,
+                  ),
+                  _buildKpiCard(
+                    'Auto-Push Active',
+                    '$autoPushCount',
+                    'Pipeline scheduled',
+                    Icons.notifications_active_rounded,
+                    _success,
+                  ),
+                  _buildKpiCard(
+                    'Target Categories',
+                    '$categoriesCount',
+                    'Direct catalog links',
+                    Icons.category_rounded,
+                    kPurple,
+                  ),
+                  _buildKpiCard(
+                    'Push Pipeline',
+                    'Online',
+                    'Cloud Messaging Active',
+                    Icons.cloud_done_rounded,
+                    kWarning,
+                  ),
+                ];
+
+                if (isDesktop) {
+                  return Row(
+                    children: cards
+                        .map(
+                          (c) => Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 5),
+                              child: c,
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  );
+                }
+                return GridView.count(
+                  crossAxisCount: isTablet ? 2 : 1,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: 2.2,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: cards,
+                );
+              },
+            );
+          },
+          loading: () => const SizedBox(),
+          error: (_, _) => const SizedBox(),
+        ),
+        const SizedBox(height: 14),
 
         // Occasions Data Table
         Expanded(
           child: occasionsAsync.when(
             data: (occasions) {
               return Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.02),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
+                decoration: kCardDecoration,
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(kCardRadius),
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       return SingleChildScrollView(
@@ -197,74 +289,80 @@ class _OccasionsAdminViewState extends ConsumerState<OccasionsAdminView> {
                               minWidth: constraints.maxWidth,
                             ),
                             child: DataTable(
-                        headingRowHeight: 52,
-                        dataRowMinHeight: 64,
-                        dataRowMaxHeight: 64,
-                        headingRowColor: WidgetStateProperty.all(
-                          const Color(0xFFF8FAFC),
-                        ),
-                        columns: const [
-                          DataColumn(
-                            label: Text(
-                              'OCCASION NAME',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                                color: Color(0xFF475569),
+                              headingRowHeight: 38,
+                              dataRowMinHeight: 46,
+                              dataRowMaxHeight: 46,
+                              headingRowColor: WidgetStateProperty.all(
+                                kDashBg,
                               ),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'EVENT DATE',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                                color: Color(0xFF475569),
-                              ),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'TARGET CATEGORY',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                                color: Color(0xFF475569),
-                              ),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'AUTO-PUSH TRIGGER',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                                color: Color(0xFF475569),
-                              ),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'LEAD TIME',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                                color: Color(0xFF475569),
-                              ),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
-                              'ACTIONS',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                                color: Color(0xFF475569),
-                              ),
-                            ),
-                          ),
-                        ],
+                              columns: const [
+                                DataColumn(
+                                  label: Text(
+                                    'OCCASION NAME',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 10.5,
+                                      color: kMutedColor,
+                                      letterSpacing: 0.8,
+                                    ),
+                                  ),
+                                ),
+                                DataColumn(
+                                  label: Text(
+                                    'EVENT DATE',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 10.5,
+                                      color: kMutedColor,
+                                      letterSpacing: 0.8,
+                                    ),
+                                  ),
+                                ),
+                                DataColumn(
+                                  label: Text(
+                                    'TARGET CATEGORY',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 10.5,
+                                      color: kMutedColor,
+                                      letterSpacing: 0.8,
+                                    ),
+                                  ),
+                                ),
+                                DataColumn(
+                                  label: Text(
+                                    'AUTO-PUSH TRIGGER',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 10.5,
+                                      color: kMutedColor,
+                                      letterSpacing: 0.8,
+                                    ),
+                                  ),
+                                ),
+                                DataColumn(
+                                  label: Text(
+                                    'LEAD TIME',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 10.5,
+                                      color: kMutedColor,
+                                      letterSpacing: 0.8,
+                                    ),
+                                  ),
+                                ),
+                                DataColumn(
+                                  label: Text(
+                                    'ACTIONS',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 10.5,
+                                      color: kMutedColor,
+                                      letterSpacing: 0.8,
+                                    ),
+                                  ),
+                                ),
+                              ],
                         rows: occasions.map((occ) {
                           return DataRow(
                             cells: [
@@ -274,18 +372,18 @@ class _OccasionsAdminViewState extends ConsumerState<OccasionsAdminView> {
                                     const Icon(
                                       Icons.event_rounded,
                                       color: _primaryAccent,
-                                      size: 20,
+                                      size: 16,
                                     ),
-                                    const SizedBox(width: 10),
+                                    const SizedBox(width: 8),
                                     Flexible(
                                       child: Text(
                                         occ.name,
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
-                                          color: Color(0xFF0F172A),
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 13,
+                                          color: kTitleColor,
                                         ),
                                       ),
                                     ),
@@ -297,57 +395,61 @@ class _OccasionsAdminViewState extends ConsumerState<OccasionsAdminView> {
                                   '${occ.date.day}/${occ.date.month}/${occ.date.year}',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.w600,
-                                    color: Color(0xFF1E293B),
-                                    fontSize: 14,
+                                    color: kTitleColor,
+                                    fontSize: 12.5,
                                   ),
                                 ),
                               ),
                               DataCell(
                                 Container(
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 4,
+                                    horizontal: 8,
+                                    vertical: 3,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFF1F5F9),
-                                    borderRadius: BorderRadius.circular(20),
+                                    color: kDashBg,
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(color: kDashBorder),
                                   ),
                                   child: Text(
                                     occ.targetCategoryName,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                      color: Color(0xFF334155),
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 11,
+                                      color: kBodyColor,
                                     ),
                                   ),
                                 ),
                               ),
                               DataCell(
-                                Switch(
-                                  value: occ.autoPushEnabled,
-                                  activeColor: _success,
-                                  onChanged: (val) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'Auto push reminder for ${occ.name} ${val ? 'enabled' : 'disabled'}.',
+                                Transform.scale(
+                                  scale: 0.75,
+                                  child: Switch(
+                                    value: occ.autoPushEnabled,
+                                    activeThumbColor: _success,
+                                    onChanged: (val) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'Auto push reminder for ${occ.name} ${val ? 'enabled' : 'disabled'}.',
+                                          ),
+                                          backgroundColor: val
+                                              ? _success
+                                              : kMutedColor,
                                         ),
-                                        backgroundColor: val
-                                            ? _success
-                                            : const Color(0xFF64748B),
-                                      ),
-                                    );
-                                  },
+                                      );
+                                    },
+                                  ),
                                 ),
                               ),
                               DataCell(
                                 Text(
                                   '${occ.pushDaysBefore} days before',
                                   style: const TextStyle(
-                                    color: Color(0xFF64748B),
-                                    fontSize: 13,
+                                    color: kLabelColor,
+                                    fontSize: 12,
                                   ),
                                 ),
                               ),
@@ -356,21 +458,22 @@ class _OccasionsAdminViewState extends ConsumerState<OccasionsAdminView> {
                                   onPressed: () => _triggerInstantPush(occ),
                                   icon: const Icon(
                                     Icons.send_rounded,
-                                    size: 14,
+                                    size: 13,
+                                    color: Colors.white,
                                   ),
                                   label: const Text(
-                                    'Send Alert Now',
-                                    style: TextStyle(fontSize: 12),
+                                    'Send Alert',
+                                    style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: Colors.white),
                                   ),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: _primaryAccent,
                                     foregroundColor: Colors.white,
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 8,
+                                      horizontal: 10,
+                                      vertical: 6,
                                     ),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
+                                      borderRadius: BorderRadius.circular(6),
                                     ),
                                     elevation: 0,
                                   ),
@@ -396,6 +499,68 @@ class _OccasionsAdminViewState extends ConsumerState<OccasionsAdminView> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildKpiCard(
+    String title,
+    String value,
+    String subtitle,
+    IconData icon,
+    Color color,
+  ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: kCardDecoration,
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(7),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: color, size: 18),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: kLabelColor,
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: kTitleColor,
+                    letterSpacing: -0.3,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 10.5, color: kMutedColor),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

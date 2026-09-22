@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-
-const _sidebarBg = Color(0xFF0F172A);
-const _sidebarItemActiveBg = Color(0xFF1E293B);
-const _sidebarText = Color(0xFF94A3B8);
-const _sidebarTextActive = Colors.white;
-const _primaryAccent = Color(0xFF3B82F6);
+import '../admin_theme.dart';
 
 class AdminSidebar extends StatelessWidget {
   final int selectedIndex;
@@ -21,77 +16,128 @@ class AdminSidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 260,
-      color: _sidebarBg,
+      width: kSidebarWidth,
+      color: kSidebarBg,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Logo & Branding Header
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(7),
                   decoration: BoxDecoration(
-                    color: _primaryAccent.withValues(alpha: 0.2),
+                    color: kPrimary.withValues(alpha: 0.16),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: const Icon(
                     Icons.diamond_outlined,
-                    color: _primaryAccent,
-                    size: 28,
+                    color: kPrimary,
+                    size: 20,
                   ),
                 ),
-                const SizedBox(width: 12),
-                const Text(
-                  'Rivon Admin',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.1,
-                  ),
+                const SizedBox(width: 10),
+                const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Rivon Admin',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                    SizedBox(height: 1),
+                    Text(
+                      'Workspace Console',
+                      style: TextStyle(
+                        color: kSidebarSection,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-          const Divider(color: Color(0xFF1E293B), height: 1),
-          const SizedBox(height: 12),
+          const Divider(color: kSidebarHoverBg, height: 1),
+          const SizedBox(height: 6),
+
+          // Categorized Navigation List
           Expanded(
             child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSidebarItem(0, Icons.dashboard_rounded, 'Overview'),
-                  _buildSidebarItem(1, Icons.category_rounded, 'Categories'),
-                  _buildSidebarItem(2, Icons.style_rounded, 'Cards Catalog'),
-                  _buildSidebarItem(3, Icons.payments_rounded, 'Purchases Ledger'),
-                  _buildSidebarItem(4, Icons.auto_graph_rounded, 'Marketing Growth'),
-                  _buildSidebarItem(5, Icons.people_rounded, 'Users Governance'),
-                  _buildSidebarItem(6, Icons.calendar_month_rounded, 'Seasonal Occasions'),
+                  _buildSectionHeader('OVERVIEW'),
+                  _buildNavItem(0, Icons.dashboard_rounded, 'Overview'),
+
+                  const SizedBox(height: 10),
+                  _buildSectionHeader('CONTENT'),
+                  _buildNavItem(1, Icons.category_rounded, 'Categories'),
+                  _buildNavItem(2, Icons.style_rounded, 'Cards Catalog'),
+
+                  const SizedBox(height: 10),
+                  _buildSectionHeader('BUSINESS'),
+                  _buildNavItem(3, Icons.payments_rounded, 'Purchases Ledger'),
+                  _buildNavItem(4, Icons.auto_graph_rounded, 'Marketing Growth'),
+                  _buildNavItem(5, Icons.people_rounded, 'Users Governance'),
+
+                  const SizedBox(height: 10),
+                  _buildSectionHeader('CAMPAIGNS'),
+                  _buildNavItem(6, Icons.calendar_month_rounded, 'Seasonal Occasions'),
                 ],
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+
+          // Bottom System Status Panel (Compact)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            margin: const EdgeInsets.fromLTRB(10, 0, 10, 12),
+            decoration: BoxDecoration(
+              color: kSidebarHoverBg.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: kSidebarHoverBg),
+            ),
+            child: Row(
               children: [
-                Text(
-                  'Rivon Enterprise v1.2',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.4),
-                    fontSize: 12,
+                Container(
+                  width: 7,
+                  height: 7,
+                  decoration: const BoxDecoration(
+                    color: kSuccess,
+                    shape: BoxShape.circle,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  'Cloud Engine Active',
-                  style: TextStyle(
-                    color: const Color(0xFF10B981).withValues(alpha: 0.9),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
+                const SizedBox(width: 8),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Cloud Engine Active',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(height: 1),
+                      Text(
+                        'Rivon Enterprise v1.2',
+                        style: TextStyle(
+                          color: kSidebarSection,
+                          fontSize: 9.5,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -102,38 +148,82 @@ class AdminSidebar extends StatelessWidget {
     );
   }
 
-  Widget _buildSidebarItem(int index, IconData icon, String title) {
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 10, top: 10, bottom: 4),
+      child: Text(
+        title,
+        style: const TextStyle(
+          color: kSidebarSection,
+          fontSize: 9.5,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 1.1,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(int index, IconData icon, String title) {
     final isSelected = selectedIndex == index;
-    return InkWell(
-      onTap: () => onItemSelected(index),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-        decoration: BoxDecoration(
-          color: isSelected ? _sidebarItemActiveBg : Colors.transparent,
-          border: Border(
-            left: BorderSide(
-              color: isSelected ? _primaryAccent : Colors.transparent,
-              width: 4,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 1.5),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(8),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => onItemSelected(index),
+          hoverColor: kSidebarHoverBg,
+          borderRadius: BorderRadius.circular(8),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 160),
+            curve: Curves.easeInOut,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            decoration: BoxDecoration(
+              gradient: isSelected ? kPrimaryGradient : null,
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: kPrimary.withValues(alpha: 0.3),
+                        blurRadius: 6,
+                        offset: const Offset(0, 1.5),
+                      ),
+                    ]
+                  : null,
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  icon,
+                  color: isSelected ? kSidebarTextActive : kSidebarText,
+                  size: 17,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: isSelected ? kSidebarTextActive : kSidebarText,
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                      fontSize: 12.5,
+                    ),
+                  ),
+                ),
+                if (isSelected)
+                  Container(
+                    width: 4.5,
+                    height: 4.5,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+              ],
             ),
           ),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? _primaryAccent : _sidebarText,
-              size: 20,
-            ),
-            const SizedBox(width: 14),
-            Text(
-              title,
-              style: TextStyle(
-                color: isSelected ? _sidebarTextActive : _sidebarText,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                fontSize: 14,
-              ),
-            ),
-          ],
         ),
       ),
     );
