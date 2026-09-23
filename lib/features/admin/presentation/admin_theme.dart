@@ -56,7 +56,7 @@ const kLabelColor = Color(0xFF6E5C60); // Warm rose-slate (App secondary text ev
 const kMutedColor = Color(0xFF9E8D91); // Table headers and meta timestamps
 
 // ─── 7. Professional High-Density Dimensions & Radii ───
-const kSidebarWidth = 224.0; // Streamlined from 260px to free screen width
+const kSidebarWidth = 256.0; // Professional enterprise sidebar width (upgraded from 224px)
 const kCardRadius = 12.0; // Compact modern corners (from 16-20px)
 const kCardPadding = 16.0; // High-density internal padding (from 20-24px)
 const kPagePadding = 20.0; // Compact margins (from 32px)

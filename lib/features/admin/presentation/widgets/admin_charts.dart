@@ -70,7 +70,7 @@ class _AdminAreaLineChartState extends State<AdminAreaLineChart> {
                       Text(
                         widget.title!,
                         style: GoogleFonts.inter(
-                          fontSize: 13,
+                          fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: kLabelColor,
                         ),
@@ -82,7 +82,7 @@ class _AdminAreaLineChartState extends State<AdminAreaLineChart> {
                           Text(
                             widget.mainValue!,
                             style: GoogleFonts.inter(
-                              fontSize: 22,
+                              fontSize: 24,
                               fontWeight: FontWeight.w800,
                               color: kTitleColor,
                               letterSpacing: -0.4,
@@ -92,18 +92,18 @@ class _AdminAreaLineChartState extends State<AdminAreaLineChart> {
                             const SizedBox(width: 8),
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 7,
-                                vertical: 2,
+                                horizontal: 8,
+                                vertical: 3,
                               ),
                               decoration: BoxDecoration(
                                 color: (widget.badgeColor ?? kSuccess)
                                     .withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(5),
+                                borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
                                 widget.badgeText!,
                                 style: GoogleFonts.inter(
-                                  fontSize: 10.5,
+                                  fontSize: 11.5,
                                   fontWeight: FontWeight.w700,
                                   color: widget.badgeColor ?? kSuccess,
                                 ),
@@ -118,7 +118,7 @@ class _AdminAreaLineChartState extends State<AdminAreaLineChart> {
                       Text(
                         widget.subtitle!,
                         style: GoogleFonts.inter(
-                          fontSize: 12,
+                          fontSize: 12.5,
                           color: kMutedColor,
                         ),
                       ),
@@ -450,7 +450,7 @@ class AdminWeeklyBarChart extends StatelessWidget {
                   Text(
                     title,
                     style: GoogleFonts.inter(
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: kLabelColor,
                     ),
@@ -460,7 +460,7 @@ class AdminWeeklyBarChart extends StatelessWidget {
                     Text(
                       subtitle!,
                       style: GoogleFonts.inter(
-                        fontSize: 11,
+                        fontSize: 12,
                         color: kMutedColor,
                       ),
                     ),
@@ -483,7 +483,7 @@ class AdminWeeklyBarChart extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           SizedBox(
-            height: 95,
+            height: 105,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -512,7 +512,7 @@ class AdminWeeklyBarChart extends StatelessWidget {
                             child: Text(
                               item.displayValue ?? item.value.toInt().toString(),
                               style: GoogleFonts.inter(
-                                fontSize: 8.5,
+                                fontSize: 9.5,
                                 fontWeight: FontWeight.w700,
                                 color: Colors.white,
                               ),
@@ -538,7 +538,7 @@ class AdminWeeklyBarChart extends StatelessWidget {
                         Text(
                           item.label,
                           style: GoogleFonts.inter(
-                            fontSize: 10,
+                            fontSize: 11,
                             fontWeight: isHighlighted
                                 ? FontWeight.w700
                                 : FontWeight.w500,
@@ -594,7 +594,7 @@ class AdminDonutChart extends StatelessWidget {
               Text(
                 title,
                 style: GoogleFonts.inter(
-                  fontSize: 13,
+                  fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: kLabelColor,
                 ),
@@ -609,13 +609,13 @@ class AdminDonutChart extends StatelessWidget {
           const SizedBox(height: 10),
           Center(
             child: SizedBox(
-              width: 96,
-              height: 96,
+              width: 108,
+              height: 108,
               child: Stack(
                 alignment: Alignment.center,
                 children: [
                   CustomPaint(
-                    size: const Size(96, 96),
+                    size: const Size(108, 108),
                     painter: _DonutChartPainter(
                       percentage: percentage,
                       primaryColor: primaryColor,
@@ -628,7 +628,7 @@ class AdminDonutChart extends StatelessWidget {
                       Text(
                         centerLabel,
                         style: GoogleFonts.inter(
-                          fontSize: 20,
+                          fontSize: 22,
                           fontWeight: FontWeight.w800,
                           color: kTitleColor,
                           letterSpacing: -0.4,
@@ -637,7 +637,7 @@ class AdminDonutChart extends StatelessWidget {
                       Text(
                         'Retained',
                         style: GoogleFonts.inter(
-                          fontSize: 10,
+                          fontSize: 11,
                           fontWeight: FontWeight.w500,
                           color: kMutedColor,
                         ),
@@ -653,7 +653,7 @@ class AdminDonutChart extends StatelessWidget {
             child: Text(
               targetText,
               style: GoogleFonts.inter(
-                fontSize: 11,
+                fontSize: 12,
                 fontWeight: FontWeight.w500,
                 color: kSuccess,
               ),

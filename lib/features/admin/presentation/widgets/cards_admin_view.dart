@@ -22,7 +22,6 @@ class CardsAdminView extends ConsumerStatefulWidget {
 class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
   final _searchController = TextEditingController();
   String? _selectedCategoryFilter;
-  final Set<String> _selectedCardIds = {};
   Timer? _debounceTimer;
   String _activeSearchQuery = '';
   int _currentPage = 0;
@@ -85,7 +84,7 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
               backgroundColor: Colors.transparent,
               elevation: 0,
               child: Container(
-                width: 440,
+                width: 480,
                 decoration: BoxDecoration(
                   color: kDashCardBg,
                   borderRadius: BorderRadius.circular(kCardRadius),
@@ -97,8 +96,8 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 14,
+                        horizontal: 20,
+                        vertical: 16,
                       ),
                       decoration: const BoxDecoration(
                         color: kDashBg,
@@ -113,7 +112,7 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                       child: Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(6),
+                            padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
                               color: _primaryAccent.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
@@ -121,15 +120,15 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                             child: const Icon(
                               Icons.style_rounded,
                               color: _primaryAccent,
-                              size: 18,
+                              size: 20,
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 12),
                           const Text(
                             'Add Card Template',
                             style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
                               color: kTitleColor,
                             ),
                           ),
@@ -141,7 +140,7 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                             icon: const Icon(
                               Icons.close_rounded,
                               color: kLabelColor,
-                              size: 18,
+                              size: 20,
                             ),
                           ),
                         ],
@@ -150,19 +149,19 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                     Flexible(
                       child: SingleChildScrollView(
                         child: Padding(
-                          padding: const EdgeInsets.all(18),
+                          padding: const EdgeInsets.all(20),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
                                 'Card Category',
                                 style: TextStyle(
-                                  fontSize: 12.5,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w600,
                                   color: kTitleColor,
                                 ),
                               ),
-                              const SizedBox(height: 6),
+                              const SizedBox(height: 8),
                               DropdownButtonFormField<String>(
                                 initialValue: selectedCategoryId,
                                 decoration: InputDecoration(
@@ -170,7 +169,7 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                                   fillColor: kDashBg,
                                   contentPadding: const EdgeInsets.symmetric(
                                     horizontal: 14,
-                                    vertical: 10,
+                                    vertical: 12,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
@@ -178,38 +177,62 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                                       color: kDashBorder,
                                     ),
                                   ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: const BorderSide(
+                                      color: kDashBorder,
+                                    ),
+                                  ),
                                 ),
-                                hint: const Text('Select a category', style: TextStyle(fontSize: 13)),
+                                hint: const Text(
+                                  'Select a category',
+                                  style: TextStyle(
+                                    fontSize: 13.5,
+                                    color: kMutedColor,
+                                  ),
+                                ),
                                 items: categories.map((c) {
                                   return DropdownMenuItem(
                                     value: c.id,
-                                    child: Text(c.name, style: const TextStyle(fontSize: 13)),
+                                    child: Text(
+                                      c.name,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: kTitleColor,
+                                      ),
+                                    ),
                                   );
                                 }).toList(),
                                 onChanged: (val) =>
                                     setState(() => selectedCategoryId = val),
                               ),
-                              const SizedBox(height: 14),
+                              const SizedBox(height: 16),
                               const Text(
                                 'Card Title',
                                 style: TextStyle(
-                                  fontSize: 12.5,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w600,
                                   color: kTitleColor,
                                 ),
                               ),
-                              const SizedBox(height: 6),
+                              const SizedBox(height: 8),
                               TextField(
                                 controller: titleController,
-                                style: const TextStyle(fontSize: 13, color: kTitleColor),
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: kTitleColor,
+                                ),
                                 decoration: InputDecoration(
                                   hintText: 'e.g., Happy Mother\'s Day Classic',
-                                  hintStyle: const TextStyle(fontSize: 13, color: kMutedColor),
+                                  hintStyle: const TextStyle(
+                                    fontSize: 13.5,
+                                    color: kMutedColor,
+                                  ),
                                   filled: true,
                                   fillColor: kDashBg,
                                   contentPadding: const EdgeInsets.symmetric(
                                     horizontal: 14,
-                                    vertical: 10,
+                                    vertical: 12,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
@@ -217,29 +240,41 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                                       color: kDashBorder,
                                     ),
                                   ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: const BorderSide(
+                                      color: kDashBorder,
+                                    ),
+                                  ),
                                 ),
                               ),
-                              const SizedBox(height: 14),
+                              const SizedBox(height: 16),
                               const Text(
                                 'Front Cover Preset Text',
                                 style: TextStyle(
-                                  fontSize: 12.5,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w600,
                                   color: kTitleColor,
                                 ),
                               ),
-                              const SizedBox(height: 6),
+                              const SizedBox(height: 8),
                               TextField(
                                 controller: frontMsgController,
-                                style: const TextStyle(fontSize: 13, color: kTitleColor),
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: kTitleColor,
+                                ),
                                 decoration: InputDecoration(
                                   hintText: 'Front cover text preset...',
-                                  hintStyle: const TextStyle(fontSize: 13, color: kMutedColor),
+                                  hintStyle: const TextStyle(
+                                    fontSize: 13.5,
+                                    color: kMutedColor,
+                                  ),
                                   filled: true,
                                   fillColor: kDashBg,
                                   contentPadding: const EdgeInsets.symmetric(
                                     horizontal: 14,
-                                    vertical: 10,
+                                    vertical: 12,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
@@ -247,26 +282,38 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                                       color: kDashBorder,
                                     ),
                                   ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: const BorderSide(
+                                      color: kDashBorder,
+                                    ),
+                                  ),
                                 ),
                               ),
-                              const SizedBox(height: 14),
+                              const SizedBox(height: 16),
                               const Text(
                                 'Inside Page Preset Text',
                                 style: TextStyle(
-                                  fontSize: 12.5,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.w600,
                                   color: kTitleColor,
                                 ),
                               ),
-                              const SizedBox(height: 6),
+                              const SizedBox(height: 8),
                               TextField(
                                 controller: insideMsgController,
                                 maxLines: 2,
-                                style: const TextStyle(fontSize: 13, color: kTitleColor),
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: kTitleColor,
+                                ),
                                 decoration: InputDecoration(
                                   hintText:
                                       'Inside page default greeting text...',
-                                  hintStyle: const TextStyle(fontSize: 13, color: kMutedColor),
+                                  hintStyle: const TextStyle(
+                                    fontSize: 13.5,
+                                    color: kMutedColor,
+                                  ),
                                   filled: true,
                                   fillColor: kDashBg,
                                   contentPadding: const EdgeInsets.all(12),
@@ -276,9 +323,15 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                                       color: kDashBorder,
                                     ),
                                   ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: const BorderSide(
+                                      color: kDashBorder,
+                                    ),
+                                  ),
                                 ),
                               ),
-                              const SizedBox(height: 14),
+                              const SizedBox(height: 16),
                               Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
@@ -313,13 +366,16 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                                       },
                                       icon: const Icon(
                                         Icons.image_outlined,
-                                        size: 16,
+                                        size: 18,
                                       ),
                                       label: Text(
                                         selectedFile == null
                                             ? 'Upload Artwork'
                                             : 'Change Artwork',
-                                        style: const TextStyle(fontSize: 12),
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: kDashCardBg,
@@ -329,15 +385,16 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                                           color: kDashBorder,
                                         ),
                                         padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 8,
+                                          horizontal: 14,
+                                          vertical: 10,
                                         ),
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(6),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(width: 10),
+                                    const SizedBox(width: 12),
                                     if (selectedFile != null)
                                       Expanded(
                                         child: Text(
@@ -346,7 +403,7 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                                           style: const TextStyle(
                                             color: _success,
                                             fontWeight: FontWeight.bold,
-                                            fontSize: 12,
+                                            fontSize: 12.5,
                                           ),
                                         ),
                                       ),
@@ -360,8 +417,8 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 12,
+                        horizontal: 20,
+                        vertical: 14,
                       ),
                       decoration: const BoxDecoration(
                         color: kDashBg,
@@ -382,16 +439,22 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                                 : () => Navigator.pop(context),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 9,
+                                horizontal: 18,
+                                vertical: 11,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            child: const Text('Cancel'),
+                            child: const Text(
+                              'Cancel',
+                              style: TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 12),
                           ElevatedButton(
                             onPressed: isSaving
                                 ? null
@@ -456,8 +519,8 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                               backgroundColor: _primaryAccent,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 18,
-                                vertical: 9,
+                                horizontal: 20,
+                                vertical: 11,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -465,14 +528,20 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                             ),
                             child: isSaving
                                 ? const SizedBox(
-                                    width: 16,
-                                    height: 16,
+                                    width: 18,
+                                    height: 18,
                                     child: CircularProgressIndicator(
                                       color: Colors.white,
                                       strokeWidth: 2,
                                     ),
                                   )
-                                : const Text('Create Card Template'),
+                                : const Text(
+                                    'Create Card Template',
+                                    style: TextStyle(
+                                      fontSize: 13.5,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
                           ),
                         ],
                       ),
@@ -490,6 +559,7 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
   void _showEditCardDialog(BuildContext context, AdminCard card) {
     final titleController = TextEditingController(text: card.title);
     bool isActive = card.isActive;
+    bool isFeatured = card.isFeatured;
     PlatformFile? replacementFile;
     bool isSaving = false;
 
@@ -503,7 +573,7 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
               backgroundColor: Colors.transparent,
               elevation: 0,
               child: Container(
-                width: 440,
+                width: 480,
                 decoration: BoxDecoration(
                   color: kDashCardBg,
                   borderRadius: BorderRadius.circular(kCardRadius),
@@ -515,8 +585,8 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 14,
+                        horizontal: 20,
+                        vertical: 16,
                       ),
                       decoration: const BoxDecoration(
                         color: kDashBg,
@@ -531,23 +601,23 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                       child: Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(6),
+                            padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
                               color: _primaryAccent.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Icon(
-                              Icons.edit_note_rounded,
+                              Icons.tune_rounded,
                               color: _primaryAccent,
-                              size: 18,
+                              size: 20,
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 12),
                           const Text(
-                            'Edit Card Template',
+                            'Manage Card Template',
                             style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
                               color: kTitleColor,
                             ),
                           ),
@@ -559,35 +629,38 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                             icon: const Icon(
                               Icons.close_rounded,
                               color: kLabelColor,
-                              size: 18,
+                              size: 20,
                             ),
                           ),
                         ],
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(18),
+                      padding: const EdgeInsets.all(20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
                             'Card Title',
                             style: TextStyle(
-                              fontSize: 12.5,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: kTitleColor,
                             ),
                           ),
-                          const SizedBox(height: 6),
+                          const SizedBox(height: 8),
                           TextField(
                             controller: titleController,
-                            style: const TextStyle(fontSize: 13, color: kTitleColor),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: kTitleColor,
+                            ),
                             decoration: InputDecoration(
                               filled: true,
                               fillColor: kDashBg,
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 14,
-                                vertical: 10,
+                                vertical: 12,
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -595,20 +668,26 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                                   color: kDashBorder,
                                 ),
                               ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(
+                                  color: kDashBorder,
+                                ),
+                              ),
                             ),
                           ),
-                          const SizedBox(height: 14),
+                          const SizedBox(height: 16),
                           const Text(
                             'Replace Cover Artwork Image',
                             style: TextStyle(
-                              fontSize: 12.5,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: kTitleColor,
                             ),
                           ),
-                          const SizedBox(height: 6),
+                          const SizedBox(height: 8),
                           Container(
-                            padding: const EdgeInsets.all(10),
+                            padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
                               color: kDashBg,
                               borderRadius: BorderRadius.circular(8),
@@ -641,13 +720,16 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                                   },
                                   icon: const Icon(
                                     Icons.image_outlined,
-                                    size: 16,
+                                    size: 18,
                                   ),
                                   label: Text(
                                     replacementFile == null
                                         ? 'Select New Image'
                                         : 'Change New Image',
-                                    style: const TextStyle(fontSize: 12),
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: kDashCardBg,
@@ -657,15 +739,15 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                                       color: kDashBorder,
                                     ),
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 8,
+                                      horizontal: 14,
+                                      vertical: 10,
                                     ),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6),
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 10),
+                                const SizedBox(width: 12),
                                 if (replacementFile != null)
                                   Expanded(
                                     child: Text(
@@ -674,7 +756,7 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                                       style: const TextStyle(
                                         color: _success,
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 12,
+                                        fontSize: 12.5,
                                       ),
                                     ),
                                   )
@@ -683,49 +765,226 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                                     'Keep current artwork',
                                     style: TextStyle(
                                       color: kMutedColor,
-                                      fontSize: 12,
+                                      fontSize: 12.5,
                                     ),
                                   ),
                               ],
                             ),
                           ),
-                          const SizedBox(height: 14),
+                          const SizedBox(height: 16),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 4,
+                              horizontal: 16,
+                              vertical: 12,
                             ),
                             decoration: BoxDecoration(
                               color: kDashBg,
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: kDashBorder,
-                              ),
+                              border: Border.all(color: kDashBorder),
                             ),
-                            child: SwitchListTile(
-                              dense: true,
-                              contentPadding: EdgeInsets.zero,
-                              title: const Text(
-                                'Card Active Status',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 13,
-                                  color: kTitleColor,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      isActive ? 'Active' : 'Inactive',
+                                      style: TextStyle(
+                                        color: isActive
+                                            ? _success
+                                            : kLabelColor,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    Switch(
+                                      value: isActive,
+                                      activeThumbColor: _primaryAccent,
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      onChanged: (val) {
+                                        setState(() => isActive = val);
+                                      },
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              subtitle: Text(
-                                isActive
-                                    ? 'Visible to users'
-                                    : 'Hidden from catalog',
-                                style: const TextStyle(
-                                  fontSize: 11.5,
-                                  color: kLabelColor,
+                                const SizedBox(height: 8),
+                                Text(
+                                  isActive
+                                      ? 'Visible to users on card catalog and template selectors.'
+                                      : 'Hidden from card catalog and deactivated for users.',
+                                  style: const TextStyle(
+                                    fontSize: 12.5,
+                                    color: kLabelColor,
+                                  ),
                                 ),
-                              ),
-                              value: isActive,
-                              activeThumbColor: _primaryAccent,
-                              onChanged: (val) =>
-                                  setState(() => isActive = val),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: kDashBg,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: kDashBorder),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          isFeatured
+                                              ? Icons.star_rounded
+                                              : Icons.star_border_rounded,
+                                          color: isFeatured
+                                              ? kWarning
+                                              : kLabelColor,
+                                          size: 20,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          isFeatured
+                                              ? 'Featured Template'
+                                              : 'Standard Template',
+                                          style: TextStyle(
+                                            color: isFeatured
+                                                ? kWarning
+                                                : kLabelColor,
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Switch(
+                                      value: isFeatured,
+                                      activeThumbColor: _primaryAccent,
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      onChanged: (val) {
+                                        setState(() => isFeatured = val);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  isFeatured
+                                      ? 'Highlighted in featured carousel and top template collections.'
+                                      : 'Standard catalog listing without featured carousel placement.',
+                                  style: const TextStyle(
+                                    fontSize: 12.5,
+                                    color: kLabelColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: kDashBg,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: kDashBorder),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: _primaryAccent.withValues(
+                                      alpha: 0.1,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Icon(
+                                    Icons.visibility_outlined,
+                                    color: _primaryAccent,
+                                    size: 18,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                const Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Card Preview',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 14,
+                                          color: kTitleColor,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Inspect card artwork and template layout',
+                                        style: TextStyle(
+                                          fontSize: 12.5,
+                                          color: kLabelColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    final categoriesAsync =
+                                        ref.read(adminCategoriesProvider);
+                                    final categories =
+                                        categoriesAsync.valueOrNull ?? [];
+                                    final cat = categories.firstWhere(
+                                      (c) => c.id == card.categoryId,
+                                      orElse: () => AdminCategory(
+                                        id: '',
+                                        name: 'General',
+                                        isActive: true,
+                                      ),
+                                    );
+                                    _showCardPreviewDialog(
+                                      context,
+                                      card,
+                                      cat.name,
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: _primaryAccent,
+                                    foregroundColor: Colors.white,
+                                    elevation: 0,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 14,
+                                      vertical: 6,
+                                    ),
+                                    minimumSize: const Size(0, 34),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'Preview',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
@@ -733,8 +992,8 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 12,
+                        horizontal: 20,
+                        vertical: 14,
                       ),
                       decoration: const BoxDecoration(
                         color: kDashBg,
@@ -755,16 +1014,22 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                                 : () => Navigator.pop(context),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 9,
+                                horizontal: 18,
+                                vertical: 11,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            child: const Text('Cancel'),
+                            child: const Text(
+                              'Cancel',
+                              style: TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 12),
                           ElevatedButton(
                             onPressed: isSaving
                                 ? null
@@ -781,6 +1046,7 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                                         cardId: card.id,
                                         title: title,
                                         isActive: isActive,
+                                        isFeatured: isFeatured,
                                         imageBytes: replacementFile?.bytes,
                                         fileExtension:
                                             replacementFile?.extension,
@@ -808,8 +1074,8 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                               backgroundColor: _primaryAccent,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 18,
-                                vertical: 9,
+                                horizontal: 20,
+                                vertical: 11,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -817,14 +1083,20 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                             ),
                             child: isSaving
                                 ? const SizedBox(
-                                    width: 16,
-                                    height: 16,
+                                    width: 18,
+                                    height: 18,
                                     child: CircularProgressIndicator(
                                       color: Colors.white,
                                       strokeWidth: 2,
                                     ),
                                   )
-                                : const Text('Save Changes'),
+                                : const Text(
+                                    'Save Changes',
+                                    style: TextStyle(
+                                      fontSize: 13.5,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
                           ),
                         ],
                       ),
@@ -851,7 +1123,7 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           child: Container(
-            width: 440,
+            width: 480,
             decoration: BoxDecoration(
               color: kDashCardBg,
               borderRadius: BorderRadius.circular(kCardRadius),
@@ -863,8 +1135,8 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 18,
-                    vertical: 14,
+                    horizontal: 20,
+                    vertical: 16,
                   ),
                   decoration: const BoxDecoration(
                     color: kDashBg,
@@ -879,18 +1151,18 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                   child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(6),
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: _primaryAccent.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Icon(
-                          Icons.remove_red_eye_rounded,
+                          Icons.visibility_rounded,
                           color: _primaryAccent,
-                          size: 18,
+                          size: 20,
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -900,8 +1172,8 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
                                 color: kTitleColor,
                               ),
                             ),
@@ -909,7 +1181,7 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                             Text(
                               'Category: $categoryName',
                               style: const TextStyle(
-                                fontSize: 11.5,
+                                fontSize: 12.5,
                                 color: kLabelColor,
                               ),
                             ),
@@ -921,7 +1193,7 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                         icon: const Icon(
                           Icons.close_rounded,
                           color: kLabelColor,
-                          size: 18,
+                          size: 20,
                         ),
                       ),
                     ],
@@ -930,13 +1202,13 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                 Flexible(
                   child: SingleChildScrollView(
                     child: Padding(
-                      padding: const EdgeInsets.all(18),
+                      padding: const EdgeInsets.all(20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Center(
                             child: Container(
-                              height: 200,
+                              height: 210,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
@@ -948,8 +1220,10 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                                 child: Image.network(
                                   card.coverImageUrl,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) => Container(
-                                    width: 180,
+                                  errorBuilder:
+                                      (context, error, stackTrace) =>
+                                          Container(
+                                    width: 190,
                                     color: kDashBg,
                                     child: const Column(
                                       mainAxisAlignment:
@@ -964,7 +1238,7 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                                         Text(
                                           'Image error',
                                           style: TextStyle(
-                                            fontSize: 11,
+                                            fontSize: 12,
                                             color: kLabelColor,
                                           ),
                                         ),
@@ -975,20 +1249,20 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 18),
                           if (card.defaultFrontMessage.isNotEmpty) ...[
                             const Text(
                               'Front Cover Preset Text',
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: 13.5,
                                 fontWeight: FontWeight.w700,
                                 color: kLabelColor,
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 6),
                             Container(
                               width: double.infinity,
-                              padding: const EdgeInsets.all(10),
+                              padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
                                 color: kDashBg,
                                 borderRadius: BorderRadius.circular(8),
@@ -999,26 +1273,26 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                               child: Text(
                                 card.defaultFrontMessage,
                                 style: const TextStyle(
-                                  fontSize: 12.5,
+                                  fontSize: 13.5,
                                   color: kTitleColor,
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 14),
                           ],
                           if (card.defaultInsideMessage.isNotEmpty) ...[
                             const Text(
                               'Inside Page Preset Greeting',
                               style: TextStyle(
-                                fontSize: 12,
+                                fontSize: 13.5,
                                 fontWeight: FontWeight.w700,
                                 color: kLabelColor,
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 6),
                             Container(
                               width: double.infinity,
-                              padding: const EdgeInsets.all(10),
+                              padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
                                 color: kDashBg,
                                 borderRadius: BorderRadius.circular(8),
@@ -1029,7 +1303,7 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                               child: Text(
                                 card.defaultInsideMessage,
                                 style: const TextStyle(
-                                  fontSize: 12.5,
+                                  fontSize: 13.5,
                                   color: kTitleColor,
                                   fontStyle: FontStyle.italic,
                                 ),
@@ -1042,7 +1316,10 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 14,
+                  ),
                   decoration: const BoxDecoration(
                     color: kDashBg,
                     borderRadius: BorderRadius.only(
@@ -1056,27 +1333,21 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 3,
+                          horizontal: 10,
+                          vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color:
-                              (card.isActive
-                                      ? _success
-                                      : kLabelColor)
-                                  .withValues(alpha: 0.1),
+                          color: (card.isActive ? _success : kLabelColor)
+                              .withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          card.isActive
-                              ? 'Active in Catalog'
-                              : 'Inactive / Hidden',
+                          card.isActive ? 'Active' : 'Inactive',
                           style: TextStyle(
-                            color: card.isActive
-                                ? _success
-                                : kLabelColor,
+                            color:
+                                card.isActive ? _success : kLabelColor,
                             fontWeight: FontWeight.w700,
-                            fontSize: 11,
+                            fontSize: 12,
                           ),
                         ),
                       ),
@@ -1087,12 +1358,18 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                               Navigator.pop(context);
                               _showEditCardDialog(context, card);
                             },
-                            icon: const Icon(Icons.edit_outlined, size: 15),
-                            label: const Text('Edit Card', style: TextStyle(fontSize: 12.5)),
+                            icon: const Icon(Icons.edit_outlined, size: 16),
+                            label: const Text(
+                              'Edit Card',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 9,
+                                horizontal: 16,
+                                vertical: 10,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -1106,14 +1383,20 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                               backgroundColor: _primaryAccent,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 9,
+                                horizontal: 18,
+                                vertical: 10,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            child: const Text('Close Preview', style: TextStyle(fontSize: 12.5)),
+                            child: const Text(
+                              'Close',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -1140,7 +1423,7 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
           title: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(6),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: _danger.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
@@ -1151,12 +1434,12 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                   size: 20,
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 12),
               const Text(
                 'Deactivate Card Template',
                 style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 17,
                   color: kTitleColor,
                 ),
               ),
@@ -1164,12 +1447,18 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
           ),
           content: Text(
             'Are you sure you want to deactivate "${card.title}"?',
-            style: const TextStyle(fontSize: 13.5, color: kBodyColor),
+            style: const TextStyle(fontSize: 14, color: kBodyColor),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -1181,79 +1470,21 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: _danger,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 10,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text('Deactivate'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _confirmBatchDeleteCards(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: kDashCardBg,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(kCardRadius),
-          ),
-          title: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: _danger.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(
-                  Icons.warning_amber_rounded,
-                  color: _danger,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 10),
-              const Text(
-                'Deactivate Selected Cards',
+              child: const Text(
+                'Deactivate',
                 style: TextStyle(
+                  fontSize: 13.5,
                   fontWeight: FontWeight.w700,
-                  fontSize: 16,
-                  color: kTitleColor,
                 ),
               ),
-            ],
-          ),
-          content: Text(
-            'Are you sure you want to deactivate ${_selectedCardIds.length} selected card templates?',
-            style: const TextStyle(fontSize: 13.5, color: kBodyColor),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                Navigator.pop(context);
-                final repo = ref.read(adminRepositoryProvider);
-                await repo.deleteCardsBatch(_selectedCardIds.toList());
-                _selectedCardIds.clear();
-                ref.invalidate(adminCardsProvider);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _danger,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text('Deactivate All'),
             ),
           ],
         );
@@ -1272,167 +1503,133 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
       children: [
         // Top Action Header Bar Surface
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: kCardDecoration,
-          child: Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 12,
-            runSpacing: 10,
-            children: [
-              Wrap(
-                spacing: 10,
-                runSpacing: 8,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  // Debounced Search Field
-                  Container(
-                    width: 220,
-                    height: 36,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: kDashBg,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: kDashBorder),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isNarrow = constraints.maxWidth < 750;
+
+              final searchField = Container(
+                height: 42,
+                decoration: BoxDecoration(
+                  color: kDashBg,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: kDashBorder),
+                ),
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: _onSearchChanged,
+                  style: const TextStyle(fontSize: 13.5, color: kTitleColor),
+                  decoration: InputDecoration(
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
                     ),
-                    child: TextField(
-                      controller: _searchController,
-                      onChanged: _onSearchChanged,
-                      style: const TextStyle(fontSize: 12.5, color: kTitleColor),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 8),
-                        border: InputBorder.none,
-                        icon: const Icon(
-                          Icons.search_rounded,
-                          color: kMutedColor,
-                          size: 16,
-                        ),
-                        hintText: 'Search card title...',
-                        hintStyle: const TextStyle(
-                          color: kMutedColor,
-                          fontSize: 12.5,
-                        ),
-                        suffixIcon: _searchController.text.isNotEmpty
-                            ? IconButton(
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints.tightFor(width: 20, height: 20),
-                                icon: const Icon(
-                                  Icons.clear_rounded,
-                                  size: 14,
-                                  color: kMutedColor,
-                                ),
-                                onPressed: () {
-                                  _searchController.clear();
-                                  _onSearchChanged('');
-                                },
-                              )
-                            : null,
-                      ),
+                    border: InputBorder.none,
+                    prefixIcon: const Icon(
+                      Icons.search_rounded,
+                      color: kMutedColor,
+                      size: 18,
                     ),
-                  ),
-                  // Category Filter Dropdown
-                  Container(
-                    height: 36,
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                      color: kDashBg,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: kDashBorder),
+                    prefixIconConstraints: const BoxConstraints(
+                      minWidth: 42,
+                      minHeight: 42,
                     ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String?>(
-                        value: _selectedCategoryFilter,
-                        hint: const Text(
-                          'All Categories',
-                          style: TextStyle(
-                            fontSize: 12.5,
-                            color: kLabelColor,
-                          ),
-                        ),
-                        items: [
-                          const DropdownMenuItem(
-                            value: null,
-                            child: Text('All Categories', style: TextStyle(fontSize: 12.5)),
-                          ),
-                          ...categories.map(
-                            (c) => DropdownMenuItem(
-                              value: c.id,
-                              child: Text(c.name, style: const TextStyle(fontSize: 12.5)),
+                    hintText: 'Search card title...',
+                    hintStyle: const TextStyle(
+                      color: kMutedColor,
+                      fontSize: 13.5,
+                    ),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints.tightFor(
+                              width: 38,
+                              height: 38,
                             ),
-                          ),
-                        ],
-                        onChanged: (val) {
-                          setState(() {
-                            _selectedCategoryFilter = val;
-                            _currentPage = 0;
-                          });
-                        },
-                      ),
-                    ),
+                            icon: const Icon(
+                              Icons.clear_rounded,
+                              size: 16,
+                              color: kMutedColor,
+                            ),
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() {});
+                              _onSearchChanged('');
+                            },
+                          )
+                        : null,
                   ),
-                ],
-              ),
-              Wrap(
-                spacing: 10,
-                runSpacing: 8,
-                crossAxisAlignment: WrapCrossAlignment.center,
+                ),
+              );
+
+              final categoryFilter = Container(
+                height: 42,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: kDashBg,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: kDashBorder),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String?>(
+                    value: _selectedCategoryFilter,
+                    icon: const Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: kLabelColor,
+                      size: 20,
+                    ),
+                    hint: const Text(
+                      'All Categories',
+                      style: TextStyle(
+                        fontSize: 13.5,
+                        color: kLabelColor,
+                      ),
+                    ),
+                    items: [
+                      const DropdownMenuItem(
+                        value: null,
+                        child: Text(
+                          'All Categories',
+                          style: TextStyle(fontSize: 13.5),
+                        ),
+                      ),
+                      ...categories.map(
+                        (c) => DropdownMenuItem(
+                          value: c.id,
+                          child: Text(
+                            c.name,
+                            style: const TextStyle(fontSize: 13.5),
+                          ),
+                        ),
+                      ),
+                    ],
+                    onChanged: (val) {
+                      setState(() {
+                        _selectedCategoryFilter = val;
+                        _currentPage = 0;
+                      });
+                    },
+                  ),
+                ),
+              );
+
+              final actionButtons = Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (_selectedCardIds.isNotEmpty) ...[
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _primaryAccent.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        '${_selectedCardIds.length} selected',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: _primaryAccent,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                    OutlinedButton.icon(
-                      onPressed: () => _confirmBatchDeleteCards(context),
-                      icon: const Icon(
-                        Icons.delete_outline_rounded,
-                        color: _danger,
-                        size: 16,
-                      ),
-                      label: const Text(
-                        'Deactivate Selected',
-                        style: TextStyle(
-                          color: _danger,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12.5,
-                        ),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: _danger.withValues(alpha: 0.3)),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                  ],
                   Tooltip(
                     message: 'Refresh card list',
                     child: IconButton(
                       padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints.tightFor(width: 34, height: 34),
+                      constraints: const BoxConstraints.tightFor(
+                        width: 40,
+                        height: 40,
+                      ),
                       icon: cardsAsync.isLoading || cardsAsync.isRefreshing
                           ? const SizedBox(
-                              width: 16,
-                              height: 16,
+                              width: 18,
+                              height: 18,
                               child: CircularProgressIndicator(
                                 color: _primaryAccent,
                                 strokeWidth: 2,
@@ -1441,24 +1638,28 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                           : const Icon(
                               Icons.refresh_rounded,
                               color: _primaryAccent,
-                              size: 18,
+                              size: 20,
                             ),
                       onPressed: () => ref.invalidate(adminCardsProvider),
                     ),
                   ),
+                  const SizedBox(width: 10),
                   ElevatedButton.icon(
                     onPressed: () => _showAddCardDialog(context),
-                    icon: const Icon(Icons.add_rounded, size: 16),
+                    icon: const Icon(Icons.add_rounded, size: 18),
                     label: const Text(
                       'Add Card Template',
-                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13.5,
+                      ),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _primaryAccent,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 9,
+                        horizontal: 18,
+                        vertical: 11,
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -1467,8 +1668,37 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                     ),
                   ),
                 ],
-              ),
-            ],
+              );
+
+              if (isNarrow) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    searchField,
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(child: categoryFilter),
+                        const SizedBox(width: 10),
+                        actionButtons,
+                      ],
+                    ),
+                  ],
+                );
+              }
+
+              return Row(
+                children: [
+                  Expanded(
+                    child: searchField,
+                  ),
+                  const SizedBox(width: 12),
+                  categoryFilter,
+                  const SizedBox(width: 12),
+                  actionButtons,
+                ],
+              );
+            },
           ),
         ),
         const SizedBox(height: 14),
@@ -1566,44 +1796,22 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                                     minWidth: constraints.maxWidth,
                                   ),
                                   child: DataTable(
-                                    headingRowHeight: 38,
-                                    dataRowMinHeight: 48,
-                                    dataRowMaxHeight: 48,
+                                    headingRowHeight: 46,
+                                    dataRowMinHeight: 58,
+                                    dataRowMaxHeight: 58,
                                     headingRowColor: WidgetStateProperty.all(
                                       kDashBg,
                                     ),
-                                    showCheckboxColumn: true,
-                                    onSelectAll: (val) {
-                                      setState(() {
-                                        if (val == true) {
-                                          _selectedCardIds.addAll(
-                                            filtered.map((c) => c.id),
-                                          );
-                                        } else {
-                                          _selectedCardIds.clear();
-                                        }
-                                      });
-                                    },
+                                    showCheckboxColumn: false,
                                     columns: const [
                                       DataColumn(
                                         label: Text(
                                           'CARD TITLE',
                                           style: TextStyle(
                                             fontWeight: FontWeight.w700,
-                                            fontSize: 10.5,
+                                            fontSize: 11.5,
                                             color: kMutedColor,
-                                            letterSpacing: 0.8,
-                                          ),
-                                        ),
-                                      ),
-                                      DataColumn(
-                                        label: Text(
-                                          'FEATURED',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 10.5,
-                                            color: kMutedColor,
-                                            letterSpacing: 0.8,
+                                            letterSpacing: 0.9,
                                           ),
                                         ),
                                       ),
@@ -1612,9 +1820,9 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                                           'STATUS',
                                           style: TextStyle(
                                             fontWeight: FontWeight.w700,
-                                            fontSize: 10.5,
+                                            fontSize: 11.5,
                                             color: kMutedColor,
-                                            letterSpacing: 0.8,
+                                            letterSpacing: 0.9,
                                           ),
                                         ),
                                       ),
@@ -1623,133 +1831,45 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                                           'ACTIONS',
                                           style: TextStyle(
                                             fontWeight: FontWeight.w700,
-                                            fontSize: 10.5,
+                                            fontSize: 11.5,
                                             color: kMutedColor,
-                                            letterSpacing: 0.8,
+                                            letterSpacing: 0.9,
                                           ),
                                         ),
                                       ),
                                     ],
                                     rows: paginatedList.map((card) {
-                                      final isSelected = _selectedCardIds.contains(
-                                        card.id,
-                                      );
                                       return DataRow(
-                                        selected: isSelected,
-                                        onSelectChanged: (val) {
-                                          setState(() {
-                                            if (val == true) {
-                                              _selectedCardIds.add(card.id);
-                                            } else {
-                                              _selectedCardIds.remove(card.id);
-                                            }
-                                          });
-                                        },
                                         cells: [
-                                          DataCell(
-                                            InkWell(
-                                              onTap: () {
-                                                final cat = categories.firstWhere(
-                                                  (c) => c.id == card.categoryId,
-                                                  orElse: () => AdminCategory(
-                                                    id: '',
-                                                    name: 'General',
-                                                    isActive: true,
-                                                  ),
-                                                );
-                                                _showCardPreviewDialog(
-                                                  context,
-                                                  card,
-                                                  cat.name,
-                                                );
-                                              },
-                                              child: Text(
-                                                card.title,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: 13,
-                                                  color: kTitleColor,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          DataCell(
-                                            Transform.scale(
-                                              scale: 0.75,
-                                              child: Switch(
-                                                value: card.isFeatured,
-                                                activeThumbColor: _primaryAccent,
-                                                onChanged: (val) async {
-                                                  await ref
-                                                      .read(adminRepositoryProvider)
-                                                      .toggleFeaturedCard(card.id, val);
-                                                  ref.invalidate(adminCardsProvider);
-                                                },
-                                              ),
-                                            ),
-                                          ),
-                                          DataCell(
-                                            Container(
-                                              padding: const EdgeInsets.symmetric(
-                                                horizontal: 8,
-                                                vertical: 3,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color:
-                                                    (card.isActive
-                                                            ? _success
-                                                            : kLabelColor)
-                                                        .withValues(alpha: 0.1),
-                                                borderRadius: BorderRadius.circular(
-                                                  12,
-                                                ),
-                                              ),
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Container(
-                                                    width: 5,
-                                                    height: 5,
-                                                    decoration: BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      color: card.isActive
-                                                          ? _success
-                                                          : kLabelColor,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 6),
-                                                  Text(
-                                                    card.isActive
-                                                        ? 'Active'
-                                                        : 'Inactive',
-                                                    style: TextStyle(
-                                                      color: card.isActive
-                                                          ? _success
-                                                          : kLabelColor,
-                                                      fontWeight: FontWeight.w700,
-                                                      fontSize: 11,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
                                           DataCell(
                                             Row(
                                               children: [
-                                                Tooltip(
-                                                  message: 'Preview Card',
-                                                  child: IconButton(
-                                                    padding: EdgeInsets.zero,
-                                                    constraints: const BoxConstraints.tightFor(width: 28, height: 28),
-                                                    icon: const Icon(
-                                                      Icons.remove_red_eye_outlined,
-                                                      color: _primaryAccent,
-                                                      size: 16,
-                                                    ),
-                                                    onPressed: () {
+                                                Container(
+                                                  padding: const EdgeInsets.all(8),
+                                                  decoration: BoxDecoration(
+                                                    color: (card.isFeatured
+                                                            ? const Color(0xFFD97706)
+                                                            : _primaryAccent)
+                                                        .withValues(
+                                                          alpha: card.isFeatured
+                                                              ? 0.12
+                                                              : 0.08,
+                                                        ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(8),
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.style_rounded,
+                                                    size: 18,
+                                                    color: card.isFeatured
+                                                        ? const Color(0xFFD97706)
+                                                        : _primaryAccent,
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 12),
+                                                Flexible(
+                                                  child: InkWell(
+                                                    onTap: () {
                                                       final cat = categories
                                                           .firstWhere(
                                                             (c) =>
@@ -1758,8 +1878,10 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                                                             orElse: () =>
                                                                 AdminCategory(
                                                                   id: '',
-                                                                  name: 'General',
-                                                                  isActive: true,
+                                                                  name:
+                                                                      'General',
+                                                                  isActive:
+                                                                      true,
                                                                 ),
                                                           );
                                                       _showCardPreviewDialog(
@@ -1768,40 +1890,132 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                                                         cat.name,
                                                       );
                                                     },
+                                                    child: Text(
+                                                      card.title,
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontSize: 14,
+                                                        color: kTitleColor,
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
-                                                Tooltip(
-                                                  message: 'Edit card details',
-                                                  child: IconButton(
-                                                    padding: EdgeInsets.zero,
-                                                    constraints: const BoxConstraints.tightFor(width: 28, height: 28),
-                                                    icon: const Icon(
-                                                      Icons.edit_outlined,
-                                                      color: kLabelColor,
-                                                      size: 16,
-                                                    ),
-                                                    onPressed: () =>
-                                                        _showEditCardDialog(
-                                                          context,
-                                                          card,
+                                              ],
+                                            ),
+                                          ),
+                                          DataCell(
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 10,
+                                                    vertical: 4,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                color: (card.isActive
+                                                        ? _success
+                                                        : kLabelColor)
+                                                    .withValues(alpha: 0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                              child: Text(
+                                                card.isActive
+                                                    ? 'Active'
+                                                    : 'Inactive',
+                                                style: TextStyle(
+                                                  color: card.isActive
+                                                      ? _success
+                                                      : kLabelColor,
+                                                  fontWeight:
+                                                      FontWeight.w700,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          DataCell(
+                                            Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                ElevatedButton(
+                                                  onPressed: () =>
+                                                      _showEditCardDialog(
+                                                        context,
+                                                        card,
+                                                      ),
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        _primaryAccent,
+                                                    foregroundColor:
+                                                        Colors.white,
+                                                    elevation: 0,
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 14,
+                                                          vertical: 6,
                                                         ),
+                                                    minimumSize:
+                                                        const Size(0, 34),
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            8,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                  child: const Text(
+                                                    'Manage',
+                                                    style: TextStyle(
+                                                      fontSize: 13,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
                                                   ),
                                                 ),
-                                                Tooltip(
-                                                  message: 'Deactivate card',
-                                                  child: IconButton(
-                                                    padding: EdgeInsets.zero,
-                                                    constraints: const BoxConstraints.tightFor(width: 28, height: 28),
-                                                    icon: const Icon(
-                                                      Icons.delete_outline_rounded,
-                                                      color: _danger,
-                                                      size: 16,
+                                                const SizedBox(width: 10),
+                                                OutlinedButton(
+                                                  onPressed: () =>
+                                                      _confirmDeleteCard(
+                                                        context,
+                                                        card,
+                                                      ),
+                                                  style:
+                                                      OutlinedButton.styleFrom(
+                                                    foregroundColor: _danger,
+                                                    side: BorderSide(
+                                                      color: _danger
+                                                          .withValues(
+                                                            alpha: 0.35,
+                                                          ),
                                                     ),
-                                                    onPressed: () =>
-                                                        _confirmDeleteCard(
-                                                          context,
-                                                          card,
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 14,
+                                                          vertical: 6,
                                                         ),
+                                                    minimumSize:
+                                                        const Size(0, 34),
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            8,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                  child: const Text(
+                                                    'Delete',
+                                                    style: TextStyle(
+                                                      fontSize: 13,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
                                                   ),
                                                 ),
                                               ],
@@ -1823,8 +2037,8 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                     if (totalPages > 1)
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
+                          horizontal: 18,
+                          vertical: 12,
                         ),
                         decoration: const BoxDecoration(
                           color: kDashBg,
@@ -1843,7 +2057,7 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                               'Showing ${startIndex + 1} - $endIndex of ${filtered.length} cards',
                               style: const TextStyle(
                                 color: kLabelColor,
-                                fontSize: 12,
+                                fontSize: 13,
                               ),
                             ),
                             Row(
@@ -1854,39 +2068,53 @@ class _CardsAdminViewState extends ConsumerState<CardsAdminView> {
                                       : null,
                                   style: OutlinedButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 6,
+                                      horizontal: 14,
+                                      vertical: 7,
                                     ),
+                                    minimumSize: const Size(0, 34),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6),
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
-                                  child: const Text('Previous', style: TextStyle(fontSize: 12)),
+                                  child: const Text(
+                                    'Previous',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                                 ),
-                                const SizedBox(width: 8),
+                                const SizedBox(width: 10),
                                 Text(
                                   'Page ${_currentPage + 1} of $totalPages',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 12,
+                                    fontSize: 13,
                                     color: kTitleColor,
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                const SizedBox(width: 10),
                                 OutlinedButton(
                                   onPressed: _currentPage < totalPages - 1
                                       ? () => setState(() => _currentPage++)
                                       : null,
                                   style: OutlinedButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 6,
+                                      horizontal: 14,
+                                      vertical: 7,
                                     ),
+                                    minimumSize: const Size(0, 34),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6),
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
-                                  child: const Text('Next', style: TextStyle(fontSize: 12)),
+                                  child: const Text(
+                                    'Next',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),

@@ -22,7 +22,6 @@ class CategoriesAdminView extends ConsumerStatefulWidget {
 
 class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
   final _searchController = TextEditingController();
-  final Set<String> _selectedCategoryIds = {};
   Timer? _debounceTimer;
   String _activeSearchQuery = '';
   int _currentPage = 0;
@@ -60,7 +59,7 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
               backgroundColor: Colors.transparent,
               elevation: 0,
               child: Container(
-                width: 420,
+                width: 480,
                 decoration: BoxDecoration(
                   color: kDashCardBg,
                   borderRadius: BorderRadius.circular(kCardRadius),
@@ -72,8 +71,8 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 14,
+                        horizontal: 20,
+                        vertical: 16,
                       ),
                       decoration: const BoxDecoration(
                         color: kDashBg,
@@ -88,7 +87,7 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                       child: Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(6),
+                            padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
                               color: _primaryAccent.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
@@ -96,14 +95,14 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                             child: const Icon(
                               Icons.category_rounded,
                               color: _primaryAccent,
-                              size: 18,
+                              size: 20,
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 12),
                           const Text(
                             'Add New Category',
                             style: TextStyle(
-                              fontSize: 15,
+                              fontSize: 17,
                               fontWeight: FontWeight.w700,
                               color: kTitleColor,
                             ),
@@ -116,40 +115,44 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                             icon: const Icon(
                               Icons.close_rounded,
                               color: kLabelColor,
-                              size: 18,
+                              size: 20,
                             ),
                           ),
                         ],
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(18),
+                      padding: const EdgeInsets.all(20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
                             'Category Name',
                             style: TextStyle(
-                              fontSize: 13,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: kTitleColor,
                             ),
                           ),
-                          const SizedBox(height: 6),
+                          const SizedBox(height: 8),
                           TextField(
                             controller: titleController,
                             autofocus: true,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: kTitleColor,
+                            ),
                             decoration: InputDecoration(
                               hintText: 'e.g., Mother\'s Day, Birthdays',
                               hintStyle: const TextStyle(
                                 color: kMutedColor,
-                                fontSize: 13,
+                                fontSize: 13.5,
                               ),
                               filled: true,
                               fillColor: kDashBg,
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 14,
-                                vertical: 10,
+                                vertical: 12,
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -164,8 +167,8 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 12,
+                        horizontal: 20,
+                        vertical: 14,
                       ),
                       decoration: const BoxDecoration(
                         color: kDashBg,
@@ -186,16 +189,22 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                                 : () => Navigator.pop(context),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 9,
+                                horizontal: 18,
+                                vertical: 11,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            child: const Text('Cancel'),
+                            child: const Text(
+                              'Cancel',
+                              style: TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 12),
                           ElevatedButton(
                             onPressed: isSaving
                                 ? null
@@ -232,8 +241,8 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                               backgroundColor: _primaryAccent,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 18,
-                                vertical: 9,
+                                horizontal: 20,
+                                vertical: 11,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -241,14 +250,20 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                             ),
                             child: isSaving
                                 ? const SizedBox(
-                                    width: 16,
-                                    height: 16,
+                                    width: 18,
+                                    height: 18,
                                     child: CircularProgressIndicator(
                                       color: Colors.white,
                                       strokeWidth: 2,
                                     ),
                                   )
-                                : const Text('Create Category'),
+                                : const Text(
+                                    'Create Category',
+                                    style: TextStyle(
+                                      fontSize: 13.5,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
                           ),
                         ],
                       ),
@@ -263,7 +278,10 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
     );
   }
 
-  void _showEditCategoryDialog(BuildContext context, AdminCategory category) {
+  void _showManageCategoryDialog(
+    BuildContext context,
+    AdminCategory category,
+  ) {
     final titleController = TextEditingController(text: category.name);
     bool isActive = category.isActive;
     bool isSaving = false;
@@ -273,12 +291,12 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
       barrierDismissible: false,
       builder: (context) {
         return StatefulBuilder(
-          builder: (context, setState) {
+          builder: (context, setDialogState) {
             return Dialog(
               backgroundColor: Colors.transparent,
               elevation: 0,
               child: Container(
-                width: 420,
+                width: 480,
                 decoration: BoxDecoration(
                   color: kDashCardBg,
                   borderRadius: BorderRadius.circular(kCardRadius),
@@ -288,10 +306,11 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    // Header
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 14,
+                        horizontal: 20,
+                        vertical: 16,
                       ),
                       decoration: const BoxDecoration(
                         color: kDashBg,
@@ -306,23 +325,23 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                       child: Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(6),
+                            padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
                               color: _primaryAccent.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Icon(
-                              Icons.edit_note_rounded,
+                              Icons.tune_rounded,
                               color: _primaryAccent,
-                              size: 18,
+                              size: 20,
                             ),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 12),
                           const Text(
-                            'Edit Category',
+                            'Manage Category',
                             style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
                               color: kTitleColor,
                             ),
                           ),
@@ -334,34 +353,41 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                             icon: const Icon(
                               Icons.close_rounded,
                               color: kLabelColor,
-                              size: 18,
+                              size: 20,
                             ),
                           ),
                         ],
                       ),
                     ),
+
+                    // Body
                     Padding(
-                      padding: const EdgeInsets.all(18),
+                      padding: const EdgeInsets.all(20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Category Name & Edit Button
                           const Text(
                             'Category Name',
                             style: TextStyle(
-                              fontSize: 13,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: kTitleColor,
                             ),
                           ),
-                          const SizedBox(height: 6),
+                          const SizedBox(height: 8),
                           TextField(
                             controller: titleController,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: kTitleColor,
+                            ),
                             decoration: InputDecoration(
                               filled: true,
                               fillColor: kDashBg,
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 14,
-                                vertical: 10,
+                                vertical: 12,
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -369,54 +395,167 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                                   color: kDashBorder,
                                 ),
                               ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: const BorderSide(
+                                  color: kDashBorder,
+                                ),
+                              ),
                             ),
                           ),
-                          const SizedBox(height: 14),
+                          const SizedBox(height: 16),
+
+                          // Review / Status Switch & Deactivate Option
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 4,
+                              horizontal: 16,
+                              vertical: 12,
                             ),
                             decoration: BoxDecoration(
                               color: kDashBg,
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: kDashBorder,
-                              ),
+                              border: Border.all(color: kDashBorder),
                             ),
-                            child: SwitchListTile(
-                              dense: true,
-                              contentPadding: EdgeInsets.zero,
-                              title: const Text(
-                                'Category Active Status',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 13,
-                                  color: kTitleColor,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      isActive
+                                          ? 'Active'
+                                          : 'Inactive',
+                                      style: TextStyle(
+                                        color: isActive
+                                            ? _success
+                                            : kLabelColor,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    Switch(
+                                      value: isActive,
+                                      activeThumbColor: _primaryAccent,
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      onChanged: (val) {
+                                        setDialogState(
+                                          () => isActive = val,
+                                        );
+                                      },
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              subtitle: Text(
-                                isActive
-                                    ? 'Visible to users on card catalog'
-                                    : 'Hidden from card catalog',
-                                style: const TextStyle(
-                                  fontSize: 11.5,
-                                  color: kLabelColor,
+                                const SizedBox(height: 8),
+                                Text(
+                                  isActive
+                                      ? 'Visible to users on card catalog and template selectors.'
+                                      : 'Hidden from card catalog and deactivated for users.',
+                                  style: const TextStyle(
+                                    fontSize: 12.5,
+                                    color: kLabelColor,
+                                  ),
                                 ),
-                              ),
-                              value: isActive,
-                              activeThumbColor: _primaryAccent,
-                              onChanged: (val) =>
-                                  setState(() => isActive = val),
+                              ],
                             ),
                           ),
+
+                          // View Cards in this Category
+                          if (widget.onSelectCategoryFilter != null) ...[
+                            const SizedBox(height: 16),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
+                              decoration: BoxDecoration(
+                                color: kDashBg,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: kDashBorder),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: _primaryAccent.withValues(
+                                        alpha: 0.1,
+                                      ),
+                                      borderRadius:
+                                          BorderRadius.circular(8),
+                                    ),
+                                    child: const Icon(
+                                      Icons.style_outlined,
+                                      color: _primaryAccent,
+                                      size: 18,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  const Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Category Cards',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 14,
+                                            color: kTitleColor,
+                                          ),
+                                        ),
+                                        Text(
+                                          'View cards in this category',
+                                          style: TextStyle(
+                                            fontSize: 12.5,
+                                            color: kLabelColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      widget.onSelectCategoryFilter?.call(
+                                        category.id,
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: _primaryAccent,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 14,
+                                        vertical: 8,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'View Cards',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),
+
+                    // Dialog Footer
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 18,
-                        vertical: 12,
+                        horizontal: 20,
+                        vertical: 14,
                       ),
                       decoration: const BoxDecoration(
                         color: kDashBg,
@@ -437,24 +576,31 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                                 : () => Navigator.pop(context),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 9,
+                                horizontal: 18,
+                                vertical: 11,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            child: const Text('Cancel'),
+                            child: const Text(
+                              'Close',
+                              style: TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 12),
                           ElevatedButton(
                             onPressed: isSaving
                                 ? null
                                 : () async {
-                                    final name = titleController.text.trim();
+                                    final name =
+                                        titleController.text.trim();
                                     if (name.isEmpty) return;
 
-                                    setState(() => isSaving = true);
+                                    setDialogState(() => isSaving = true);
                                     try {
                                       final repo = ref.read(
                                         adminRepositoryProvider,
@@ -464,13 +610,17 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                                         name,
                                         isActive,
                                       );
-                                      ref.invalidate(adminCategoriesProvider);
+                                      ref.invalidate(
+                                        adminCategoriesProvider,
+                                      );
                                       if (context.mounted) {
                                         Navigator.pop(context);
                                       }
                                     } catch (e) {
                                       if (context.mounted) {
-                                        setState(() => isSaving = false);
+                                        setDialogState(
+                                          () => isSaving = false,
+                                        );
                                         ScaffoldMessenger.of(
                                           context,
                                         ).showSnackBar(
@@ -487,8 +637,8 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                               backgroundColor: _primaryAccent,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 18,
-                                vertical: 9,
+                                horizontal: 20,
+                                vertical: 11,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -496,14 +646,20 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                             ),
                             child: isSaving
                                 ? const SizedBox(
-                                    width: 16,
-                                    height: 16,
+                                    width: 18,
+                                    height: 18,
                                     child: CircularProgressIndicator(
                                       color: Colors.white,
                                       strokeWidth: 2,
                                     ),
                                   )
-                                : const Text('Save Changes'),
+                                : const Text(
+                                    'Save Changes',
+                                    style: TextStyle(
+                                      fontSize: 13.5,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
                           ),
                         ],
                       ),
@@ -542,14 +698,14 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(
-                  Icons.warning_amber_rounded,
+                  Icons.delete_outline_rounded,
                   color: _danger,
                   size: 20,
                 ),
               ),
               const SizedBox(width: 10),
               const Text(
-                'Deactivate Category',
+                'Delete Category',
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
                   fontSize: 16,
@@ -563,7 +719,7 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Are you sure you want to deactivate "${category.name}"?',
+                'Are you sure you want to delete "${category.name}"?',
                 style: const TextStyle(fontSize: 13.5, color: kBodyColor),
               ),
               if (activeCardsCount > 0) ...[
@@ -602,7 +758,13 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -614,79 +776,18 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: _danger,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text('Deactivate'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _confirmBatchDeleteCategories(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: kDashCardBg,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(kCardRadius),
-          ),
-          title: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: _danger.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(
-                  Icons.warning_amber_rounded,
-                  color: _danger,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 10),
-              const Text(
-                'Deactivate Selected',
+              child: const Text(
+                'Delete',
                 style: TextStyle(
+                  fontSize: 13.5,
                   fontWeight: FontWeight.w700,
-                  fontSize: 16,
-                  color: kTitleColor,
                 ),
               ),
-            ],
-          ),
-          content: Text(
-            'Are you sure you want to deactivate ${_selectedCategoryIds.length} selected categories?',
-            style: const TextStyle(fontSize: 13.5, color: kBodyColor),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                Navigator.pop(context);
-                final repo = ref.read(adminRepositoryProvider);
-                await repo.deleteCategoriesBatch(_selectedCategoryIds.toList());
-                _selectedCategoryIds.clear();
-                ref.invalidate(adminCategoriesProvider);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _danger,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text('Deactivate All'),
             ),
           ],
         );
@@ -703,122 +804,100 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
       children: [
         // Top Action Header Bar
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: kCardDecoration,
-          child: Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 12,
-            runSpacing: 10,
-            children: [
-              // Debounced Search Field
-              Container(
-                width: 240,
-                height: 36,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                decoration: BoxDecoration(
-                  color: kDashBg,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: kDashBorder),
-                ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isNarrow = constraints.maxWidth < 500;
+
+              final searchField = SizedBox(
+                height: 42,
                 child: TextField(
                   controller: _searchController,
-                  onChanged: _onSearchChanged,
-                  style: const TextStyle(fontSize: 12.5, color: kTitleColor),
+                  onChanged: (val) {
+                    setState(() {});
+                    _onSearchChanged(val);
+                  },
+                  textAlign: TextAlign.start,
+                  textAlignVertical: TextAlignVertical.center,
+                  style: const TextStyle(fontSize: 13.5, color: kTitleColor),
                   decoration: InputDecoration(
+                    filled: true,
+                    fillColor: kDashBg,
                     isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 8),
-                    border: InputBorder.none,
-                    icon: const Icon(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: kDashBorder),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: kDashBorder),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(
+                        color: _primaryAccent,
+                        width: 1.5,
+                      ),
+                    ),
+                    prefixIcon: const Icon(
                       Icons.search_rounded,
                       color: kMutedColor,
-                      size: 16,
+                      size: 18,
                     ),
-                    hintText: 'Search categories...',
-                    hintStyle: const TextStyle(
-                      color: kMutedColor,
-                      fontSize: 12.5,
+                    prefixIconConstraints: const BoxConstraints(
+                      minWidth: 42,
+                      minHeight: 42,
                     ),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
                             padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints.tightFor(width: 20, height: 20),
+                            constraints: const BoxConstraints(
+                              minWidth: 42,
+                              minHeight: 42,
+                            ),
                             icon: const Icon(
                               Icons.clear_rounded,
-                              size: 14,
+                              size: 16,
                               color: kMutedColor,
                             ),
                             onPressed: () {
                               _searchController.clear();
+                              setState(() {});
                               _onSearchChanged('');
                             },
                           )
                         : null,
+                    hintText: 'Search categories...',
+                    hintStyle: const TextStyle(
+                      color: kMutedColor,
+                      fontSize: 13.5,
+                    ),
                   ),
                 ),
-              ),
-              Wrap(
-                spacing: 10,
-                runSpacing: 8,
-                crossAxisAlignment: WrapCrossAlignment.center,
+              );
+
+              final actionButtons = Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (_selectedCategoryIds.isNotEmpty) ...[
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _primaryAccent.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        '${_selectedCategoryIds.length} selected',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: _primaryAccent,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                    OutlinedButton.icon(
-                      onPressed: () => _confirmBatchDeleteCategories(context),
-                      icon: const Icon(
-                        Icons.delete_outline_rounded,
-                        color: _danger,
-                        size: 16,
-                      ),
-                      label: const Text(
-                        'Deactivate Selected',
-                        style: TextStyle(
-                          color: _danger,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12.5,
-                        ),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: _danger.withValues(alpha: 0.3)),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                  ],
                   Tooltip(
                     message: 'Refresh catalog list',
                     child: IconButton(
                       padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints.tightFor(width: 34, height: 34),
-                      icon:
-                          categoriesAsync.isLoading ||
+                      constraints: const BoxConstraints.tightFor(
+                        width: 40,
+                        height: 40,
+                      ),
+                      icon: categoriesAsync.isLoading ||
                               categoriesAsync.isRefreshing
                           ? const SizedBox(
-                              width: 16,
-                              height: 16,
+                              width: 18,
+                              height: 18,
                               child: CircularProgressIndicator(
                                 color: _primaryAccent,
                                 strokeWidth: 2,
@@ -827,24 +906,28 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                           : const Icon(
                               Icons.refresh_rounded,
                               color: _primaryAccent,
-                              size: 18,
+                              size: 20,
                             ),
                       onPressed: () => ref.invalidate(adminCategoriesProvider),
                     ),
                   ),
+                  const SizedBox(width: 10),
                   ElevatedButton.icon(
                     onPressed: () => _showAddCategoryDialog(context),
-                    icon: const Icon(Icons.add_rounded, size: 16),
+                    icon: const Icon(Icons.add_rounded, size: 18),
                     label: const Text(
                       'Add Category',
-                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13.5,
+                      ),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _primaryAccent,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 9,
+                        horizontal: 18,
+                        vertical: 11,
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -853,8 +936,32 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                     ),
                   ),
                 ],
-              ),
-            ],
+              );
+
+              if (isNarrow) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    searchField,
+                    const SizedBox(height: 12),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: actionButtons,
+                    ),
+                  ],
+                );
+              }
+
+              return Row(
+                children: [
+                  Expanded(
+                    child: searchField,
+                  ),
+                  const SizedBox(width: 12),
+                  actionButtons,
+                ],
+              );
+            },
           ),
         ),
         const SizedBox(height: 14),
@@ -947,33 +1054,22 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                                     minWidth: constraints.maxWidth,
                                   ),
                                   child: DataTable(
-                                    headingRowHeight: 38,
-                                    dataRowMinHeight: 46,
-                                    dataRowMaxHeight: 46,
+                                    headingRowHeight: 46,
+                                    dataRowMinHeight: 58,
+                                    dataRowMaxHeight: 58,
                                     headingRowColor: WidgetStateProperty.all(
                                       kDashBg,
                                     ),
-                                    showCheckboxColumn: true,
-                                    onSelectAll: (val) {
-                                      setState(() {
-                                        if (val == true) {
-                                          _selectedCategoryIds.addAll(
-                                            filtered.map((c) => c.id),
-                                          );
-                                        } else {
-                                          _selectedCategoryIds.clear();
-                                        }
-                                      });
-                                    },
+                                    showCheckboxColumn: false,
                                     columns: const [
                                       DataColumn(
                                         label: Text(
                                           'CATEGORY NAME',
                                           style: TextStyle(
                                             fontWeight: FontWeight.w700,
-                                            fontSize: 10.5,
+                                            fontSize: 11.5,
                                             color: kMutedColor,
-                                            letterSpacing: 0.8,
+                                            letterSpacing: 0.9,
                                           ),
                                         ),
                                       ),
@@ -982,9 +1078,9 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                                           'STATUS',
                                           style: TextStyle(
                                             fontWeight: FontWeight.w700,
-                                            fontSize: 10.5,
+                                            fontSize: 11.5,
                                             color: kMutedColor,
-                                            letterSpacing: 0.8,
+                                            letterSpacing: 0.9,
                                           ),
                                         ),
                                       ),
@@ -993,47 +1089,35 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                                           'ACTIONS',
                                           style: TextStyle(
                                             fontWeight: FontWeight.w700,
-                                            fontSize: 10.5,
+                                            fontSize: 11.5,
                                             color: kMutedColor,
-                                            letterSpacing: 0.8,
+                                            letterSpacing: 0.9,
                                           ),
                                         ),
                                       ),
                                     ],
                                     rows: paginatedList.map((c) {
-                                      final isSelected = _selectedCategoryIds
-                                          .contains(c.id);
                                       return DataRow(
-                                        selected: isSelected,
-                                        onSelectChanged: (val) {
-                                          setState(() {
-                                            if (val == true) {
-                                              _selectedCategoryIds.add(c.id);
-                                            } else {
-                                              _selectedCategoryIds.remove(c.id);
-                                            }
-                                          });
-                                        },
                                         cells: [
                                           DataCell(
                                             Row(
                                               children: [
                                                 Container(
-                                                  padding: const EdgeInsets.all(6),
+                                                  padding: const EdgeInsets.all(8),
                                                   decoration: BoxDecoration(
                                                     color: _primaryAccent.withValues(
                                                       alpha: 0.08,
                                                     ),
                                                     borderRadius:
-                                                        BorderRadius.circular(6),
+                                                        BorderRadius.circular(8),
                                                   ),
                                                   child: const Icon(
                                                     Icons.folder_open_rounded,
-                                                    size: 15,
+                                                    size: 18,
                                                     color: _primaryAccent,
                                                   ),
                                                 ),
-                                                const SizedBox(width: 10),
+                                                const SizedBox(width: 12),
                                                 Flexible(
                                                   child: Text(
                                                     c.name,
@@ -1041,7 +1125,7 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                                                     overflow: TextOverflow.ellipsis,
                                                     style: const TextStyle(
                                                       fontWeight: FontWeight.w600,
-                                                      fontSize: 13,
+                                                      fontSize: 14,
                                                       color: kTitleColor,
                                                     ),
                                                   ),
@@ -1052,8 +1136,8 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                                           DataCell(
                                             Container(
                                               padding: const EdgeInsets.symmetric(
-                                                horizontal: 8,
-                                                vertical: 3,
+                                                horizontal: 10,
+                                                vertical: 4,
                                               ),
                                               decoration: BoxDecoration(
                                                 color:
@@ -1065,89 +1149,85 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                                                   12,
                                                 ),
                                               ),
-                                              child: Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  Container(
-                                                    width: 5,
-                                                    height: 5,
-                                                    decoration: BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      color: c.isActive
-                                                          ? _success
-                                                          : kLabelColor,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 6),
-                                                  Text(
-                                                    c.isActive
-                                                        ? 'Active'
-                                                        : 'Inactive',
-                                                    style: TextStyle(
-                                                      color: c.isActive
-                                                          ? _success
-                                                          : kLabelColor,
-                                                      fontWeight: FontWeight.w700,
-                                                      fontSize: 11,
-                                                    ),
-                                                  ),
-                                                ],
+                                              child: Text(
+                                                c.isActive
+                                                    ? 'Active'
+                                                    : 'Inactive',
+                                                style: TextStyle(
+                                                  color: c.isActive
+                                                      ? _success
+                                                      : kLabelColor,
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 12,
+                                                ),
                                               ),
                                             ),
                                           ),
                                           DataCell(
                                             Row(
+                                              mainAxisSize: MainAxisSize.min,
                                               children: [
-                                                if (widget.onSelectCategoryFilter !=
-                                                    null)
-                                                  Tooltip(
-                                                    message:
-                                                        'View cards in this category',
-                                                    child: IconButton(
-                                                      padding: EdgeInsets.zero,
-                                                      constraints: const BoxConstraints.tightFor(width: 28, height: 28),
-                                                      icon: const Icon(
-                                                        Icons.style_outlined,
-                                                        color: _primaryAccent,
-                                                        size: 16,
+                                                ElevatedButton(
+                                                  onPressed: () =>
+                                                      _showManageCategoryDialog(
+                                                        context,
+                                                        c,
                                                       ),
-                                                      onPressed: () => widget
-                                                          .onSelectCategoryFilter
-                                                          ?.call(c.id),
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor: _primaryAccent,
+                                                    foregroundColor: Colors.white,
+                                                    elevation: 0,
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 14,
+                                                          vertical: 6,
+                                                    ),
+                                                    minimumSize: const Size(0, 34),
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(8),
                                                     ),
                                                   ),
-                                                Tooltip(
-                                                  message: 'Edit category',
-                                                  child: IconButton(
-                                                    padding: EdgeInsets.zero,
-                                                    constraints: const BoxConstraints.tightFor(width: 28, height: 28),
-                                                    icon: const Icon(
-                                                      Icons.edit_outlined,
-                                                      color: kLabelColor,
-                                                      size: 16,
+                                                  child: const Text(
+                                                    'Manage',
+                                                    style: TextStyle(
+                                                      fontSize: 13,
+                                                      fontWeight:
+                                                          FontWeight.w600,
                                                     ),
-                                                    onPressed: () =>
-                                                        _showEditCategoryDialog(
-                                                          context,
-                                                          c,
-                                                        ),
                                                   ),
                                                 ),
-                                                Tooltip(
-                                                  message: 'Deactivate category',
-                                                  child: IconButton(
-                                                    padding: EdgeInsets.zero,
-                                                    constraints: const BoxConstraints.tightFor(width: 28, height: 28),
-                                                    icon: const Icon(
-                                                      Icons.delete_outline_rounded,
-                                                      color: _danger,
-                                                      size: 16,
+                                                const SizedBox(width: 10),
+                                                OutlinedButton(
+                                                  onPressed: () =>
+                                                      _confirmDeleteCategory(
+                                                        context,
+                                                        c,
+                                                      ),
+                                                  style: OutlinedButton.styleFrom(
+                                                    foregroundColor: _danger,
+                                                    side: BorderSide(
+                                                      color: _danger
+                                                          .withValues(alpha: 0.35),
                                                     ),
-                                                    onPressed: () =>
-                                                        _confirmDeleteCategory(
-                                                          context,
-                                                          c,
-                                                        ),
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          horizontal: 14,
+                                                          vertical: 6,
+                                                    ),
+                                                    minimumSize: const Size(0, 34),
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(8),
+                                                    ),
+                                                  ),
+                                                  child: const Text(
+                                                    'Delete',
+                                                    style: TextStyle(
+                                                      fontSize: 13,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
                                                   ),
                                                 ),
                                               ],
@@ -1169,8 +1249,8 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                     if (totalPages > 1)
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
+                          horizontal: 18,
+                          vertical: 12,
                         ),
                         decoration: const BoxDecoration(
                           color: kDashBg,
@@ -1189,7 +1269,7 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                               'Showing ${startIndex + 1} - $endIndex of ${filtered.length} categories',
                               style: const TextStyle(
                                 color: kLabelColor,
-                                fontSize: 12,
+                                fontSize: 13,
                               ),
                             ),
                             Row(
@@ -1200,39 +1280,53 @@ class _CategoriesAdminViewState extends ConsumerState<CategoriesAdminView> {
                                       : null,
                                   style: OutlinedButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 6,
+                                      horizontal: 14,
+                                      vertical: 7,
                                     ),
+                                    minimumSize: const Size(0, 34),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6),
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
-                                  child: const Text('Previous', style: TextStyle(fontSize: 12)),
+                                  child: const Text(
+                                    'Previous',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                                 ),
-                                const SizedBox(width: 8),
+                                const SizedBox(width: 10),
                                 Text(
                                   'Page ${_currentPage + 1} of $totalPages',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 12,
+                                    fontSize: 13,
                                     color: kTitleColor,
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                const SizedBox(width: 10),
                                 OutlinedButton(
                                   onPressed: _currentPage < totalPages - 1
                                       ? () => setState(() => _currentPage++)
                                       : null,
                                   style: OutlinedButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 6,
+                                      horizontal: 14,
+                                      vertical: 7,
                                     ),
+                                    minimumSize: const Size(0, 34),
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6),
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
-                                  child: const Text('Next', style: TextStyle(fontSize: 12)),
+                                  child: const Text(
+                                    'Next',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),

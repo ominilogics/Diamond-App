@@ -142,7 +142,7 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           child: Container(
-            width: 440,
+            width: 480,
             decoration: BoxDecoration(
               color: kDashCardBg,
               borderRadius: BorderRadius.circular(kCardRadius),
@@ -154,8 +154,8 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 18,
-                    vertical: 14,
+                    horizontal: 20,
+                    vertical: 16,
                   ),
                   decoration: const BoxDecoration(
                     color: kDashBg,
@@ -170,7 +170,7 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                   child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(6),
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: _primaryAccent.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
@@ -178,10 +178,10 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                         child: const Icon(
                           Icons.receipt_long_rounded,
                           color: _primaryAccent,
-                          size: 18,
+                          size: 20,
                         ),
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,15 +189,16 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                             Text(
                               'Order #${purchase.id.length > 12 ? purchase.id.substring(0, 12) : purchase.id}',
                               style: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold,
                                 color: kTitleColor,
                               ),
                             ),
+                            const SizedBox(height: 2),
                             Text(
                               'Customer: ${purchase.customerName}',
                               style: const TextStyle(
-                                fontSize: 11.5,
+                                fontSize: 12.5,
                                 color: kLabelColor,
                               ),
                             ),
@@ -209,38 +210,38 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                         icon: const Icon(
                           Icons.close_rounded,
                           color: kLabelColor,
-                          size: 18,
+                          size: 20,
                         ),
                       ),
                     ],
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(18),
+                  padding: const EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildDetailRow('Customer Email', purchase.customerEmail),
                       if (purchase.age != null) ...[
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 12),
                         _buildDetailRow(
                           'Customer Age',
                           '${purchase.age} yrs (${purchase.dateOfBirth})',
                         ),
                       ],
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
                       _buildDetailRow('Card Title', purchase.cardTitle),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
                       _buildDetailRow(
                         'Purchase Amount',
                         '\$${purchase.amount.toStringAsFixed(2)}',
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
                       _buildDetailRow(
                         'Delivery Method',
                         purchase.deliveryMethod,
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
                       _buildDetailRow(
                         'Timestamp',
                         '${purchase.addedAt.day}/${purchase.addedAt.month}/${purchase.addedAt.year} ${purchase.addedAt.hour.toString().padLeft(2, '0')}:${purchase.addedAt.minute.toString().padLeft(2, '0')}',
@@ -249,15 +250,15 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                       const Text(
                         'Card Inside Greeting Message',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 13,
                           fontWeight: FontWeight.w700,
                           color: kLabelColor,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 6),
                       Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: kDashBg,
                           borderRadius: BorderRadius.circular(8),
@@ -266,7 +267,7 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                         child: Text(
                           purchase.message,
                           style: const TextStyle(
-                            fontSize: 12.5,
+                            fontSize: 13,
                             color: kTitleColor,
                             fontStyle: FontStyle.italic,
                           ),
@@ -276,7 +277,7 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                   decoration: const BoxDecoration(
                     color: kDashBg,
                     borderRadius: BorderRadius.only(
@@ -294,14 +295,20 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                           backgroundColor: _primaryAccent,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 18,
-                            vertical: 9,
+                            horizontal: 20,
+                            vertical: 11,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: const Text('Close', style: TextStyle(fontSize: 12.5)),
+                        child: const Text(
+                          'Close',
+                          style: TextStyle(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -320,14 +327,14 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
       children: [
         Text(
           label,
-          style: const TextStyle(color: kLabelColor, fontSize: 13),
+          style: const TextStyle(color: kLabelColor, fontSize: 13.5),
         ),
         Text(
           value,
           style: const TextStyle(
             fontWeight: FontWeight.w700,
             color: kTitleColor,
-            fontSize: 13,
+            fontSize: 13.5,
           ),
         ),
       ],
@@ -512,7 +519,7 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
         );
 
         Widget toolbar = Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: kCardDecoration,
           child: Wrap(
             alignment: WrapAlignment.spaceBetween,
@@ -526,9 +533,9 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Container(
-                    width: 220,
-                    height: 36,
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    width: 240,
+                    height: 40,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
                     decoration: BoxDecoration(
                       color: kDashBg,
                       borderRadius: BorderRadius.circular(8),
@@ -539,14 +546,14 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                         const Icon(
                           Icons.search_rounded,
                           color: kMutedColor,
-                          size: 16,
+                          size: 18,
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: 8),
                         Expanded(
                           child: TextField(
                             controller: _searchController,
                             onChanged: _onSearchChanged,
-                            style: const TextStyle(fontSize: 12.5, color: kTitleColor),
+                            style: const TextStyle(fontSize: 13.5, color: kTitleColor),
                             decoration: const InputDecoration(
                               border: InputBorder.none,
                               isDense: true,
@@ -554,7 +561,7 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                               hintText: 'Search customer or card...',
                               hintStyle: TextStyle(
                                 color: kMutedColor,
-                                fontSize: 12,
+                                fontSize: 13.5,
                               ),
                             ),
                           ),
@@ -577,8 +584,8 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                     ),
                   ),
                   Container(
-                    height: 36,
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    height: 40,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
                     decoration: BoxDecoration(
                       color: kDashBg,
                       borderRadius: BorderRadius.circular(8),
@@ -590,17 +597,17 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                         const Icon(
                           Icons.date_range_rounded,
                           color: kLabelColor,
-                          size: 16,
+                          size: 18,
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: 8),
                         DropdownButtonHideUnderline(
                           child: DropdownButton<DateFilterRange>(
                             value: _selectedDateFilter,
-                            style: const TextStyle(fontSize: 12.5, color: kTitleColor),
+                            style: const TextStyle(fontSize: 13.5, color: kTitleColor),
                             items: DateFilterRange.values.map((d) {
                               return DropdownMenuItem(
                                 value: d,
-                                child: Text(d.label, style: const TextStyle(fontSize: 12.5)),
+                                child: Text(d.label, style: const TextStyle(fontSize: 13.5)),
                               );
                             }).toList(),
                             onChanged: (val) {
@@ -625,17 +632,17 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                     onPressed: () => setState(() => _showTrendChart = !_showTrendChart),
                     icon: Icon(
                       _showTrendChart ? Icons.visibility_off_outlined : Icons.show_chart_rounded,
-                      size: 15,
+                      size: 16,
                     ),
                     label: Text(_showTrendChart ? 'Hide Trend' : 'View Trend'),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                      textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
                       side: const BorderSide(color: kDashBorder),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 10),
                   DecoratedBox(
                     decoration: BoxDecoration(
                       gradient: AppColors.primaryButtonGradient,
@@ -656,15 +663,15 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                                   .toList(),
                             )
                           : null,
-                      icon: const Icon(Icons.file_download_outlined, size: 16, color: Colors.white),
+                      icon: const Icon(Icons.file_download_outlined, size: 18, color: Colors.white),
                       label: const Text(
                         'Export CSV',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white),
+                        style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600, color: Colors.white),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.transparent,
                         shadowColor: Colors.transparent,
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -752,9 +759,9 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                               child: ConstrainedBox(
                                 constraints: BoxConstraints(minWidth: constraints.maxWidth),
                                 child: DataTable(
-                                  headingRowHeight: 38,
-                                  dataRowMinHeight: 46,
-                                  dataRowMaxHeight: 46,
+                                  headingRowHeight: 46,
+                                  dataRowMinHeight: 58,
+                                  dataRowMaxHeight: 58,
                                   headingRowColor: WidgetStateProperty.all(
                                     kDashBg,
                                   ),
@@ -764,9 +771,9 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                                         'ORDER ID',
                                         style: TextStyle(
                                           fontWeight: FontWeight.w700,
-                                          fontSize: 10.5,
+                                          fontSize: 11.5,
                                           color: kMutedColor,
-                                          letterSpacing: 0.8,
+                                          letterSpacing: 0.9,
                                         ),
                                       ),
                                     ),
@@ -775,9 +782,9 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                                         'CUSTOMER',
                                         style: TextStyle(
                                           fontWeight: FontWeight.w700,
-                                          fontSize: 10.5,
+                                          fontSize: 11.5,
                                           color: kMutedColor,
-                                          letterSpacing: 0.8,
+                                          letterSpacing: 0.9,
                                         ),
                                       ),
                                     ),
@@ -786,9 +793,9 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                                         'CARD TITLE',
                                         style: TextStyle(
                                           fontWeight: FontWeight.w700,
-                                          fontSize: 10.5,
+                                          fontSize: 11.5,
                                           color: kMutedColor,
-                                          letterSpacing: 0.8,
+                                          letterSpacing: 0.9,
                                         ),
                                       ),
                                     ),
@@ -797,9 +804,9 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                                         'AMOUNT',
                                         style: TextStyle(
                                           fontWeight: FontWeight.w700,
-                                          fontSize: 10.5,
+                                          fontSize: 11.5,
                                           color: kMutedColor,
-                                          letterSpacing: 0.8,
+                                          letterSpacing: 0.9,
                                         ),
                                       ),
                                     ),
@@ -808,9 +815,9 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                                         'DELIVERY METHOD',
                                         style: TextStyle(
                                           fontWeight: FontWeight.w700,
-                                          fontSize: 10.5,
+                                          fontSize: 11.5,
                                           color: kMutedColor,
-                                          letterSpacing: 0.8,
+                                          letterSpacing: 0.9,
                                         ),
                                       ),
                                     ),
@@ -819,9 +826,9 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                                         'PURCHASE DATE',
                                         style: TextStyle(
                                           fontWeight: FontWeight.w700,
-                                          fontSize: 10.5,
+                                          fontSize: 11.5,
                                           color: kMutedColor,
-                                          letterSpacing: 0.8,
+                                          letterSpacing: 0.9,
                                         ),
                                       ),
                                     ),
@@ -830,9 +837,9 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                                         'INSPECT',
                                         style: TextStyle(
                                           fontWeight: FontWeight.w700,
-                                          fontSize: 10.5,
+                                          fontSize: 11.5,
                                           color: kMutedColor,
-                                          letterSpacing: 0.8,
+                                          letterSpacing: 0.9,
                                         ),
                                       ),
                                     ),
@@ -845,7 +852,7 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                                             '#${p.id.length > 8 ? p.id.substring(0, 8) : p.id}',
                                             style: const TextStyle(
                                               fontWeight: FontWeight.w600,
-                                              fontSize: 12,
+                                              fontSize: 13,
                                               color: kLabelColor,
                                             ),
                                           ),
@@ -861,14 +868,14 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                                                 p.customerName,
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.w600,
-                                                  fontSize: 13,
+                                                  fontSize: 14,
                                                   color: kTitleColor,
                                                 ),
                                               ),
                                               Text(
                                                 p.customerEmail,
                                                 style: const TextStyle(
-                                                  fontSize: 11,
+                                                  fontSize: 12,
                                                   color: kLabelColor,
                                                 ),
                                               ),
@@ -880,7 +887,7 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                                             p.cardTitle,
                                             style: const TextStyle(
                                               fontWeight: FontWeight.w600,
-                                              fontSize: 12.5,
+                                              fontSize: 13.5,
                                               color: kTitleColor,
                                             ),
                                           ),
@@ -890,7 +897,7 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                                             '\$${p.amount.toStringAsFixed(2)}',
                                             style: const TextStyle(
                                               fontWeight: FontWeight.w700,
-                                              fontSize: 13,
+                                              fontSize: 14,
                                               color: _success,
                                             ),
                                           ),
@@ -898,19 +905,19 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                                         DataCell(
                                           Container(
                                             padding: const EdgeInsets.symmetric(
-                                              horizontal: 8,
-                                              vertical: 3,
+                                              horizontal: 10,
+                                              vertical: 4,
                                             ),
                                             decoration: BoxDecoration(
                                               color: kDashBg,
-                                              borderRadius: BorderRadius.circular(6),
+                                              borderRadius: BorderRadius.circular(8),
                                               border: Border.all(color: kDashBorder),
                                             ),
                                             child: Text(
                                               p.deliveryMethod,
                                               style: const TextStyle(
                                                 fontWeight: FontWeight.w600,
-                                                fontSize: 11,
+                                                fontSize: 12,
                                                 color: kBodyColor,
                                               ),
                                             ),
@@ -921,23 +928,33 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                                             '${p.addedAt.day}/${p.addedAt.month}/${p.addedAt.year}',
                                             style: const TextStyle(
                                               color: kLabelColor,
-                                              fontSize: 12,
+                                              fontSize: 13,
                                             ),
                                           ),
                                         ),
                                         DataCell(
-                                          SizedBox(
-                                            width: 28,
-                                            height: 28,
-                                            child: IconButton(
-                                              padding: EdgeInsets.zero,
-                                              icon: const Icon(
-                                                Icons.visibility_rounded,
-                                                color: _primaryAccent,
-                                                size: 16,
+                                          ElevatedButton(
+                                            onPressed: () =>
+                                                _inspectPurchaseDetail(context, p),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: _primaryAccent,
+                                              foregroundColor: Colors.white,
+                                              elevation: 0,
+                                              padding: const EdgeInsets.symmetric(
+                                                horizontal: 14,
+                                                vertical: 6,
                                               ),
-                                              onPressed: () =>
-                                                  _inspectPurchaseDetail(context, p),
+                                              minimumSize: const Size(0, 34),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(8),
+                                              ),
+                                            ),
+                                            child: const Text(
+                                              'Inspect',
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -957,8 +974,8 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                   if (totalPages > 1)
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
+                        horizontal: 18,
+                        vertical: 12,
                       ),
                       decoration: const BoxDecoration(
                         color: kDashBg,
@@ -977,7 +994,7 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                             'Showing ${startIndex + 1} - $endIndex of ${filtered.length} orders',
                             style: const TextStyle(
                               color: kLabelColor,
-                              fontSize: 12,
+                              fontSize: 13,
                             ),
                           ),
                           Row(
@@ -987,19 +1004,29 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                                     ? () => setState(() => _currentPage--)
                                     : null,
                                 style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                  textStyle: const TextStyle(fontSize: 12),
-                                  side: const BorderSide(color: kDashBorder),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 7,
+                                  ),
+                                  minimumSize: const Size(0, 34),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
                                 ),
-                                child: const Text('Previous'),
+                                child: const Text(
+                                  'Previous',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                               ),
                               const SizedBox(width: 10),
                               Text(
                                 'Page ${_currentPage + 1} of $totalPages',
                                 style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
                                   color: kTitleColor,
                                 ),
                               ),
@@ -1009,12 +1036,22 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                                     ? () => setState(() => _currentPage++)
                                     : null,
                                 style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                  textStyle: const TextStyle(fontSize: 12),
-                                  side: const BorderSide(color: kDashBorder),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 7,
+                                  ),
+                                  minimumSize: const Size(0, 34),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
                                 ),
-                                child: const Text('Next'),
+                                child: const Text(
+                                  'Next',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -1086,19 +1123,19 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
 
   Widget _buildKpiCard(String title, String value, IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: kCardDecoration,
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(7),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, color: color, size: 18),
+            child: Icon(icon, color: color, size: 20),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1110,17 +1147,17 @@ class _PurchasesAdminViewState extends ConsumerState<PurchasesAdminView> {
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: kLabelColor,
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 3),
                 Text(
                   value,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 18,
+                    fontSize: 20,
                     fontWeight: FontWeight.w700,
                     color: kTitleColor,
                     letterSpacing: -0.3,

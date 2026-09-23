@@ -52,33 +52,35 @@ class _UsersAdminViewState extends ConsumerState<UsersAdminView> {
           title: user.isBanned ? 'Reactivate Account' : 'Suspend Account',
           icon: user.isBanned ? Icons.check_circle_outline_rounded : Icons.block_rounded,
           iconColor: user.isBanned ? _success : _danger,
-          width: 420,
+          width: 460,
           content: Text(
             user.isBanned
                 ? 'Are you sure you want to restore application access for "${user.name}"? They will regain access to their cards and account immediately.'
                 : 'Are you sure you want to suspend "${user.name}"? They will lose access to the app immediately.',
             style: const TextStyle(
-              fontSize: 13,
+              fontSize: 13.5,
               color: kBodyColor,
-              height: 1.45,
+              height: 1.5,
             ),
           ),
           actions: [
             OutlinedButton(
               onPressed: () => Navigator.pop(context),
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                minimumSize: const Size(0, 36),
                 side: const BorderSide(color: kDashBorder),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
-              child: const Text('Cancel', style: TextStyle(fontSize: 12.5)),
+              child: const Text('Cancel', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 10),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: user.isBanned ? _success : _danger,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                minimumSize: const Size(0, 36),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 elevation: 0,
               ),
@@ -97,7 +99,7 @@ class _UsersAdminViewState extends ConsumerState<UsersAdminView> {
               },
               child: Text(
                 user.isBanned ? 'Confirm Reactivation' : 'Confirm Suspension',
-                style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600),
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
               ),
             ),
           ],
@@ -296,14 +298,14 @@ class _UsersAdminViewState extends ConsumerState<UsersAdminView> {
         );
 
         Widget toolbar = Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: kCardDecoration,
           child: Row(
             children: [
               Expanded(
                 child: Container(
-                  height: 36,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  height: 40,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
                     color: kDashBg,
                     borderRadius: BorderRadius.circular(8),
@@ -314,14 +316,14 @@ class _UsersAdminViewState extends ConsumerState<UsersAdminView> {
                       const Icon(
                         Icons.search_rounded,
                         color: kMutedColor,
-                        size: 16,
+                        size: 18,
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: TextField(
                           controller: _searchController,
                           onChanged: _onSearchChanged,
-                          style: const TextStyle(fontSize: 12.5, color: kTitleColor),
+                          style: const TextStyle(fontSize: 13.5, color: kTitleColor),
                           decoration: const InputDecoration(
                             border: InputBorder.none,
                             isDense: true,
@@ -329,7 +331,7 @@ class _UsersAdminViewState extends ConsumerState<UsersAdminView> {
                             hintText: 'Search user by name or email...',
                             hintStyle: TextStyle(
                               color: kMutedColor,
-                              fontSize: 12,
+                              fontSize: 13.5,
                             ),
                           ),
                         ),
@@ -338,11 +340,11 @@ class _UsersAdminViewState extends ConsumerState<UsersAdminView> {
                         IconButton(
                           icon: const Icon(
                             Icons.clear_rounded,
-                            size: 16,
+                            size: 18,
                             color: kMutedColor,
                           ),
                           padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(minWidth: 20, minHeight: 20),
+                          constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
                           onPressed: () {
                             _searchController.clear();
                             _onSearchChanged('');
@@ -356,14 +358,14 @@ class _UsersAdminViewState extends ConsumerState<UsersAdminView> {
               Tooltip(
                 message: 'Refresh accounts directory',
                 child: SizedBox(
-                  width: 32,
-                  height: 32,
+                  width: 40,
+                  height: 40,
                   child: IconButton(
                     padding: EdgeInsets.zero,
                     icon: usersAsync.isLoading || usersAsync.isRefreshing
                         ? const SizedBox(
-                            width: 16,
-                            height: 16,
+                            width: 18,
+                            height: 18,
                             child: CircularProgressIndicator(
                               color: _primaryAccent,
                               strokeWidth: 2,
@@ -372,7 +374,7 @@ class _UsersAdminViewState extends ConsumerState<UsersAdminView> {
                         : const Icon(
                             Icons.refresh_rounded,
                             color: _primaryAccent,
-                            size: 18,
+                            size: 20,
                           ),
                     onPressed: () => ref.invalidate(adminUsersProvider),
                   ),
@@ -454,18 +456,18 @@ class _UsersAdminViewState extends ConsumerState<UsersAdminView> {
                                   minWidth: constraints.maxWidth,
                                 ),
                                 child: DataTable(
-                                  headingRowHeight: 38,
-                                  dataRowMinHeight: 48,
-                                  dataRowMaxHeight: 48,
+                                  headingRowHeight: 46,
+                                  dataRowMinHeight: 58,
+                                  dataRowMaxHeight: 58,
                                   headingRowColor: WidgetStateProperty.all(
                                     kDashBg,
                                   ),
                                   columns: const [
-                                    DataColumn(label: Text('USER PROFILE', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 10.5, color: kMutedColor, letterSpacing: 0.8))),
-                                    DataColumn(label: Text('SUBSCRIPTION TIER', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 10.5, color: kMutedColor, letterSpacing: 0.8))),
-                                    DataColumn(label: Text('ACCOUNT STATUS', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 10.5, color: kMutedColor, letterSpacing: 0.8))),
-                                    DataColumn(label: Text('JOINED DATE', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 10.5, color: kMutedColor, letterSpacing: 0.8))),
-                                    DataColumn(label: Text('GOVERNANCE ACTIONS', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 10.5, color: kMutedColor, letterSpacing: 0.8))),
+                                    DataColumn(label: Text('USER PROFILE', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 11.5, color: kMutedColor, letterSpacing: 0.9))),
+                                    DataColumn(label: Text('SUBSCRIPTION TIER', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 11.5, color: kMutedColor, letterSpacing: 0.9))),
+                                    DataColumn(label: Text('ACCOUNT STATUS', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 11.5, color: kMutedColor, letterSpacing: 0.9))),
+                                    DataColumn(label: Text('JOINED DATE', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 11.5, color: kMutedColor, letterSpacing: 0.9))),
+                                    DataColumn(label: Text('GOVERNANCE ACTIONS', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 11.5, color: kMutedColor, letterSpacing: 0.9))),
                                   ],
                                   rows: paginatedList.map((u) {
                                     return DataRow(
@@ -477,58 +479,91 @@ class _UsersAdminViewState extends ConsumerState<UsersAdminView> {
                                             children: [
                                               Row(
                                                 children: [
-                                                  Text(u.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: kTitleColor)),
+                                                  Text(
+                                                    u.name,
+                                                    style: const TextStyle(
+                                                      fontWeight: FontWeight.w600,
+                                                      fontSize: 14,
+                                                      color: kTitleColor,
+                                                    ),
+                                                  ),
                                                   if (u.age != null) ...[
-                                                    const SizedBox(width: 6),
+                                                    const SizedBox(width: 8),
                                                     Container(
-                                                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                                       decoration: BoxDecoration(
                                                         color: kDashBg,
                                                         borderRadius: BorderRadius.circular(4),
                                                         border: Border.all(color: kDashBorder),
                                                       ),
-                                                      child: Text('${u.age} yrs', style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: kBodyColor)),
+                                                      child: Text(
+                                                        '${u.age} yrs',
+                                                        style: const TextStyle(
+                                                          fontSize: 11,
+                                                          fontWeight: FontWeight.w600,
+                                                          color: kBodyColor,
+                                                        ),
+                                                      ),
                                                     ),
                                                   ],
                                                 ],
                                               ),
-                                              Text(u.email, style: const TextStyle(fontSize: 11, color: kLabelColor)),
+                                              const SizedBox(height: 2),
+                                              Text(
+                                                u.email,
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  color: kLabelColor,
+                                                ),
+                                              ),
                                             ],
                                           ),
                                         ),
                                         DataCell(_buildTierBadge(u.subscriptionTier)),
                                         DataCell(
                                           Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                             decoration: BoxDecoration(
                                               color: (u.isBanned ? _danger : _success).withValues(alpha: 0.1),
-                                              borderRadius: BorderRadius.circular(6),
+                                              borderRadius: BorderRadius.circular(12),
                                             ),
                                             child: Text(
                                               u.isBanned ? 'Banned' : 'Active',
                                               style: TextStyle(
                                                 color: u.isBanned ? _danger : _success,
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 11,
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 12,
                                               ),
                                             ),
                                           ),
                                         ),
-                                        DataCell(Text('${u.createdAt.day}/${u.createdAt.month}/${u.createdAt.year}', style: const TextStyle(color: kLabelColor, fontSize: 12))),
+                                        DataCell(
+                                          Text(
+                                            '${u.createdAt.day}/${u.createdAt.month}/${u.createdAt.year}',
+                                            style: const TextStyle(color: kLabelColor, fontSize: 13),
+                                          ),
+                                        ),
                                         DataCell(
                                           PopupMenuButton<String>(
-                                            icon: const Icon(Icons.more_vert_rounded, color: kLabelColor, size: 18),
+                                            icon: const Icon(Icons.more_vert_rounded, color: kLabelColor, size: 20),
                                             padding: EdgeInsets.zero,
-                                            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                                            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
                                             onSelected: (value) => _handleUserAction(context, u, value),
                                             itemBuilder: (context) => [
                                               PopupMenuItem(
                                                 value: 'toggle_ban',
                                                 child: Row(
                                                   children: [
-                                                    Icon(u.isBanned ? Icons.check_circle_outline_rounded : Icons.block_rounded, color: u.isBanned ? _success : _danger, size: 16),
-                                                    const SizedBox(width: 8),
-                                                    Text(u.isBanned ? 'Unban Account' : 'Ban Account', style: const TextStyle(fontSize: 12.5)),
+                                                    Icon(
+                                                      u.isBanned ? Icons.check_circle_outline_rounded : Icons.block_rounded,
+                                                      color: u.isBanned ? _success : _danger,
+                                                      size: 18,
+                                                    ),
+                                                    const SizedBox(width: 10),
+                                                    Text(
+                                                      u.isBanned ? 'Unban Account' : 'Ban Account',
+                                                      style: const TextStyle(fontSize: 13),
+                                                    ),
                                                   ],
                                                 ),
                                               ),
@@ -536,9 +571,9 @@ class _UsersAdminViewState extends ConsumerState<UsersAdminView> {
                                                 value: 'reset_password',
                                                 child: Row(
                                                   children: [
-                                                    Icon(Icons.lock_reset_rounded, color: _primaryAccent, size: 16),
-                                                    SizedBox(width: 8),
-                                                    Text('Send Password Reset', style: TextStyle(fontSize: 12.5)),
+                                                    Icon(Icons.lock_reset_rounded, color: _primaryAccent, size: 18),
+                                                    SizedBox(width: 10),
+                                                    Text('Send Password Reset', style: TextStyle(fontSize: 13)),
                                                   ],
                                                 ),
                                               ),
@@ -561,8 +596,8 @@ class _UsersAdminViewState extends ConsumerState<UsersAdminView> {
                   if (totalPages > 1)
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
+                        horizontal: 18,
+                        vertical: 12,
                       ),
                       decoration: const BoxDecoration(
                         color: kDashBg,
@@ -581,7 +616,7 @@ class _UsersAdminViewState extends ConsumerState<UsersAdminView> {
                             'Showing ${startIndex + 1} - $endIndex of ${filtered.length} users',
                             style: const TextStyle(
                               color: kLabelColor,
-                              fontSize: 12,
+                              fontSize: 13,
                             ),
                           ),
                           Row(
@@ -591,19 +626,29 @@ class _UsersAdminViewState extends ConsumerState<UsersAdminView> {
                                     ? () => setState(() => _currentPage--)
                                     : null,
                                 style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                  textStyle: const TextStyle(fontSize: 12),
-                                  side: const BorderSide(color: kDashBorder),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 7,
+                                  ),
+                                  minimumSize: const Size(0, 34),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
                                 ),
-                                child: const Text('Previous'),
+                                child: const Text(
+                                  'Previous',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                               ),
                               const SizedBox(width: 10),
                               Text(
                                 'Page ${_currentPage + 1} of $totalPages',
                                 style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
                                   color: kTitleColor,
                                 ),
                               ),
@@ -613,12 +658,22 @@ class _UsersAdminViewState extends ConsumerState<UsersAdminView> {
                                     ? () => setState(() => _currentPage++)
                                     : null,
                                 style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                  textStyle: const TextStyle(fontSize: 12),
-                                  side: const BorderSide(color: kDashBorder),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 7,
+                                  ),
+                                  minimumSize: const Size(0, 34),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
                                 ),
-                                child: const Text('Next'),
+                                child: const Text(
+                                  'Next',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -664,19 +719,19 @@ class _UsersAdminViewState extends ConsumerState<UsersAdminView> {
 
   Widget _buildKpiCard(String title, String value, IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: kCardDecoration,
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(7),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, color: color, size: 18),
+            child: Icon(icon, color: color, size: 20),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -688,17 +743,17 @@ class _UsersAdminViewState extends ConsumerState<UsersAdminView> {
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: kLabelColor,
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 3),
                 Text(
                   value,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 18,
+                    fontSize: 20,
                     fontWeight: FontWeight.w700,
                     color: kTitleColor,
                     letterSpacing: -0.3,
@@ -727,17 +782,17 @@ class _UsersAdminViewState extends ConsumerState<UsersAdminView> {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         tier,
         style: TextStyle(
           color: color,
-          fontWeight: FontWeight.w600,
-          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          fontSize: 12,
         ),
       ),
     );

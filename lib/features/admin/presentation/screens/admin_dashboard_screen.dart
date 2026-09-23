@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/routing/app_routes.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../admin_theme.dart';
 import '../widgets/admin_sidebar.dart';
 import '../widgets/admin_overview_view.dart';
@@ -28,7 +31,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
   String get _currentTabTitle {
     switch (_selectedIndex) {
       case 0:
-        return 'Dashboard Overview';
+        return 'Dashboard';
       case 1:
         return 'Categories Management';
       case 2:
@@ -40,10 +43,64 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
       case 5:
         return 'Users & Account Governance';
       case 6:
-        return 'Seasonal Occasions Campaign Manager';
+        return 'Seasonal Occasions';
       default:
         return 'Admin Console';
     }
+  }
+
+  void _handleLogout() {
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return buildAdminDialog(
+          context: dialogContext,
+          title: 'Sign Out',
+          icon: Icons.logout_rounded,
+          iconColor: kDanger,
+          width: 440,
+          content: const Text(
+            'Are you sure you want to sign out of the Rivon Admin workspace?',
+            style: TextStyle(
+              fontSize: 13.5,
+              color: kBodyColor,
+              height: 1.5,
+            ),
+          ),
+          actions: [
+            OutlinedButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                minimumSize: const Size(0, 36),
+                side: const BorderSide(color: kDashBorder),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              child: const Text('Cancel', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+            ),
+            const SizedBox(width: 10),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kDanger,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                minimumSize: const Size(0, 36),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                elevation: 0,
+              ),
+              onPressed: () async {
+                Navigator.pop(dialogContext);
+                await ref.read(authProvider.notifier).signOut();
+                if (mounted) {
+                  context.goNamed(AppRoute.login.name);
+                }
+              },
+              child: const Text('Confirm Sign Out', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -65,6 +122,10 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
                   setState(() => _selectedIndex = index);
                   Navigator.pop(context);
                 },
+                onLogout: () {
+                  Navigator.pop(context);
+                  _handleLogout();
+                },
                 isDrawer: true,
               ),
             ),
@@ -77,6 +138,7 @@ class _AdminDashboardScreenState extends ConsumerState<AdminDashboardScreen> {
               onItemSelected: (index) {
                 setState(() => _selectedIndex = index);
               },
+              onLogout: _handleLogout,
             ),
 
           // Main Screen Content Area

@@ -36,26 +36,26 @@ class AdminOverviewView extends ConsumerWidget {
           Text(
             'Core Metrics',
             style: GoogleFonts.inter(
-              fontSize: 15,
+              fontSize: 16.5,
               fontWeight: FontWeight.w700,
               color: kTitleColor,
               letterSpacing: -0.2,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
 
-          // KPI Stats Cards Grid (Shopeers Anatomy - High Density)
+          // KPI Stats Cards Grid (Shopeers Anatomy - Professional Enterprise Density)
           LayoutBuilder(
             builder: (context, constraints) {
               final isDesktop = constraints.maxWidth >= 1000;
               final isTablet = constraints.maxWidth >= 600;
               final crossAxisCount = isDesktop ? 4 : (isTablet ? 2 : 1);
-              final childAspectRatio = isDesktop ? 2.2 : (isTablet ? 2.0 : 2.2);
+              final childAspectRatio = isDesktop ? 2.0 : (isTablet ? 1.85 : 2.1);
 
               return GridView.count(
                 crossAxisCount: crossAxisCount,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
+                crossAxisSpacing: 14,
+                mainAxisSpacing: 14,
                 childAspectRatio: childAspectRatio,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -104,7 +104,7 @@ class AdminOverviewView extends ConsumerWidget {
               );
             },
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
 
           // Analytics & Performance Visualizations (Shopeers Layout)
           Row(
@@ -113,45 +113,31 @@ class AdminOverviewView extends ConsumerWidget {
               Text(
                 'Performance & Velocity',
                 style: GoogleFonts.inter(
-                  fontSize: 15,
+                  fontSize: 16.5,
                   fontWeight: FontWeight.w700,
                   color: kTitleColor,
                   letterSpacing: -0.2,
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: kPrimaryLight,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: kPrimary.withValues(alpha: 0.2)),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 6,
-                      height: 6,
-                      decoration: const BoxDecoration(
-                        color: kPrimary,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      'Live Telemetry',
-                      style: GoogleFonts.inter(
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w600,
-                        color: kPrimary,
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  'Live Telemetry',
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: kPrimary,
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
 
           LayoutBuilder(
             builder: (context, constraints) {
@@ -165,14 +151,14 @@ class AdminOverviewView extends ConsumerWidget {
                     : '\$446.7K',
                 badgeText: '+18.4% this week',
                 badgeColor: kSuccess,
-                height: 260,
+                height: 275,
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _buildPeriodChip('7D', true),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: 5),
                     _buildPeriodChip('30D', false),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: 5),
                     _buildPeriodChip('12M', false),
                   ],
                 ),
@@ -203,7 +189,7 @@ class AdminOverviewView extends ConsumerWidget {
                       ChartDataPoint(label: 'S', value: 50),
                     ],
                   ),
-                  SizedBox(height: 12),
+                  SizedBox(height: 14),
                   AdminDonutChart(
                     title: 'Customer Retention',
                     percentage: 68.0,
@@ -221,7 +207,7 @@ class AdminOverviewView extends ConsumerWidget {
                       flex: 64,
                       child: areaChartWidget,
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 14),
                     Expanded(
                       flex: 36,
                       child: rightChartsWidget,
@@ -233,25 +219,25 @@ class AdminOverviewView extends ConsumerWidget {
               return Column(
                 children: [
                   areaChartWidget,
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   rightChartsWidget,
                 ],
               );
             },
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
 
           // Quick Management Actions Row
           Text(
             'Quick Action Shortcuts',
             style: GoogleFonts.inter(
-              fontSize: 15,
+              fontSize: 16.5,
               fontWeight: FontWeight.w700,
               color: kTitleColor,
               letterSpacing: -0.2,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           LayoutBuilder(
             builder: (context, constraints) {
               final isStacked = constraints.maxWidth < 650;
@@ -265,7 +251,7 @@ class AdminOverviewView extends ConsumerWidget {
                       color: kPurple,
                       onTap: onNavigateToCategories,
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 12),
                     _buildActionShortcut(
                       title: 'Manage Cards',
                       subtitle: 'Upload card artwork templates & message presets',
@@ -287,7 +273,7 @@ class AdminOverviewView extends ConsumerWidget {
                       onTap: onNavigateToCategories,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 14),
                   Expanded(
                     child: _buildActionShortcut(
                       title: 'Manage Cards',
@@ -308,7 +294,7 @@ class AdminOverviewView extends ConsumerWidget {
 
   Widget _buildPeriodChip(String label, bool isSelected) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: isSelected ? kPrimary : kDashBg,
         borderRadius: BorderRadius.circular(6),
@@ -319,7 +305,7 @@ class AdminOverviewView extends ConsumerWidget {
       child: Text(
         label,
         style: GoogleFonts.inter(
-          fontSize: 10.5,
+          fontSize: 12,
           fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
           color: isSelected ? Colors.white : kLabelColor,
         ),
@@ -350,27 +336,27 @@ class AdminOverviewView extends ConsumerWidget {
             children: [
               // Left Semantic Accent Bar
               Container(
-                width: 3.5,
-                height: 58,
+                width: 4,
+                height: 64,
                 color: color,
               ),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 10,
+                    horizontal: 16,
+                    vertical: 12,
                   ),
                   child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(9),
                         decoration: BoxDecoration(
                           color: color.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Icon(icon, color: color, size: 18),
+                        child: Icon(icon, color: color, size: 20),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 14),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -379,18 +365,18 @@ class AdminOverviewView extends ConsumerWidget {
                             Text(
                               title,
                               style: const TextStyle(
-                                fontSize: 13.5,
+                                fontSize: 14.5,
                                 fontWeight: FontWeight.w700,
                                 color: kTitleColor,
                               ),
                             ),
-                            const SizedBox(height: 2),
+                            const SizedBox(height: 3),
                             Text(
                               subtitle,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
-                                fontSize: 11,
+                                fontSize: 12,
                                 color: kLabelColor,
                               ),
                             ),
@@ -399,7 +385,7 @@ class AdminOverviewView extends ConsumerWidget {
                       ),
                       const Icon(
                         Icons.arrow_forward_ios_rounded,
-                        size: 12,
+                        size: 14,
                         color: kMutedColor,
                       ),
                     ],
@@ -477,7 +463,7 @@ class _StatCardItemState extends State<_StatCardItem> {
             onTap: widget.onTap,
             borderRadius: BorderRadius.circular(kCardRadius),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -489,27 +475,27 @@ class _StatCardItemState extends State<_StatCardItem> {
                       Text(
                         widget.title,
                         style: const TextStyle(
-                          fontSize: 12,
+                          fontSize: 13.5,
                           fontWeight: FontWeight.w600,
                           color: kLabelColor,
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.all(6),
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           color: widget.accentColor.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(
                           widget.icon,
                           color: widget.accentColor,
-                          size: 16,
+                          size: 18,
                         ),
                       ),
                     ],
                   ),
 
-                  // Bottom Section: 20px Bold Value + Status Badge + Subtitle
+                  // Bottom Section: Bold Value + Status Badge + Subtitle
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -520,26 +506,26 @@ class _StatCardItemState extends State<_StatCardItem> {
                           Text(
                             widget.value,
                             style: const TextStyle(
-                              fontSize: 20,
+                              fontSize: 22,
                               fontWeight: FontWeight.w700,
                               color: kTitleColor,
                               letterSpacing: -0.4,
                             ),
                           ),
-                          const SizedBox(width: 6),
+                          const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 5,
-                              vertical: 1.5,
+                              horizontal: 7,
+                              vertical: 2.5,
                             ),
                             decoration: BoxDecoration(
                               color: widget.badgeColor.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(4),
+                              borderRadius: BorderRadius.circular(5),
                             ),
                             child: Text(
                               widget.badgeText,
                               style: TextStyle(
-                                fontSize: 10,
+                                fontSize: 11,
                                 fontWeight: FontWeight.w700,
                                 color: widget.badgeColor,
                               ),
@@ -547,13 +533,13 @@ class _StatCardItemState extends State<_StatCardItem> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 4),
                       Text(
                         widget.subtitle,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          fontSize: 11,
+                          fontSize: 12,
                           fontWeight: FontWeight.w400,
                           color: kMutedColor,
                         ),
@@ -569,4 +555,3 @@ class _StatCardItemState extends State<_StatCardItem> {
     );
   }
 }
-
