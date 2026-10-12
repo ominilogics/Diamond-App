@@ -35,8 +35,12 @@ jobs:
         run: |
           if [ -n "${{ secrets.ENV_FILE }}" ]; then
             echo "${{ secrets.ENV_FILE }}" > .env
+          elif [ -f .env ]; then
+            echo "Using existing .env file"
           else
-            touch .env
+            echo "SUPABASE_URL=https://jlfgigvfmxuvlixohzli.supabase.co" > .env
+            echo "SUPABASE_ANON_KEY=sb_publishable_O_Kn6xkvvwDHMHeOWcB1dg_adSEP-Fy" >> .env
+            echo "SUPABASE_PUBLISHABLE_KEY=sb_publishable_O_Kn6xkvvwDHMHeOWcB1dg_adSEP-Fy" >> .env
           fi
 
       - name: Install Apple Certificate and Provisioning Profile

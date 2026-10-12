@@ -23,16 +23,32 @@ import 'package:app_links/app_links.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await dotenv.load(fileName: ".env");
-  await Supabase.initialize(
-    url: dotenv.env['SUPABASE_URL']!,
-    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
-  );
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    debugPrint('[INIT] Warning: Could not load .env file: $e');
+  }
+
+  final supabaseUrl = dotenv.env['SUPABASE_URL'] ?? 'https://jlfgigvfmxuvlixohzli.supabase.co';
+  final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'] ?? 'sb_publishable_O_Kn6xkvvwDHMHeOWcB1dg_adSEP-Fy';
+
+  try {
+    await Supabase.initialize(
+      url: supabaseUrl,
+      anonKey: supabaseAnonKey,
+    );
+  } catch (e) {
+    debugPrint('[INIT] Error initializing Supabase: $e');
+  }
 
   if (!kIsWeb) {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    } catch (e) {
+      debugPrint('[INIT] Error initializing Firebase: $e');
+    }
   }
 
   // Initialize AppLinks for deep link handling
@@ -76,23 +92,35 @@ void main() async {
   }
 
   // Load user preferences
-  final prefs = await SharedPreferences.getInstance();
-  AppRouter.hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    AppRouter.hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
+  } catch (e) {
+    debugPrint('[INIT] Error loading SharedPreferences: $e');
+  }
 
   final appDatabase = AppDatabase();
 
   // Initialize RevenueCat and sync user if already logged in
   final paymentRepository = RevenueCatRepositoryImpl();
-  await paymentRepository.initialize();
-  final user = Supabase.instance.client.auth.currentUser;
-  if (user != null) {
-    paymentRepository.loginUser(user.id);
+  try {
+    await paymentRepository.initialize();
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user != null) {
+      paymentRepository.loginUser(user.id);
+    }
+  } catch (e) {
+    debugPrint('[INIT] Error initializing RevenueCat: $e');
   }
 
   // Initialize Notification Engine
   final notificationService = LocalNotificationServiceImpl();
   if (!kIsWeb) {
-    await notificationService.init();
+    try {
+      await notificationService.init();
+    } catch (e) {
+      debugPrint('[INIT] Error initializing notification service: $e');
+    }
   }
 
   // Configure system UI overlays for Android edge-to-edge support
@@ -138,10 +166,14 @@ class MyApp extends ConsumerWidget {
     // Globally listen to unread notifications to update the launcher badge
     ref.listen<int>(unreadNotificationsCountProvider, (previous, next) {
       if (!kIsWeb) {
-        if (next > 0) {
-          AppBadgePlus.updateBadge(next);
-        } else {
-          AppBadgePlus.updateBadge(0);
+        try {
+          if (next > 0) {
+            AppBadgePlus.updateBadge(next);
+          } else {
+            AppBadgePlus.updateBadge(0);
+          }
+        } catch (e) {
+          debugPrint('[BADGE] Error updating badge: $e');
         }
       }
     });
